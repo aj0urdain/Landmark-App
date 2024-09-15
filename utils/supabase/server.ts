@@ -1,10 +1,11 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createServerClient as createServerSideClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 
-export const createClient = () => {
+export const createServerClient = () => {
   const cookieStore = cookies();
 
-  return createServerClient(
+  return createServerSideClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -18,12 +19,23 @@ export const createClient = () => {
               cookieStore.set(name, value, options);
             });
           } catch (error) {
-            // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            console.log(error);
           }
         },
       },
-    },
+    }
+  );
+};
+
+export const createServiceRoleClient = () => {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
   );
 };
