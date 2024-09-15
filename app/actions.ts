@@ -1,130 +1,221 @@
-"use server";
+'use server';
 
-import { encodedRedirect } from "@/utils/utils";
-import { createClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { getConfig } from '@/utils/supabase/config';
+import {
+  createServerClient,
+  createServiceRoleClient,
+} from '@/utils/supabase/server';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export const signUpAction = async (formData: FormData) => {
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
-  const supabase = createClient();
-  const origin = headers().get("origin");
+type Attempt = { timestamp: string; success: boolean };
 
-  if (!email || !password) {
-    return { error: "Email and password are required" };
+export const signInAction = async (formData: FormData) => {
+  const email = formData.get('email') as string;
+  const supabase = createServerClient();
+  const supabaseAdmin = createServiceRoleClient();
+  const origin = headers().get('origin');
+
+  console.log('email', email);
+  console.log('origin', origin);
+
+  if (!email) {
+    return { error: 'Email is required' };
   }
 
-  const { error } = await supabase.auth.signUp({
+  // Get user data from user_profiles
+  const { data: userData, error: userError } = await supabaseAdmin
+    .from('user_profiles')
+    .select('id')
+    .eq('email', email)
+    .single();
+
+  if (userError) {
+    console.error(userError);
+    return { error: 'An error occurred. Please try again.' };
+  }
+
+  if (userData) {
+    // Fetch OTP settings
+    const otpSettings = await getConfig<{
+      cooldown_minutes: number;
+      max_attempts: number;
+    }>('OTP_SETTINGS');
+    if (!otpSettings) {
+      console.error('Failed to fetch OTP settings');
+      return { error: 'An error occurred. Please try again.' };
+    }
+
+    const { cooldown_minutes, max_attempts } = otpSettings;
+
+    // Check existing attempts
+    const { data: attemptData, error: attemptError } = await supabaseAdmin
+      .from('otp_attempts')
+      .select('attempts')
+      .eq('user_id', userData.id)
+      .single();
+
+    if (attemptError && attemptError.code !== 'PGRST116') {
+      console.error(attemptError);
+      return { error: 'An error occurred. Please try again.' };
+    }
+
+    const attempts = attemptData?.attempts || [];
+    const cooldownTime = new Date(Date.now() - cooldown_minutes * 60 * 1000);
+
+    const recentAttempts = attempts.filter(
+      (attempt: Attempt) => new Date(attempt.timestamp) > cooldownTime
+    );
+
+    if (recentAttempts.length >= max_attempts) {
+      const oldestRecentAttempt = new Date(recentAttempts[0].timestamp);
+      const timeLeft =
+        cooldown_minutes -
+        Math.floor((Date.now() - oldestRecentAttempt.getTime()) / 60000);
+
+      return {
+        error: `Too many recent attempts. Please try again in ${timeLeft} minute${timeLeft !== 1 ? 's' : ''}.`,
+        refresh: true,
+      };
+    }
+  }
+
+  // Proceed with OTP sign-in
+  const { error } = await supabase.auth.signInWithOtp({
     email,
-    password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${origin}/api/auth/callback`,
     },
   });
 
   if (error) {
-    console.error(error.code + " " + error.message);
-    return encodedRedirect("error", "/sign-up", error.message);
-  } else {
-    return encodedRedirect(
-      "success",
-      "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
-    );
+    console.error(error.message);
+    return { error: error.message };
   }
+
+  return { success: 'Check your email for the login link or OTP.' };
 };
 
-export const signInAction = async (formData: FormData) => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const supabase = createClient();
+export const verifyOtpAction = async (formData: FormData) => {
+  const email = formData.get('email') as string;
+  const token = formData.get('token') as string;
+  const supabaseAdmin = createServiceRoleClient();
+  const supabase = createServerClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  if (!email || !token) {
+    return { error: 'Email and OTP are required' };
+  }
+
+  // Fetch OTP settings
+  const otpSettings = await getConfig<{
+    cooldown_minutes: number;
+    max_attempts: number;
+  }>('OTP_SETTINGS');
+  if (!otpSettings) {
+    console.error('Failed to fetch OTP settings');
+    return { error: 'An error occurred. Please try again.' };
+  }
+
+  const { cooldown_minutes, max_attempts } = otpSettings;
+
+  // Get user data from user_profiles
+  const { data: userData, error: userError } = await supabaseAdmin
+    .from('user_profiles')
+    .select('id')
+    .eq('email', email)
+    .single();
+
+  if (userError || !userData) {
+    console.error(userError);
+    return { error: 'User not found' };
+  }
+
+  // Get attempt data
+  const { data: attemptData, error: attemptError } = await supabaseAdmin
+    .from('otp_attempts')
+    .select('attempts')
+    .eq('user_id', userData.id)
+    .single();
+
+  if (attemptError && attemptError.code !== 'PGRST116') {
+    console.error(attemptError);
+    return { error: 'An error occurred. Please try again.' };
+  }
+
+  const attempts = attemptData?.attempts || [];
+  const cooldownTime = new Date(Date.now() - cooldown_minutes * 60 * 1000);
+
+  // Filter recent attempts and count consecutive failures
+  const recentAttempts = attempts.filter(
+    (attempt: Attempt) => new Date(attempt.timestamp) > cooldownTime
+  );
+
+  let consecutiveFailures = 0;
+  for (let i = recentAttempts.length - 1; i >= 0; i--) {
+    if (!recentAttempts[i].success) {
+      consecutiveFailures++;
+    } else {
+      break;
+    }
+  }
+
+  if (consecutiveFailures >= max_attempts) {
+    const oldestRecentFailure = recentAttempts.findLast(
+      (attempt: Attempt) => !attempt.success
+    );
+    const timeLeft =
+      cooldown_minutes -
+      Math.floor(
+        (Date.now() - new Date(oldestRecentFailure.timestamp).getTime()) / 60000
+      );
+    return {
+      error: `Too many failed attempts. Please try again in ${timeLeft} minute${timeLeft !== 1 ? 's' : ''}.`,
+      attemptsLeft: 0,
+    };
+  }
+
+  // Verify OTP
+  const { data, error } = await supabase.auth.verifyOtp({
     email,
-    password,
+    token,
+    type: 'email',
   });
 
-  if (error) {
-    return encodedRedirect("error", "/sign-in", error.message);
-  }
+  const newAttempt = {
+    timestamp: new Date().toISOString(),
+    success: !error,
+  };
 
-  return redirect("/protected");
-};
-
-export const forgotPasswordAction = async (formData: FormData) => {
-  const email = formData.get("email")?.toString();
-  const supabase = createClient();
-  const origin = headers().get("origin");
-  const callbackUrl = formData.get("callbackUrl")?.toString();
-
-  if (!email) {
-    return encodedRedirect("error", "/forgot-password", "Email is required");
-  }
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?redirect_to=/protected/reset-password`,
+  // Update attempts in the database
+  await supabaseAdmin.from('otp_attempts').upsert({
+    user_id: userData.id,
+    attempts: [...attempts, newAttempt],
   });
 
   if (error) {
     console.error(error.message);
-    return encodedRedirect(
-      "error",
-      "/forgot-password",
-      "Could not reset password",
-    );
+    return {
+      error: `Invalid Code. Please try again.`,
+      attemptsLeft: max_attempts - (consecutiveFailures + 1),
+    };
   }
 
-  if (callbackUrl) {
-    return redirect(callbackUrl);
+  if (!data.user) {
+    return {
+      error: 'Verification failed',
+      attemptsLeft: max_attempts - (consecutiveFailures + 1),
+    };
   }
 
-  return encodedRedirect(
-    "success",
-    "/forgot-password",
-    "Check your email for a link to reset your password.",
-  );
-};
-
-export const resetPasswordAction = async (formData: FormData) => {
-  const supabase = createClient();
-
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
-
-  if (!password || !confirmPassword) {
-    encodedRedirect(
-      "error",
-      "/protected/reset-password",
-      "Password and confirm password are required",
-    );
+  if (data.session) {
+    return { success: true, message: 'OTP verified successfully' };
+  } else {
+    return { success: false, error: 'Invalid OTP' };
   }
-
-  if (password !== confirmPassword) {
-    encodedRedirect(
-      "error",
-      "/protected/reset-password",
-      "Passwords do not match",
-    );
-  }
-
-  const { error } = await supabase.auth.updateUser({
-    password: password,
-  });
-
-  if (error) {
-    encodedRedirect(
-      "error",
-      "/protected/reset-password",
-      "Password update failed",
-    );
-  }
-
-  encodedRedirect("success", "/protected/reset-password", "Password updated");
 };
 
 export const signOutAction = async () => {
-  const supabase = createClient();
+  const supabase = createServerClient();
   await supabase.auth.signOut();
-  return redirect("/sign-in");
+  return redirect('/sign-in');
 };
