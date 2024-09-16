@@ -25,6 +25,11 @@ import {
   FormMessage,
   Message,
 } from '@/components/atoms/FormMessage/FormMessage';
+import Image from 'next/image';
+import { Card } from '@/components/ui/card';
+import { LogoWordmark } from '@/components/atoms/LogoWordmark/LogoWordmark';
+import { Separator } from '@/components/ui/separator';
+import { Dot } from '@/components/atoms/Dot/Dot';
 
 type ActionResult =
   | { error: string; attemptsLeft?: number; cooldownMinutes?: number }
@@ -273,38 +278,67 @@ export default function SignIn() {
   }, []);
 
   return (
-    <div className='flex flex-col gap-2 min-w-64'>
-      <SignInForm
-        isOtpSent={isOtpSent}
-        onSubmit={handleSubmit}
-        attemptsLeft={attemptsLeft}
-        isLoading={isLoading}
-        otpError={otpError}
-        onReset={handleReset}
-        email={email}
-        allowedDomains={allowedDomains}
-        isLoginSuccessful={isLoginSuccessful}
-      />
-      <FormMessage message={message} />
-      {isOtpSent && attemptsLeft !== null && attemptsLeft > 0 && (
-        <p className='text-xs text-warning dark:text-warning-foreground'>
-          Attempts left: {attemptsLeft}
-        </p>
-      )}
-      <Dialog open={isDisabled}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Too Many Attempts</DialogTitle>
-            <DialogDescription>
-              You have made too many false attempts. You can try again in{' '}
-              {cooldownMinutes} minutes.
-            </DialogDescription>
-          </DialogHeader>
-          <div className='flex justify-center mt-6'>
-            <Button onClick={handleRefresh}>I understand</Button>
+    <div className='w-full h-screen flex items-center justify-center'>
+      <div className='relative flex w-1/2 h-full'>
+        <div className='absolute top-0 left-0 w-full h-full z-10 bg-gradient-to-t from-slate-800 to-transparent' />
+        <Image
+          src='/images/burgess-rawson-login-bg.jpg'
+          alt='logo'
+          width={2048}
+          height={1365}
+          className='object-cover w-full h-full grayscale opacity-40'
+        />
+        <div className='absolute gap-8 top-0 left-0 w-full h-full z-20 flex flex-col items-center justify-center'>
+          <LogoWordmark className='w-2/3 h-auto' />
+          <Separator orientation='vertical' className='h-0.5 w-1/2 bg-white' />
+          <div className='flex gap-6 items-center justify-center'>
+            <Dot size='small' />
+            <Dot size='large' />
+            <p className='text-4xl font-bold font-lexia tracking-widest uppercase'>
+              Landmark
+            </p>
+            <Dot size='large' />
+            <Dot size='small' />
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
+      <div className='flex w-1/2 h-full items-center justify-center'>
+        <Card className='max-w-sm w-full max-h-96 p-6'>
+          <div className='flex flex-col gap-2 w-full'>
+            <SignInForm
+              isOtpSent={isOtpSent}
+              onSubmit={handleSubmit}
+              attemptsLeft={attemptsLeft}
+              isLoading={isLoading}
+              otpError={otpError}
+              onReset={handleReset}
+              email={email}
+              allowedDomains={allowedDomains}
+              isLoginSuccessful={isLoginSuccessful}
+            />
+            <FormMessage message={message} />
+            {isOtpSent && attemptsLeft !== null && attemptsLeft > 0 && (
+              <p className='text-xs text-warning dark:text-warning-foreground'>
+                Attempts left: {attemptsLeft}
+              </p>
+            )}
+            <Dialog open={isDisabled}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Too Many Attempts</DialogTitle>
+                  <DialogDescription>
+                    You have made too many false attempts. You can try again in{' '}
+                    {cooldownMinutes} minutes.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className='flex justify-center mt-6'>
+                  <Button onClick={handleRefresh}>I understand</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
