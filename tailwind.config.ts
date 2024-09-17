@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { portfolioColors } from './styles/PortfolioPage/colors';
 
 const config = {
   darkMode: ['class'],
@@ -19,6 +20,7 @@ const config = {
     },
     extend: {
       colors: {
+        portfolio: portfolioColors,
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -71,6 +73,8 @@ const config = {
       },
       fontFamily: {
         lexia: ['Lexia', 'sans-serif'],
+        sans: ['Geist Sans', 'sans-serif'], // Keep your default sans font
+        metro: ['var(--font-metro-sans)'], // Add Metro Sans as a new option
       },
       keyframes: {
         'accordion-down': {
