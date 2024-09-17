@@ -1,6 +1,8 @@
 import { ThemeProvider } from 'next-themes';
 import { GeistSans } from 'geist/font/sans';
 import './globals.css';
+import Providers from '@/providers/providers';
+import { metroSans } from '@/utils/font';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -20,18 +22,20 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={GeistSans.className}
+      className={`${GeistSans.className} ${metroSans.variable}`}
       suppressHydrationWarning={true}
     >
       <body className={`bg-background text-foreground`}>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
