@@ -1,8 +1,6 @@
 import { Card } from "@/components/ui/card";
 import React, { useState } from "react";
-import { Slider } from "@/components/ui/slider";
-import { Heading1Icon, Minus, Plus } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Image,
@@ -13,7 +11,6 @@ import {
   Tag,
   LucideIcon,
 } from "lucide-react";
-
 import {
   Select,
   SelectContent,
@@ -26,10 +23,64 @@ import {
 import { Label } from "@/components/ui/label";
 import PropertyCopyControls from "./PropertyCopyControls/PropertyCopyControls";
 import PhotosAndLogoControls from "./PhotosAndLogosControls/PhotosAndLogoControls";
+import { Separator } from "@/components/ui/separator";
+import { CheckIcon } from "@radix-ui/react-icons";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CaretSortIcon } from "@radix-ui/react-icons";
+import { House, FilePlus, Heading1Icon } from "lucide-react";
 
-// Add these new imports
-
-// ... import other section-specific controls as needed
+// Add this near the top of your file
+const listings = [
+  {
+    id: "my1",
+    address: "123 Main St, Sydney NSW 2000",
+    agent: "John Smith",
+    type: "myListing",
+    icon: House,
+  },
+  {
+    id: "my2",
+    address: "456 Park Ave, Melbourne VIC 3000",
+    agent: "Emma Johnson",
+    type: "myListing",
+    icon: House,
+  },
+  {
+    id: "all1",
+    address: "789 Beach Rd, Gold Coast QLD 4217",
+    agent: "Michael Brown",
+    type: "allListing",
+    icon: House,
+  },
+  {
+    id: "all2",
+    address: "101 River St, Perth WA 6000",
+    agent: "Sarah Davis",
+    type: "allListing",
+    icon: House,
+  },
+  {
+    id: "sandbox",
+    address: "Sandbox Mode",
+    agent: "Make a page from scratch",
+    type: "sandbox",
+    icon: FilePlus,
+  },
+];
 
 type SectionName =
   | "Photos & Logos"
@@ -55,23 +106,10 @@ const sectionIcons: Record<SectionName, LucideIcon> = {
   "Sale Type": Tag,
 };
 
-interface PortfolioPageControlsProps {
-  setOverlayOpacity: (opacity: number) => void;
-  zoom: number;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  content: string;
-  setContent: (content: string) => void;
-}
+const PortfolioPageControls = () => {
+  const [value, setValue] = useState("");
+  const [open, setOpen] = useState(false);
 
-const PortfolioPageControls = ({
-  setOverlayOpacity,
-  zoom,
-  onZoomIn,
-  onZoomOut,
-  content,
-  setContent,
-}: PortfolioPageControlsProps) => {
   // Dummy data for incomplete items
   const incompleteItems = {
     "Photos & Logos": 2,
@@ -112,44 +150,117 @@ const PortfolioPageControls = ({
   return (
     <Card className="h-full w-[45%] p-4">
       <div className="mb-4">
-        <h3 className="mb-2 text-lg font-semibold">Overlay Opacity</h3>
-        <Slider
-          defaultValue={[50]}
-          max={100}
-          min={0}
-          step={1}
-          onValueChange={(value) => setOverlayOpacity(value[0] / 100)}
-        />
+        <Label>Choose a listing</Label>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+            >
+              {value
+                ? listings.find((listing) => listing.id === value)?.address
+                : "Select a listing"}
+              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="p-0"
+            style={{ width: "var(--radix-popover-trigger-width)" }}
+          >
+            <Command>
+              <CommandInput placeholder="Search these listings..." />
+              <CommandList>
+                <CommandEmpty>No listing found.</CommandEmpty>
+                <CommandGroup heading="Sandbox Mode">
+                  {listings
+                    .filter((listing) => listing.type === "sandbox")
+                    .map((listing) => (
+                      <CommandItem
+                        key={listing.id}
+                        onSelect={() => {
+                          setValue(listing.id);
+                          setOpen(false);
+                        }}
+                      >
+                        <FilePlus className="mr-2 h-4 w-4" />
+                        <div className="flex flex-col">
+                          <span>{listing.address}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {listing.agent}
+                          </span>
+                        </div>
+                        <CheckIcon
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            value === listing.id ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                </CommandGroup>
+                <CommandGroup heading="My Listings">
+                  {listings
+                    .filter((listing) => listing.type === "myListing")
+                    .map((listing) => (
+                      <CommandItem
+                        key={listing.id}
+                        onSelect={() => {
+                          setValue(listing.id);
+                          setOpen(false);
+                        }}
+                      >
+                        <House className="mr-2 h-4 w-4" />
+                        <div className="flex flex-col">
+                          <span>{listing.address}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {listing.agent}
+                          </span>
+                        </div>
+                        <CheckIcon
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            value === listing.id ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                </CommandGroup>
+                <CommandGroup heading="All Current Portfolio Listings">
+                  {listings
+                    .filter((listing) => listing.type === "allListing")
+                    .map((listing) => (
+                      <CommandItem
+                        key={listing.id}
+                        onSelect={() => {
+                          setValue(listing.id);
+                          setOpen(false);
+                        }}
+                      >
+                        <House className="mr-2 h-4 w-4" />
+                        <div className="flex flex-col">
+                          <span>{listing.address}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {listing.agent}
+                          </span>
+                        </div>
+                        <CheckIcon
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            value === listing.id ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
       <div className="mb-4">
-        <h3 className="mb-2 text-lg font-semibold">Zoom Controls</h3>
-        <div className="flex space-x-2">
-          <button
-            onClick={onZoomOut}
-            className="rounded bg-blue-500 p-2 text-white hover:bg-blue-600"
-          >
-            <Minus size={20} />
-          </button>
-          <span className="flex items-center rounded bg-gray-200 px-2">
-            {(zoom * 100).toFixed(0)}%
-          </span>
-          <button
-            onClick={onZoomIn}
-            className="rounded bg-blue-500 p-2 text-white hover:bg-blue-600"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-        <div className="mb-4">
-          <h3 className="mb-2 text-lg font-semibold">Content</h3>
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Enter your content here. Each new line will create a new block."
-            className="h-40"
-          />
-        </div>
-
+        <Separator className="my-8" />
         <div className="mb-2 flex items-center justify-between">
           <Label>Outstanding</Label>
           <div className="flex space-x-2">
