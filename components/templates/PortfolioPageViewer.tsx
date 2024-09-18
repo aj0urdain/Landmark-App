@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import React, { useRef, useEffect, useState } from 'react';
+import Image from "next/image";
+import React, { useRef, useEffect, useState } from "react";
 
 interface PortfolioPageViewerProps {
   zoom: number;
@@ -12,14 +12,14 @@ interface PortfolioPageViewerProps {
 const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
   zoom,
   overlayOpacity,
-  content,
+  content = "",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   const contentBlocks = content
-    .split('\n')
-    .filter((block) => block.trim() !== '');
+    .split("\n")
+    .filter((block) => block.trim() !== "");
 
   useEffect(() => {
     const updateSize = () => {
@@ -32,8 +32,8 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
     };
 
     updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, []);
 
   // A4 aspect ratio is 1:√2 (approximately 1:1.4142)
@@ -54,35 +54,35 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
   return (
     <div
       ref={containerRef}
-      className='relative w-full h-full overflow-auto  flex items-center justify-center'
+      className="relative flex h-full w-full items-center justify-center overflow-auto"
       style={{
         transform: `scale(${zoom})`,
-        transformOrigin: 'center center',
+        transformOrigin: "center center",
       }}
     >
       <div
-        className='absolute  w-full h-full z-20'
+        className="absolute z-20 h-full w-full"
         style={{
           backgroundImage: `url('/images/portfolio-reference.png')`,
           opacity: overlayOpacity,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           width: `${paperWidth}px`,
           height: `${paperHeight}px`,
         }}
       />
       <div
-        className='bg-white shadow-lg transition-transform duration-200 ease-in-out'
+        className="bg-white shadow-lg transition-transform duration-200 ease-in-out"
         style={{
           width: `${paperWidth}px`,
           height: `${paperHeight}px`,
         }}
       >
         {/* A4 paper content goes here */}
-        <div className='relative pr-[30px] pl-[30px] pb-[35px] pt-[50px] w-full h-full flex flex-col gap-3'>
+        <div className="relative flex h-full w-full flex-col gap-3 pb-[35px] pl-[30px] pr-[30px] pt-[50px]">
           {/* Location Tab */}
-          <div className='absolute top-0 right-0 w-[173px] flex items-center justify-end tracking-wider pr-[28px] pt-[6px] h-[37px] rounded-bl-[15px] bg-[#1d384c]'>
-            <p className='uppercase text-white text-[8px] font-metro'>
+          <div className="absolute right-0 top-0 flex h-[37px] w-[173px] items-center justify-end rounded-bl-[15px] bg-[#1d384c] pr-[28px] pt-[6px] tracking-wider">
+            <p className="font-metro text-[8px] uppercase text-white">
               Victoria
             </p>
           </div>
@@ -90,61 +90,61 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
           <div
             style={{
               backgroundImage: `url('https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/eden-academy-a.jpg')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
-            className='w-full min-h-[300px] rounded-tr-[45px] '
+            className="min-h-[300px] w-full rounded-tr-[45px]"
           />
           {/* Photo B & C */}
-          <div className='w-full min-h-[195px] flex gap-3'>
+          <div className="flex min-h-[195px] w-full gap-3">
             <div
               style={{
                 backgroundImage: `url('https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/eden-academy-b.jpg')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundSize: "cover",
+                backgroundPosition: "center",
               }}
-              className='w-1/2 h-full bg-blue-400'
+              className="h-full w-1/2 bg-blue-400"
             />
             <div
               style={{
                 backgroundImage: `url('https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/eden-academy-c.jpg')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundSize: "cover",
+                backgroundPosition: "center",
               }}
-              className='w-1/2 h-full bg-blue-800'
+              className="h-full w-1/2 bg-blue-800"
             />
           </div>
-          <div className='w-full h-[50px] flex items-center justify-between gap-3'>
+          <div className="flex h-[50px] w-full items-center justify-between gap-3">
             {/* Headline */}
-            <div className='w-full max-w-[350px] h-full flex items-end justify-center mt-[8px]'>
-              <p className='text-[143%] leading-[23px] font-medium text-portfolio-headline font-lexia'>
+            <div className="mt-[8px] flex h-full w-full max-w-[350px] items-end justify-center">
+              <p className="font-lexia text-[143%] font-medium leading-[23px] text-portfolio-headline">
                 Stunning Childcare Investment New 20 Year Net Lease to 2044
               </p>
             </div>
             {/* Logo */}
-            <div className='max-w-[130px] w-full h-full flex items-center justify-center mt-[8px]'>
+            <div className="mt-[8px] flex h-full w-full max-w-[130px] items-center justify-center">
               <Image
-                src='https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/eden-academy-logo.png'
-                alt='logo'
+                src="https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/eden-academy-logo.png"
+                alt="logo"
                 width={135}
                 height={135}
-                className='w-[130px] h-auto'
+                className="h-auto w-[130px]"
               />
             </div>
           </div>
-          <div className='w-full h-[170px] mt-[10px] flex items-center gap-[10px] border-b-[1px] border-portfolio-border'>
-            <div className='w-[180px] h-[160px] mb-[10px] flex flex-col justify-between'>
+          <div className="mt-[10px] flex h-[170px] w-full items-center gap-[10px] border-b-[1px] border-portfolio-border">
+            <div className="mb-[10px] flex h-[160px] w-[180px] flex-col justify-between">
               {/* Address */}
-              <div className='w-full h-[50px] border-b border-t pt-[3px] border-portfolio-border flex flex-col -space-y-0.5 items-start justify-center'>
-                <p className='text-portfolio-address font-lexia font-bold text-[11.6px]'>
+              <div className="flex h-[50px] w-full flex-col items-start justify-center -space-y-0.5 border-b border-t border-portfolio-border pt-[3px]">
+                <p className="font-lexia text-[11.6px] font-bold text-portfolio-address">
                   Pakenham (Melbourne) VIC
                 </p>
-                <p className='text-portfolio-address font-lexia font-bold text-[11.6px]'>
+                <p className="font-lexia text-[11.6px] font-bold text-portfolio-address">
                   56 Army Road
                 </p>
               </div>
               {/* Finance Copy */}
-              <div className='w-full h-[70px] mt-[10px] flex flex-col gap-[10px] leading-[12.5px] text-portfolio-financeCopy font-lexia font-medium text-[11.8px]'>
+              <div className="mt-[10px] flex h-[70px] w-full flex-col gap-[10px] font-lexia text-[11.8px] font-medium leading-[12.5px] text-portfolio-financeCopy">
                 <p>Two 10 year options to 2064</p>
                 <p>Fixed 3% annual rent increases</p>
                 <p>
@@ -153,56 +153,56 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
                 </p>
               </div>
               {/* Net Income */}
-              <div className='w-full h-[25px] flex items-end'>
-                <p className='text-portfolio-financeCopy font-lexia font-extrabold text-[10.8px]'>
+              <div className="flex h-[25px] w-full items-end">
+                <p className="font-lexia text-[10.8px] font-extrabold text-portfolio-financeCopy">
                   Net Income: $460,375 pa* + GST
                 </p>
               </div>
             </div>
             {/* Property Copy */}
-            <div className='w-[180px] h-[160px] mb-[10px] font-medium overflow-y-hidden '>
-              <div className='flex flex-col gap-[8px]'>
+            <div className="mb-[10px] h-[160px] w-[180px] overflow-y-hidden font-medium">
+              <div className="flex flex-col gap-[8px]">
                 {contentBlocks.map((block, index) => (
                   <div
                     key={index}
-                    className='flex items-start w-full h-full justify-center'
+                    className="flex h-full w-full items-start justify-center"
                   >
-                    <p className='w-full max-w-[13px] pl-[2px] text-portfolio-propertyCopy font-lexia text-[9.5px] leading-[11px]'>
+                    <p className="w-full max-w-[13px] pl-[2px] font-lexia text-[9.5px] leading-[11px] text-portfolio-propertyCopy">
                       +
                     </p>
-                    <p className='text-[10.65px] w-full font-lexia text-portfolio-propertyCopy leading-[12px] '>
+                    <p className="w-full font-lexia text-[10.65px] leading-[12px] text-portfolio-propertyCopy">
                       {block}
                     </p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className='w-[170px] h-[155px] flex flex-col justify-start gap-[10px] border-l-[1px] border-portfolio-border mb-[15px]'>
+            <div className="mb-[15px] flex h-[155px] w-[170px] flex-col justify-start gap-[10px] border-l-[1px] border-portfolio-border">
               {/* Contact */}
 
-              <div className='flex items-start justify-center w-full'>
-                <div className='max-w-[38px] w-full h-full flex items-start justify-center'>
+              <div className="flex w-full items-start justify-center">
+                <div className="flex h-full w-full max-w-[38px] items-start justify-center">
                   <Image
-                    src='https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/phone.png'
-                    alt='phone'
+                    src="https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/phone.png"
+                    alt="phone"
                     width={20}
                     height={30}
-                    className='w-[13px] h-auto'
+                    className="h-auto w-[13px]"
                   />
                 </div>
-                <div className='w-full'>
-                  <p className='text-portfolio-contactHeader font-bold font-metro text-[9.25px]'>
+                <div className="w-full">
+                  <p className="font-metro text-[9.25px] font-bold text-portfolio-contactHeader">
                     Contact
                   </p>
                   {/* Agents */}
-                  <div className='w-full'>
-                    <p className='text-portfolio-agents font-metro text-[9.25px]'>
+                  <div className="w-full">
+                    <p className="font-metro text-[9.25px] text-portfolio-agents">
                       Adam Thomas 0418 998 971
                     </p>
-                    <p className='text-portfolio-agents font-metro text-[9.25px]'>
+                    <p className="font-metro text-[9.25px] text-portfolio-agents">
                       Natalie Couper 0413 856 983
                     </p>
-                    <p className='text-portfolio-agents font-metro text-[9.25px]'>
+                    <p className="font-metro text-[9.25px] text-portfolio-agents">
                       Josh Scapolan 0484 229 829
                     </p>
 
@@ -212,32 +212,32 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
               </div>
 
               {/* Sale Type */}
-              <div className='flex items-start justify-center w-full'>
-                <div className='max-w-[38px] w-full h-full flex items-start justify-center'>
+              <div className="flex w-full items-start justify-center">
+                <div className="flex h-full w-full max-w-[38px] items-start justify-center">
                   <Image
-                    src='https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/email.png'
-                    alt='phone'
+                    src="https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/portfolio_images/email.png"
+                    alt="phone"
                     width={20}
                     height={30}
-                    className='w-[22px] h-auto mt-[2px] mr-[1px]'
+                    className="mr-[1px] mt-[2px] h-auto w-[22px]"
                   />
                 </div>
-                <div className='w-full'>
-                  <p className='text-portfolio-contactHeader font-bold font-metro text-[9.25px] whitespace-pre-line'>
-                    {'For Sale by\nExpressions of Interest'}
+                <div className="w-full">
+                  <p className="whitespace-pre-line font-metro text-[9.25px] font-bold text-portfolio-contactHeader">
+                    {"For Sale by\nExpressions of Interest"}
                   </p>
                   {/* Agents */}
-                  <div className='w-full flex flex-col gap-[10px]'>
-                    <div className='flex flex-col items-start'>
-                      <p className='text-portfolio-agents font-metro text-[9.25px]'>
+                  <div className="flex w-full flex-col gap-[10px]">
+                    <div className="flex flex-col items-start">
+                      <p className="font-metro text-[9.25px] text-portfolio-agents">
                         Closing 3pm AEST
                       </p>
-                      <p className='text-portfolio-agents font-metro text-[9.25px]'>
+                      <p className="font-metro text-[9.25px] text-portfolio-agents">
                         Thursday 3 October 2024
                       </p>
                     </div>
                     <div>
-                      <p className='text-portfolio-agents font-metro font-bold text-[7.25px]'>
+                      <p className="font-metro text-[7.25px] font-bold text-portfolio-agents">
                         *Approx
                       </p>
                     </div>
