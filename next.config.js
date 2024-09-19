@@ -9,20 +9,24 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: 'www.burgessrawson.com.au',
-        protocol: 'https',
+        hostname: "www.burgessrawson.com.au",
+        protocol: "https",
       },
       {
-        hostname: 'dodfdwvvwmnnlntpnrec.supabase.co',
-        protocol: 'https',
+        hostname: "dodfdwvvwmnnlntpnrec.supabase.co",
+        protocol: "https",
       },
       {
-        hostname: 'localhost',
-        protocol: 'http',
+        hostname: "localhost",
+        protocol: "http",
       },
       {
-        hostname: 'static.ffx.io',
-        protocol: 'https',
+        hostname: "static.ffx.io",
+        protocol: "https",
+      },
+      {
+        hostname: "i.imgur.com",
+        protocol: "https",
       },
     ],
   },
