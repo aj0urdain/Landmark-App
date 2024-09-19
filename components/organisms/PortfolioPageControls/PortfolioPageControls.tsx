@@ -1,3 +1,5 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import React, { useState } from "react";
 
@@ -10,6 +12,13 @@ import {
   Users,
   Tag,
   LucideIcon,
+  FileClock,
+  Brush,
+  UserRoundPen,
+  CircleCheck,
+  House,
+  FilePlus,
+  User,
 } from "lucide-react";
 import {
   Select,
@@ -21,8 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import PropertyCopyControls from "./PropertyCopyControls/PropertyCopyControls";
-import PhotosAndLogoControls from "./PhotosAndLogosControls/PhotosAndLogoControls";
+
 import { Separator } from "@/components/ui/separator";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
@@ -41,49 +49,24 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { CaretSortIcon } from "@radix-ui/react-icons";
-import { House, FilePlus, Heading1Icon } from "lucide-react";
-
-// Add this near the top of your file
-const listings = [
-  {
-    id: "my1",
-    address: "123 Main St, Sydney NSW 2000",
-    agent: "John Smith",
-    type: "myListing",
-    icon: House,
-  },
-  {
-    id: "my2",
-    address: "456 Park Ave, Melbourne VIC 3000",
-    agent: "Emma Johnson",
-    type: "myListing",
-    icon: House,
-  },
-  {
-    id: "all1",
-    address: "789 Beach Rd, Gold Coast QLD 4217",
-    agent: "Michael Brown",
-    type: "allListing",
-    icon: House,
-  },
-  {
-    id: "all2",
-    address: "101 River St, Perth WA 6000",
-    agent: "Sarah Davis",
-    type: "allListing",
-    icon: House,
-  },
-  {
-    id: "sandbox",
-    address: "Sandbox Mode",
-    agent: "Make a page from scratch",
-    type: "sandbox",
-    icon: FilePlus,
-  },
-];
+import { Heading1Icon } from "lucide-react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import PropertyCopyControls from "@/components/organisms/PortfolioPageControls/SectionControls/PropertyCopyControls/PropertyCopyControls";
+import HeadlineControls from "@/components/organisms/PortfolioPageControls/SectionControls/HeadlineControls/HeadlineControls";
+import AddressControls from "@/components/organisms/PortfolioPageControls/SectionControls/AddressControls/AddressControls";
+import FinanceControls from "@/components/organisms/PortfolioPageControls/SectionControls/FinanceControls/FinanceControls";
+import AgentsControls from "@/components/organisms/PortfolioPageControls/SectionControls/AgentsControls/AgentsControls";
+import SaleTypeControls from "@/components/organisms/PortfolioPageControls/SectionControls/SaleTypeControls/SaleTypeControls";
+import PhotoControls from "@/components/organisms/PortfolioPageControls/SectionControls/PhotosAndLogosControls/PhotoControls/PhotoControls";
+import LogoControls from "@/components/organisms/PortfolioPageControls/SectionControls/PhotosAndLogosControls/LogoControls/LogoControls";
 
 type SectionName =
-  | "Photos & Logos"
+  | "Photos"
+  | "Logos"
   | "Headline"
   | "Address"
   | "Finance"
@@ -97,7 +80,8 @@ type SectionStatus = {
 };
 
 const sectionIcons: Record<SectionName, LucideIcon> = {
-  "Photos & Logos": Image,
+  Photos: Image,
+  Logos: Image,
   Headline: Heading1Icon,
   Address: MapPin,
   Finance: DollarSign,
@@ -106,13 +90,149 @@ const sectionIcons: Record<SectionName, LucideIcon> = {
   "Sale Type": Tag,
 };
 
+type ListingStatus =
+  | "inProgress"
+  | "pendingDesignApproval"
+  | "pendingAgentApproval"
+  | "approved"
+  | null;
+
+interface ListingItemProps {
+  id: string;
+  address: string;
+  agent: string;
+  icon: LucideIcon;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  status: ListingStatus;
+  type: string;
+}
+
+const ListingItem: React.FC<ListingItemProps> = ({
+  id,
+  address,
+  agent,
+  icon: Icon,
+  isSelected,
+  onSelect,
+  status,
+  type,
+}) => {
+  const getStatusIcon = (status: ListingStatus) => {
+    switch (status) {
+      case "inProgress":
+        return <FileClock className="h-4 w-4 text-yellow-500" />;
+      case "pendingDesignApproval":
+        return <Brush className="h-4 w-4 text-blue-500" />;
+      case "pendingAgentApproval":
+        return <UserRoundPen className="h-4 w-4 text-purple-500" />;
+      case "approved":
+        return <CircleCheck className="h-4 w-4 text-green-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusText = (status: ListingStatus) => {
+    switch (status) {
+      case "inProgress":
+        return "In Progress";
+      case "pendingDesignApproval":
+        return "Pending Design Approval";
+      case "pendingAgentApproval":
+        return "Pending Agent Approval";
+      case "approved":
+        return "Approved";
+      default:
+        return "No status";
+    }
+  };
+
+  return (
+    <CommandItem onSelect={() => onSelect(id)}>
+      <div className="flex w-full items-center">
+        <div className="mr-2 flex flex-col items-center">
+          <Icon className="mb-1 h-4 w-4" />
+          {status && (
+            <HoverCard>
+              <HoverCardTrigger>{getStatusIcon(status)}</HoverCardTrigger>
+              <HoverCardContent>
+                <p>{getStatusText(status)}</p>
+              </HoverCardContent>
+            </HoverCard>
+          )}
+        </div>
+        <div className="flex flex-grow flex-col">
+          <span>{address}</span>
+          <div className="flex items-center gap-1">
+            {type !== "sandbox" && (
+              <User className="h-3 w-3 text-muted-foreground" />
+            )}
+            <span className="text-sm text-muted-foreground">{agent}</span>
+          </div>
+        </div>
+        <CheckIcon
+          className={cn(
+            "ml-2 h-4 w-4 flex-shrink-0",
+            isSelected ? "opacity-100" : "opacity-0",
+          )}
+        />
+      </div>
+    </CommandItem>
+  );
+};
+
 const PortfolioPageControls = () => {
   const [value, setValue] = useState("");
   const [open, setOpen] = useState(false);
 
+  const listings = [
+    {
+      id: "my1",
+      address: "123 Main St, Sydney NSW 2000",
+      agent: "John Smith",
+      type: "myListing",
+      icon: House,
+      status: "inProgress" as const,
+    },
+    {
+      id: "my2",
+      address: "456 Park Ave, Melbourne VIC 3000",
+      agent: "Emma Johnson",
+      type: "myListing",
+      icon: House,
+      status: "pendingDesignApproval" as const,
+    },
+    {
+      id: "all1",
+      address: "789 Beach Rd, Gold Coast QLD 4217",
+      agent: "Michael Brown",
+      type: "allListing",
+      icon: House,
+      status: "pendingAgentApproval" as const,
+    },
+    {
+      id: "all2",
+      address: "101 River St, Perth WA 6000",
+      agent: "Sarah Davis",
+      type: "allListing",
+      icon: House,
+      status: "approved" as const,
+    },
+    {
+      id: "sandbox",
+      address: "Sandbox Mode",
+      agent: "Make a page from scratch",
+      type: "sandbox",
+      icon: FilePlus,
+      status: null,
+    },
+  ];
+
   // Dummy data for incomplete items
   const incompleteItems = {
-    "Photos & Logos": 2,
+    Photos: 2,
+    Logos: 2,
     Headline: 1,
     Address: 1,
     Finance: 3,
@@ -122,7 +242,8 @@ const PortfolioPageControls = () => {
   };
 
   const sectionStatus: Record<string, SectionStatus> = {
-    "Photos & Logos": { necessary: 1, optional: 1 },
+    Photos: { necessary: 1, optional: 1 },
+    Logos: { necessary: 1, optional: 1 },
     Headline: { necessary: 1, optional: 0 },
     Address: { necessary: 1, optional: 0 },
     Finance: { necessary: 2, optional: 1 },
@@ -139,9 +260,20 @@ const PortfolioPageControls = () => {
     switch (selectedSection) {
       case "Property Copy":
         return <PropertyCopyControls />;
-      case "Photos & Logos":
-        return <PhotosAndLogoControls />;
-      // ... add cases for other sections
+      case "Photos":
+        return <PhotoControls />;
+      case "Logos":
+        return <LogoControls />;
+      case "Headline":
+        return <HeadlineControls />;
+      case "Address":
+        return <AddressControls />;
+      case "Finance":
+        return <FinanceControls />;
+      case "Agents":
+        return <AgentsControls />;
+      case "Sale Type":
+        return <SaleTypeControls />;
       default:
         return null;
     }
@@ -177,81 +309,60 @@ const PortfolioPageControls = () => {
                   {listings
                     .filter((listing) => listing.type === "sandbox")
                     .map((listing) => (
-                      <CommandItem
+                      <ListingItem
                         key={listing.id}
-                        onSelect={() => {
-                          setValue(listing.id);
+                        id={listing.id}
+                        address={listing.address}
+                        agent={listing.agent}
+                        icon={listing.icon}
+                        isSelected={value === listing.id}
+                        onSelect={(id) => {
+                          setValue(id);
                           setOpen(false);
                         }}
-                      >
-                        <FilePlus className="mr-2 h-4 w-4" />
-                        <div className="flex flex-col">
-                          <span>{listing.address}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {listing.agent}
-                          </span>
-                        </div>
-                        <CheckIcon
-                          className={cn(
-                            "ml-auto h-4 w-4",
-                            value === listing.id ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                      </CommandItem>
+                        status={listing.status}
+                        type={listing.type}
+                      />
                     ))}
                 </CommandGroup>
                 <CommandGroup heading="My Listings">
                   {listings
                     .filter((listing) => listing.type === "myListing")
                     .map((listing) => (
-                      <CommandItem
+                      <ListingItem
                         key={listing.id}
-                        onSelect={() => {
-                          setValue(listing.id);
+                        id={listing.id}
+                        address={listing.address}
+                        agent={listing.agent}
+                        icon={listing.icon}
+                        isSelected={value === listing.id}
+                        onSelect={(id) => {
+                          setValue(id);
                           setOpen(false);
                         }}
-                      >
-                        <House className="mr-2 h-4 w-4" />
-                        <div className="flex flex-col">
-                          <span>{listing.address}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {listing.agent}
-                          </span>
-                        </div>
-                        <CheckIcon
-                          className={cn(
-                            "ml-auto h-4 w-4",
-                            value === listing.id ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                      </CommandItem>
+                        status={listing.status}
+                        type={listing.type}
+                      />
                     ))}
                 </CommandGroup>
                 <CommandGroup heading="All Current Portfolio Listings">
                   {listings
                     .filter((listing) => listing.type === "allListing")
                     .map((listing) => (
-                      <CommandItem
+                      <ListingItem
                         key={listing.id}
-                        onSelect={() => {
-                          setValue(listing.id);
+                        id={listing.id}
+                        address={listing.address}
+                        agent={listing.agent}
+                        icon={listing.icon}
+                        isSelected={value === listing.id}
+                        onSelect={(id) => {
+                          setValue(id);
                           setOpen(false);
                         }}
-                      >
-                        <House className="mr-2 h-4 w-4" />
-                        <div className="flex flex-col">
-                          <span>{listing.address}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {listing.agent}
-                          </span>
-                        </div>
-                        <CheckIcon
-                          className={cn(
-                            "ml-auto h-4 w-4",
-                            value === listing.id ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                      </CommandItem>
+                        status={listing.status}
+                        type={listing.type}
+                      />
                     ))}
                 </CommandGroup>
               </CommandList>
@@ -262,7 +373,7 @@ const PortfolioPageControls = () => {
       <div className="mb-4">
         <Separator className="my-8" />
         <div className="mb-2 flex items-center justify-between">
-          <Label>Outstanding</Label>
+          <Label>To Do:</Label>
           <div className="flex space-x-2">
             {Object.entries(incompleteItems).map(([section, count]) => {
               if (count > 0) {
@@ -329,13 +440,10 @@ const PortfolioPageControls = () => {
           </SelectContent>
         </Select>
 
+        <Separator className="my-8" />
+
         {selectedSection && (
-          <div className="mt-4">
-            <h3 className="mb-2 text-lg font-semibold">
-              {selectedSection} Controls
-            </h3>
-            {renderSectionControls()}
-          </div>
+          <div className="mt-4">{renderSectionControls()}</div>
         )}
       </div>
     </Card>
