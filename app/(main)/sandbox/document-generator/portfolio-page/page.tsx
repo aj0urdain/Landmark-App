@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import PortfolioPageViewer from "@/components/templates/PortfolioPageViewer";
+import PortfolioPageViewer from "@/components/templates/PortfolioPageViewer/PortfolioPageViewer";
 import { Card } from "@/components/ui/card";
 import PortfolioPageControls from "@/components/organisms/PortfolioPageControls/PortfolioPageControls";
 import PreviewControls from "@/components/organisms/PortfolioPageControls/PreviewControls/PreviewControls";
@@ -11,9 +11,9 @@ const PortfolioPage = () => {
   const { data: previewSettings } = useQuery({
     queryKey: ["previewSettings"],
     queryFn: () => ({
-      zoom: 0.9,
+      zoom: 1,
       overlayOpacity: 0.5,
-      showOverlay: true,
+      showOverlay: false,
       pageSide: "left" as "left" | "right",
     }),
   });
@@ -26,7 +26,7 @@ const PortfolioPage = () => {
         <PortfolioPageControls />
         <div className="relative z-10 flex h-full w-[55%] flex-col gap-4">
           <PreviewControls />
-          <Card className="flex h-full">
+          <Card className="flex h-full overflow-hidden">
             <PortfolioPageViewer />
           </Card>
         </div>
