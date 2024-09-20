@@ -86,7 +86,7 @@ const useFetchListings = () => {
 const ListingsContent: React.FC = () => {
   const {
     portfolios,
-    isLoading: portfoliosLoading,
+    // isLoading: portfoliosLoading,
     error: portfoliosError,
   } = useFetchPortfolios();
   const {
