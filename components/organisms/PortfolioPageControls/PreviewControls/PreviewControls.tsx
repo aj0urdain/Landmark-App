@@ -19,13 +19,16 @@ const PreviewControls = () => {
 
   const { data: previewSettings } = useQuery({
     queryKey: ["previewSettings"],
-    queryFn: () => ({
-      zoom: 0.9,
-      overlayOpacity: 0.5,
-      showOverlay: true,
-      pageSide: "left" as "left" | "right",
-    }),
-  });
+  }) as {
+    data:
+      | {
+          zoom: number;
+          overlayOpacity: number;
+          showOverlay: boolean;
+          pageSide: "left" | "right";
+        }
+      | undefined;
+  };
 
   const updateSettings = useMutation({
     mutationFn: (newSettings: Partial<typeof previewSettings>) => {
