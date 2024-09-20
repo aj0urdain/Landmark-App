@@ -10,6 +10,20 @@ async function getNewTokenFromSalesforce(): Promise<{
   instance_url: string;
   expires_in: number;
 }> {
+  console.log("Getting new token from Salesforce...");
+
+  console.log(
+    "process.env.SALESFORCE_CLIENT_ID:",
+    process.env.SALESFORCE_CLIENT_ID,
+  );
+  console.log(
+    "process.env.SALESFORCE_CLIENT_SECRET:",
+    process.env.SALESFORCE_CLIENT_SECRET,
+  );
+  console.log(
+    "process.env.SALESFORCE_REFRESH_TOKEN:",
+    process.env.SALESFORCE_REFRESH_TOKEN,
+  );
   try {
     const response = await axios.post(
       "https://login.salesforce.com/services/oauth2/token",
@@ -29,7 +43,7 @@ async function getNewTokenFromSalesforce(): Promise<{
       refresh_token:
         response.data.refresh_token || process.env.SALESFORCE_REFRESH_TOKEN,
       instance_url: response.data.instance_url,
-      expires_in: response.data.expires_in,
+      expires_in: response.data.expires_in || 1800,
     };
   } catch (error) {
     console.error("Error getting new token from Salesforce:", error);
@@ -56,7 +70,7 @@ async function updateTokenInDatabase(token: {
     access_token: token.access_token,
     refresh_token: token.refresh_token,
     issued_at: token.issued_at,
-    expires_in: token.expires_in,
+    expires_in: token.expires_in || 1800,
     active: true,
   });
 
@@ -91,8 +105,8 @@ export async function refreshSalesforceToken(): Promise<string> {
     const tokenData = {
       access_token: newToken.access_token,
       refresh_token: newToken.refresh_token,
-      issued_at: dayjs().toISOString(),
-      expires_in: newToken.expires_in,
+      issued_at: dayjs().toISOString(), // Store as ISO string
+      expires_in: newToken.expires_in || 1800,
     };
     await updateTokenInDatabase(tokenData);
     setTokenInCache(newToken.access_token, newToken.expires_in);
@@ -100,7 +114,10 @@ export async function refreshSalesforceToken(): Promise<string> {
   }
 
   const { access_token, issued_at, expires_in } = data;
-  const tokenExpirationTime = dayjs(issued_at).add(expires_in, "second");
+  const tokenExpirationTime = dayjs(issued_at).add(
+    expires_in || 3600,
+    "second",
+  );
 
   // Check if token is expired or about to expire in the next 5 minutes
   if (dayjs().isAfter(tokenExpirationTime.subtract(5, "minutes"))) {
@@ -116,6 +133,14 @@ export async function refreshSalesforceToken(): Promise<string> {
       };
       await updateTokenInDatabase(tokenData);
       setTokenInCache(newToken.access_token, newToken.expires_in);
+
+      console.log("Token data:", {
+        issued_at,
+        expires_in,
+        currentTime: dayjs().toISOString(),
+        expirationTime: tokenExpirationTime.toISOString(),
+        isExpired: dayjs().isAfter(tokenExpirationTime.subtract(5, "minutes")),
+      });
       return newToken.access_token;
     } catch (refreshError) {
       // console.error("Error refreshing Salesforce token:", refreshError);
@@ -123,7 +148,7 @@ export async function refreshSalesforceToken(): Promise<string> {
     }
   } else {
     console.log("Token from database is still valid.");
-    setTokenInCache(access_token, expires_in);
+    setTokenInCache(access_token, expires_in || 1800);
     return access_token;
   }
 }
@@ -150,8 +175,12 @@ export async function makeSalesforceApiRequest(query: SOQLBuilder) {
     console.log("Salesforce API request successful.");
     return response.data;
   } catch (error) {
+    console.error("Error making Salesforce API request:");
     // console.error("Error making Salesforce API request:", error);
-    // throw new Error("Error making Salesforce API request.");
-    console.log("Error making Salesforce API request:");
+    if (error instanceof Error) {
+      return { error: error.message, details: error.stack };
+    } else {
+      return { error: "An unknown error occurred" };
+    }
   }
 }
