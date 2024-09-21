@@ -1,24 +1,24 @@
-'use client';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { getQueryClient } from '@/utils/get-query-client';
-import { createClient } from '@/utils/supabase/client';
-import { useEffect } from 'react';
-import type * as React from 'react';
+"use client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { getQueryClient } from "@/utils/get-query-client";
+import { createBrowserClient } from "@/utils/supabase/client";
+import { useEffect } from "react";
+import type * as React from "react";
 
 function RealtimeUpdates() {
   const queryClient = getQueryClient();
-  const supabase = createClient();
+  const supabase = createBrowserClient();
 
   useEffect(() => {
     const subscription = supabase
-      .channel('public:user_profiles')
+      .channel("public:user_profiles")
       .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'user_profiles' },
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user_profiles" },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-        }
+          queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+        },
       )
       .subscribe();
 
