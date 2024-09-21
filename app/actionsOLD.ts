@@ -1,41 +1,12 @@
 "use server";
 
-import { userProfileOptions } from "@/types/userProfileTypes";
-import { getQueryClient } from "@/utils/get-query-client";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { getConfig } from "@/utils/supabase/config";
 import { createServerClient } from "@/utils/supabase/server";
-
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 type Attempt = { timestamp: string; success: boolean };
-
-export const signInWithPasswordAction = async (formData: FormData) => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const supabase = createServerClient();
-
-  if (!email || !password) {
-    return { error: "Email and password are required" };
-  }
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    console.error(error.message);
-    return { error: "Invalid email or password" };
-  }
-
-  if (data.user) {
-    return { success: "Logged in successfully" };
-  } else {
-    return { error: "Login failed" };
-  }
-};
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
@@ -245,10 +216,5 @@ export const verifyOtpAction = async (formData: FormData) => {
 export const signOutAction = async () => {
   const supabase = createServerClient();
   await supabase.auth.signOut();
-
-  // Clear user profile data
-  const queryClient = getQueryClient();
-  queryClient.setQueryData(userProfileOptions.queryKey, null);
-
   return redirect("/sign-in");
 };
