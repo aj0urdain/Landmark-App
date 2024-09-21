@@ -1,11 +1,10 @@
-import { createServiceRoleClient } from '@/utils/supabase/server';
+import { supabaseAdmin } from "./admin";
 
 export async function getConfig<T>(key: string): Promise<T | null> {
-  const supabaseAdmin = createServiceRoleClient();
   const { data, error } = await supabaseAdmin
-    .from('app_config')
-    .select('value')
-    .eq('key', key)
+    .from("app_config")
+    .select("value")
+    .eq("key", key)
     .single();
 
   if (error) {
