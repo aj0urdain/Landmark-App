@@ -1,30 +1,21 @@
-import WelcomeCard from '@/components/molecules/DashboardCards/WelcomeCard/WelcomeCard';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 function AdminPage() {
   return (
-    <div className='flex flex-col items-center justify-center gap-4 mx-auto max-w-6xl py-4'>
-      <div className='flex gap-4 w-full max-h-60'>
-        <div className='w-2/5 flex'>
-          <WelcomeCard />
-        </div>
-        <div className='w-3/5 flex'>
-          <WelcomeCard />
-        </div>
-      </div>
-      <div className='flex gap-4 w-full'>
-        <div className='w-1/4 flex'>
-          <WelcomeCard />
-        </div>
-        <div className='w-1/4 flex'>
-          <WelcomeCard />
-        </div>
-        <div className='w-1/4 flex'>
-          <WelcomeCard />
-        </div>
-        <div className='w-1/4 flex'>
-          <WelcomeCard />
-        </div>
-      </div>
+    <div className="mx-auto flex h-full max-w-6xl flex-col items-center justify-center gap-4 py-4">
+      <Card className="h-full w-full">
+        <CardHeader>
+          <CardTitle>Updates</CardTitle>
+          <CardDescription>Manage your updates here</CardDescription>
+        </CardHeader>
+        <CardContent className="h-full w-full">Testing</CardContent>
+      </Card>
     </div>
   );
 }
