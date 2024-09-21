@@ -1,17 +1,17 @@
-import { ThemeProvider } from 'next-themes';
-import { GeistSans } from 'geist/font/sans';
-import './globals.css';
-import Providers from '@/providers/providers';
-import { metroSans } from '@/utils/font';
+import { ThemeProvider } from "next-themes";
+import { GeistSans } from "geist/font/sans";
+import "./globals.css";
+import Providers from "@/providers/providers";
+import { metroSans } from "@/utils/font";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : 'http://localhost:3000';
+  : "http://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'Landmark | Burgess Rawson',
-  description: 'Created by Aaron J. Girton.',
+  title: "Landmark | Burgess Rawson",
+  description: "Created by Aaron J. Girton.",
 };
 
 export default function RootLayout({
@@ -21,15 +21,15 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang='en'
+      lang="en"
       className={`${GeistSans.className} ${metroSans.variable}`}
       suppressHydrationWarning={true}
     >
       <body className={`bg-background text-foreground`}>
         <Providers>
           <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
+            attribute="class"
+            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >

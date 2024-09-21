@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
-import { Sidebar } from '@/components/molecules/Sidebar/Sidebar';
-import { Button } from '@/components/ui/button';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
-import { Header } from '@/components/molecules/Header/Header';
+import { Sidebar } from "@/components/molecules/Sidebar/Sidebar";
+import { Button } from "@/components/ui/button";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Header } from "@/components/molecules/Header/Header";
+import { UserProfileManager } from "@/components/atoms/UserProfileManager/UserProfileManager";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -15,32 +16,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className='flex h-screen overflow-hidden'>
+    <div className="flex h-screen overflow-hidden">
+      <UserProfileManager />
       <div
-        className={`
-          relative hidden md:flex flex-col
-          transition-all duration-300 ease-in-out
-          ${isSidebarCollapsed ? 'w-20' : 'w-64'}
-        `}
+        className={`relative hidden flex-col transition-all duration-300 ease-in-out md:flex ${isSidebarCollapsed ? "w-20" : "w-64"} `}
       >
         <Sidebar isCollapsed={isSidebarCollapsed} />
         <Button
-          variant='ghost'
-          size='icon'
-          className='absolute top-1/2 -right-4 transform -translate-y-1/2 rounded-full shadow-md'
+          variant="ghost"
+          size="icon"
+          className="absolute -right-4 top-1/2 -translate-y-1/2 transform rounded-full shadow-md"
           onClick={toggleSidebar}
         >
           {isSidebarCollapsed ? (
-            <PanelLeftOpen className='h-4 w-4' />
+            <PanelLeftOpen className="h-4 w-4" />
           ) : (
-            <PanelLeftClose className='h-4 w-4' />
+            <PanelLeftClose className="h-4 w-4" />
           )}
-          <span className='sr-only'>Toggle sidebar</span>
+          <span className="sr-only">Toggle sidebar</span>
         </Button>
       </div>
-      <div className='flex flex-col flex-1 overflow-hidden'>
+      <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className='flex-1 overflow-y-auto'>{children}</main>
+        <main className="flex-1 overflow-y-scroll">{children}</main>
       </div>
     </div>
   );

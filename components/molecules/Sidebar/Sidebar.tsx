@@ -1,10 +1,10 @@
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Logo } from '@/components/atoms/Logo/Logo';
-import { LogoWordmark } from '@/components/atoms/LogoWordmark/LogoWordmark';
-import { Navigation } from '@/components/molecules/Navigation/Navigation';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Logo } from "@/components/atoms/Logo/Logo";
+import { LogoWordmark } from "@/components/atoms/LogoWordmark/LogoWordmark";
+import { Navigation } from "@/components/molecules/Navigation/Navigation";
 // import { UpgradeCard } from '@/components/molecules/UpgradeCard/UpgradeCard';
 
 interface SidebarProps {
@@ -13,19 +13,19 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed }: SidebarProps) {
   return (
-    <div className='flex flex-col h-full transition-all duration-300 border'>
+    <div className="flex h-full flex-col border-r transition-all duration-300">
       <div
-        className={`h-16 p-4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'}`}
+        className={`flex h-16 items-center p-4 ${isCollapsed ? "justify-center" : "justify-start"}`}
       >
-        <Link href='/'>
+        <Link href="/">
           {isCollapsed ? (
-            <Logo className='h-auto w-5' />
+            <Logo className="h-auto w-5" />
           ) : (
-            <LogoWordmark className='h-auto w-32 ml-4' />
+            <LogoWordmark className="ml-4 h-auto w-32" />
           )}
         </Link>
       </div>
-      <ScrollArea className='flex-1'>
+      <ScrollArea className="flex-1">
         <Navigation isCollapsed={isCollapsed} />
       </ScrollArea>
       {/* {!isCollapsed && (
