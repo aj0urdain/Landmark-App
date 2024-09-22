@@ -16,7 +16,7 @@ import {
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { hasAccess } from "@/utils/permissions";
+import { hasDepartmentAccess } from "@/utils/permissions";
 import { Separator } from "@/components/ui/separator";
 import { userProfileOptions } from "@/types/userProfileTypes";
 
@@ -104,7 +104,10 @@ export const Navigation = React.memo(function Navigation({
 }: NavigationProps) {
   const { data: userProfile } = useQuery(userProfileOptions);
 
-  const showAdmin = hasAccess(userProfile?.departments, links[0].access || []);
+  const showAdmin = hasDepartmentAccess(
+    userProfile?.departments,
+    links[0].access || [],
+  );
 
   return (
     <nav className="flex flex-col gap-2 pt-4">

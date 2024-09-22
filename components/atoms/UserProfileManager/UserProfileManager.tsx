@@ -7,13 +7,30 @@ export function UserProfileManager() {
   const queryClient = useQueryClient();
   const supabase = createBrowserClient();
 
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        queryClient.invalidateQueries({
+          queryKey: userProfileOptions.queryKey,
+        });
+      }
+    });
+
+    // If you need to unsubscribe, you can use data.subscription
+    return () => {
+      data.subscription.unsubscribe();
+    };
+  }, [supabase, queryClient]);
+
   useQuery({
     ...userProfileOptions,
     queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return null;
+      if (!user) {
+        return null;
+      }
 
       const { data, error } = await supabase
         .from("user_profile_complete")
@@ -34,6 +51,7 @@ export function UserProfileManager() {
         { event: "*", schema: "public", table: "user_profiles" },
         (payload) => {
           console.log(`payload:`, payload);
+          console.log(`queryKey:`, userProfileOptions.queryKey);
           queryClient.invalidateQueries({
             queryKey: userProfileOptions.queryKey,
           });

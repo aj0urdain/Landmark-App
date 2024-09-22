@@ -30,17 +30,7 @@ export default function WelcomeCard() {
 
   return (
     <Card className="relative h-full w-full overflow-visible p-6">
-      <div className="relative z-10 flex h-full w-full animate-slide-down-fade-in flex-col justify-between">
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">
-              Hello, {userProfile?.first_name || "No Name Assigned"}!
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Have a great day at work today!
-            </p>
-          </div>
-        </div>
+      <div className="relative z-10 flex h-full w-2/5 animate-slide-down-fade-in flex-col justify-between">
         <div>
           <div className="relative z-10 flex h-full flex-col gap-1">
             <p className="text-sm text-muted-foreground">
@@ -55,8 +45,18 @@ export default function WelcomeCard() {
             </h3>
           </div>
         </div>
+        <div className="flex flex-col gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">
+              Hello, {userProfile?.first_name || "No Name Assigned"}!
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Have a great day at work today!
+            </p>
+          </div>
+        </div>
       </div>
-      <div className="absolute bottom-0 right-0 z-20 h-[100%] w-1/2 animate-slide-down-fade-in overflow-visible">
+      <div className="absolute bottom-0 right-2 z-20 h-[100%] w-1/2 animate-slide-down-fade-in overflow-visible">
         <Image
           src={
             userProfile.profile_picture || "/images/default-profile-picture.png"
