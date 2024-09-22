@@ -109,7 +109,7 @@ const PhotoSelectionDialog: React.FC<PhotoSelectionDialogProps> = ({
           )}
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[625px]">
+      <DialogContent className="h-full max-h-[90%] max-w-7xl overflow-y-scroll">
         <DialogHeader>
           <div className="flex items-center justify-start gap-2">
             {step !== "method" && (
@@ -123,7 +123,7 @@ const PhotoSelectionDialog: React.FC<PhotoSelectionDialogProps> = ({
             Choose a method to add your photo, then crop it to fit.
           </DialogDescription>
         </DialogHeader>
-        <div className="h-[400px] overflow-y-auto py-4">
+        <div className="h-full max-h-[90%] overflow-y-auto py-4">
           {renderStepContent()}
         </div>
       </DialogContent>

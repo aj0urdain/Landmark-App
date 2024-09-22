@@ -7,27 +7,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  saleTypeDataOptions,
+  updateSaleType,
+} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
 
-interface ClosingTimePickerProps {
-  closingTime: string;
-  closingAmPm: "AM" | "PM";
-  onTimeChange: (time: string) => void;
-  onAmPmChange: (amPm: "AM" | "PM") => void;
-}
+const ClosingTimePicker: React.FC = () => {
+  const queryClient = useQueryClient();
 
-const ClosingTimePicker: React.FC<ClosingTimePickerProps> = ({
-  closingTime,
-  closingAmPm,
-  onTimeChange,
-  onAmPmChange,
-}) => {
+  const { data: saleTypeData } = useQuery(saleTypeDataOptions);
+
+  const updateSaleTypeMutation = useMutation({
+    mutationFn: updateSaleType,
+    onSuccess: (newData) => {
+      queryClient.setQueryData(["saleTypeData"], newData);
+    },
+  });
+
+  const handleClosingTimeChange = (time: string) => {
+    if (!saleTypeData) return;
+    updateSaleTypeMutation.mutate({
+      ...saleTypeData,
+      expressionOfInterest: {
+        ...saleTypeData.expressionOfInterest,
+        closingTime: time,
+      },
+    });
+  };
+
+  const handleClosingAmPmChange = (amPm: "AM" | "PM") => {
+    if (!saleTypeData) return;
+    updateSaleTypeMutation.mutate({
+      ...saleTypeData,
+      expressionOfInterest: {
+        ...saleTypeData.expressionOfInterest,
+        closingAmPm: amPm,
+      },
+    });
+  };
+
   return (
     <div>
       <Label htmlFor="closing-time" className="text-xs text-slate-500">
         Closing Time
       </Label>
       <div className="flex gap-2">
-        <Select value={closingTime} onValueChange={onTimeChange}>
+        <Select
+          value={saleTypeData?.expressionOfInterest?.closingTime}
+          onValueChange={handleClosingTimeChange}
+        >
           <SelectTrigger className="w-20">
             <SelectValue placeholder="Time" />
           </SelectTrigger>
@@ -39,7 +68,10 @@ const ClosingTimePicker: React.FC<ClosingTimePickerProps> = ({
             ))}
           </SelectContent>
         </Select>
-        <Select value={closingAmPm} onValueChange={onAmPmChange}>
+        <Select
+          value={saleTypeData?.expressionOfInterest?.closingAmPm}
+          onValueChange={handleClosingAmPmChange}
+        >
           <SelectTrigger className="w-20">
             <SelectValue />
           </SelectTrigger>

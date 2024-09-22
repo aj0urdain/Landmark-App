@@ -17,16 +17,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  saleTypeDataOptions,
+  updateSaleType,
+} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
 
-interface ClosingDatePickerProps {
-  closingDate: Date | undefined;
-  onDateChange: (date: Date | undefined) => void;
-}
+const ClosingDatePicker: React.FC = () => {
+  const queryClient = useQueryClient();
 
-const ClosingDatePicker: React.FC<ClosingDatePickerProps> = ({
-  closingDate,
-  onDateChange,
-}) => {
+  const { data: saleTypeData } = useQuery(saleTypeDataOptions);
+
+  const updateSaleTypeMutation = useMutation({
+    mutationFn: updateSaleType,
+    onSuccess: (newData) => {
+      queryClient.setQueryData(["saleTypeData"], newData);
+    },
+  });
+
+  const handleClosingDateChange = (date: Date | undefined) => {
+    if (!saleTypeData) return;
+    updateSaleTypeMutation.mutate({
+      ...saleTypeData,
+      expressionOfInterest: {
+        ...saleTypeData.expressionOfInterest,
+        closingDate: date,
+      },
+    });
+  };
+
   return (
     <div>
       <Label htmlFor="closing-date" className="text-xs text-slate-500">
@@ -39,12 +58,13 @@ const ClosingDatePicker: React.FC<ClosingDatePickerProps> = ({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !closingDate && "text-muted-foreground",
+              !saleTypeData?.expressionOfInterest?.closingDate &&
+                "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {closingDate ? (
-              format(closingDate, "PPP")
+            {saleTypeData?.expressionOfInterest?.closingDate ? (
+              format(saleTypeData?.expressionOfInterest?.closingDate, "PPP")
             ) : (
               <span>Pick a date</span>
             )}
@@ -56,7 +76,7 @@ const ClosingDatePicker: React.FC<ClosingDatePickerProps> = ({
         >
           <Select
             onValueChange={(value) =>
-              onDateChange(addDays(new Date(), parseInt(value)))
+              handleClosingDateChange(addDays(new Date(), parseInt(value)))
             }
           >
             <SelectTrigger>
@@ -72,8 +92,8 @@ const ClosingDatePicker: React.FC<ClosingDatePickerProps> = ({
           <div className="rounded-md border">
             <Calendar
               mode="single"
-              selected={closingDate}
-              onSelect={onDateChange}
+              selected={saleTypeData?.expressionOfInterest?.closingDate}
+              onSelect={handleClosingDateChange}
             />
           </div>
         </PopoverContent>

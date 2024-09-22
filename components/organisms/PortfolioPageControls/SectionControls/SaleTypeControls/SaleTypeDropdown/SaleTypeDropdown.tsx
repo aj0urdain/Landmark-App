@@ -11,13 +11,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronsUpDown, Gavel, MailQuestion, MapPin } from "lucide-react";
+import { ChevronsUpDown, Gavel, MailQuestion } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { auctionDetails } from "@/lib/auctionDetails";
 
 const SaleTypeDropdown = () => {
   const [menuWidth, setMenuWidth] = useState<number | undefined>(undefined);
@@ -40,24 +36,34 @@ const SaleTypeDropdown = () => {
     }
   }, []);
 
-  const handleSaleTypeAndLocationSelect = (
-    saleType: string,
-    location?: string,
-  ) => {
+  const handleSaleTypeSelect = (saleType: "auction" | "expression") => {
     if (!saleTypeData) return;
     updateSaleTypeMutation.mutate({
       ...saleTypeData,
       saleType,
-      auctionLocation: location,
     });
   };
 
-  const displayText =
-    saleTypeData?.saleType === "auction"
-      ? `Auction - ${saleTypeData.auctionLocation || "Select Location"}`
-      : saleTypeData?.saleType === "expression"
-        ? "Expressions of Interest"
-        : "Select Sale Type";
+  const getDisplayContent = () => {
+    switch (saleTypeData?.saleType) {
+      case "auction":
+        return (
+          <>
+            <Gavel className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            Auction
+          </>
+        );
+      case "expression":
+        return (
+          <>
+            <MailQuestion className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            Expression of Interest
+          </>
+        );
+      default:
+        return "Select Sale Type";
+    }
+  };
 
   return (
     <div className="flex w-full flex-col space-y-0.5">
@@ -71,49 +77,20 @@ const SaleTypeDropdown = () => {
             variant="outline"
             role="combobox"
             aria-expanded={false}
-            className="w-full justify-between capitalize"
+            className="w-full justify-between"
           >
-            <div className="flex items-center justify-start">
-              {saleTypeData?.saleType === "auction" && (
-                <Gavel className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-              )}
-              {saleTypeData?.saleType === "expression" && (
-                <MailQuestion className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-              )}
-              {displayText}
-            </div>
+            <div className="flex items-center">{getDisplayContent()}</div>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent style={{ width: menuWidth }} className="w-full">
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="w-full">
-              <Gavel className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-              Auction
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent
-              style={{ width: menuWidth }}
-              className="w-full"
-            >
-              {auctionDetails.map((location) => (
-                <DropdownMenuItem
-                  className="w-full"
-                  key={location.value}
-                  onClick={() =>
-                    handleSaleTypeAndLocationSelect("auction", location.value)
-                  }
-                >
-                  <MapPin className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                  {location.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-          <DropdownMenuItem
-            onClick={() => handleSaleTypeAndLocationSelect("expression")}
-          >
+          <DropdownMenuItem onClick={() => handleSaleTypeSelect("auction")}>
+            <Gavel className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            Auction
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleSaleTypeSelect("expression")}>
             <MailQuestion className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            Expressions of Interest
+            Expression of Interest
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

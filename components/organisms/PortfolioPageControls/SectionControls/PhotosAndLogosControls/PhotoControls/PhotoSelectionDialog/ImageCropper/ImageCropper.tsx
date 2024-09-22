@@ -13,6 +13,7 @@ import {
   photoDataOptions,
   updatePhoto,
 } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { getAspectRatio } from "@/utils/sandbox/document-generator/portfolio-page/getAspectRatio";
 
 interface ImageCropperProps {
   src: string;
@@ -54,7 +55,9 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const imgRef = useRef<HTMLImageElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const aspect = 16 / 9;
+  const aspect = photoData
+    ? getAspectRatio(photoData.photoCount, index)
+    : 16 / 9;
 
   const updatePhotoMutation = useMutation({
     mutationFn: (newPhotoData: {
@@ -167,7 +170,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
           src={src}
           alt="Crop me"
           onLoad={onImageLoad}
-          style={{ maxHeight: "300px", width: "auto" }}
+          style={{ maxHeight: "2500px", width: "auto" }}
           crossOrigin="anonymous"
         />
       </ReactCrop>

@@ -12,8 +12,11 @@ import {
 } from "@/components/ui/popover";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Minus, Plus, Settings, RotateCcw, ArrowLeftRight } from "lucide-react";
+interface PreviewControlsProps {
+  isDisabled: boolean;
+}
 
-const PreviewControls = () => {
+const PreviewControls: React.FC<PreviewControlsProps> = ({ isDisabled }) => {
   const queryClient = useQueryClient();
   const [slidersOpen, setSlidersOpen] = useState(false);
 
@@ -56,7 +59,7 @@ const PreviewControls = () => {
       pageSide: previewSettings?.pageSide === "left" ? "right" : "left",
     });
 
-  if (!previewSettings) return null;
+  if (!previewSettings || isDisabled) return null;
 
   return (
     <Card className="flex items-center justify-between space-x-2 p-2">
