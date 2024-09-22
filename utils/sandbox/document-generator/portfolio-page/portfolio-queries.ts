@@ -5,11 +5,10 @@ interface PhotoData {
   photoCount: number;
   photos: {
     original: string | null;
-    cropped: string | null;
+    cropped: string | null; // This will be the same as original
     crop: { x: number; y: number; width: number; height: number } | null;
   }[];
 }
-
 // Photo Data
 export const photoDataOptions = queryOptions({
   queryKey: ["photoData"],
@@ -336,32 +335,31 @@ export const updateAgents = async (
 
   return newAgentsData;
 };
-
 export interface SaleTypeData {
-  saleType: string;
-  auctionLocation?: string;
-  closingTime?: string;
-  closingAmPm?: "AM" | "PM";
-  closingDate?: Date;
-  auctionTime?: string;
-  auctionAmPm?: "AM" | "PM";
-  auctionDate?: Date;
-  auctionVenue?: string;
+  saleType: "auction" | "expression" | "";
+  expressionOfInterest?: {
+    closingTime?: string;
+    closingAmPm?: "AM" | "PM";
+    closingDate?: Date;
+  };
+  auctionId?: string;
+}
+
+export interface Auction {
+  id: string;
+  auctionDate: Date;
+  auctionTime: string;
+  auctionAmPm: "AM" | "PM";
+  // Add any other relevant auction fields
 }
 
 // Sale Type Data
 export const saleTypeDataOptions = queryOptions({
   queryKey: ["saleTypeData"],
   queryFn: async (): Promise<SaleTypeData> => {
-    // const supabase = createClient();
-    // Fetch sale type data from Supabase
-    // For now, we'll return a dummy structure
+    // Fetch from your backend or return initial data
     return {
       saleType: "",
-      auctionLocation: "",
-      closingTime: "",
-      closingAmPm: "AM",
-      closingDate: new Date(),
     };
   },
 });
@@ -371,9 +369,6 @@ export const updateSaleType = async (
 ): Promise<SaleTypeData> => {
   // const supabase = createClient();
   console.log("Updating sale type", newSaleTypeData);
-
-  // Here you would update the data in Supabase
-  // await supabase.from('saleType').update(newSaleTypeData).eq('id', currentSaleTypeData.id);
 
   return newSaleTypeData;
 };

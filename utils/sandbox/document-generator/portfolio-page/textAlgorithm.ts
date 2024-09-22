@@ -20,13 +20,13 @@ export const textProperties = {
   address: {
     fontSize: 4.25,
     fontColor: "portfolio-address",
-    fontWeight: 700,
+    fontWeight: 500,
     fontFamily: "lexia",
     extraClass: "",
     leading: null,
   },
   financeCopy: {
-    fontSize: 4.25,
+    fontSize: 4.2,
     fontColor: "portfolio-financeCopy",
     fontWeight: 500,
     fontFamily: "lexia",
@@ -34,12 +34,12 @@ export const textProperties = {
     leading: 5,
   },
   netIncome: {
-    fontSize: 4.1,
+    fontSize: 3.9,
     fontColor: "portfolio-financeCopy",
     fontWeight: 800,
     fontFamily: "lexia",
     extraClass: "",
-    leading: null,
+    leading: 4,
   },
   propertyCopyBullet: {
     fontSize: 3.75,
@@ -108,10 +108,11 @@ export const textAlgorithm = (
 
   return {
     getTailwind: () =>
-      `text-${fontColor} font-[${fontWeight}] font-${fontFamily} ${extraClass}`.trim(),
+      `text-${fontColor} font-${fontFamily} ${extraClass}`.trim(),
     getStyle: () => ({
       fontSize: `${scaledFontSize}px`,
       ...(scaledLeading && { lineHeight: `${scaledLeading}px` }),
+      ...(fontWeight && { fontWeight }), // Include fontWeight in the style object
     }),
   };
 };

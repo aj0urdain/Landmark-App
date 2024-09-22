@@ -1,4 +1,4 @@
-export function hasAccess(
+export function hasDepartmentAccess(
   userDepartments: string[] | null | undefined,
   requiredAccess: string[],
 ): boolean {
