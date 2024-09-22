@@ -1,27 +1,61 @@
+import { getSalesforceToken } from "./getSalesforceToken";
+
 interface TokenData {
   token: string;
-  expiresAt: number;
 }
+
+// Initialize with an invalid token
 
 const tokenCache = new Map<string, TokenData>();
 
-export function getTokenFromCache(
-  key: string = 'salesforce'
-): TokenData | undefined {
-  const data = tokenCache.get(key);
-  if (data && Date.now() < data.expiresAt) {
-    console.log('Token is still valid and retrieved from cache.');
-    return data;
+tokenCache.set("salesforce", { token: "INVALID_TOKEN" });
+
+export async function getToken(
+  key: string = "salesforce",
+  simulateError: boolean = false,
+): Promise<string> {
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  async function attemptGetToken(): Promise<string> {
+    attempts++;
+    console.log(`Attempt ${attempts} to get token`);
+
+    const cachedData = tokenCache.get(key);
+    if (cachedData) {
+      console.log(
+        `Token retrieved from cache: ${cachedData.token.substring(0, 10)}...`,
+      );
+      return cachedData.token;
+    }
+
+    try {
+      console.log("Fetching new token from Salesforce");
+      const newToken = await getSalesforceToken(simulateError);
+      console.log(
+        `New token obtained: ${newToken.access_token.substring(0, 10)}...`,
+      );
+      tokenCache.set(key, { token: newToken.access_token });
+      return newToken.access_token;
+    } catch (error) {
+      console.error(
+        `Error getting Salesforce token (Attempt ${attempts}):`,
+        error,
+      );
+      if (attempts >= maxAttempts) {
+        throw new Error(
+          "Max attempts reached. Unable to obtain Salesforce token.",
+        );
+      }
+      console.log("Clearing invalid token from cache");
+      clearToken(key);
+      return attemptGetToken();
+    }
   }
-  return undefined;
+
+  return attemptGetToken();
 }
 
-export function setTokenInCache(
-  token: string,
-  expiresIn: number,
-  key: string = 'salesforce'
-): void {
-  const expiresAt = Date.now() + expiresIn * 1000; // Convert seconds to milliseconds
-  tokenCache.set(key, { token, expiresAt });
-  console.log('Token stored in cache.');
+export function clearToken(key: string = "salesforce"): void {
+  tokenCache.delete(key);
 }

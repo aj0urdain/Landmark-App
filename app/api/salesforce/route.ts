@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
 
       case "properties":
         query = new SOQLBuilder()
-          .select("Id", "Name", "CreatedById")
+          .select("fields(all)")
           .from("pba__Property__c")
           .orderBy("CreatedDate", "DESC")
-          .limit(30);
+          .limit(200);
         break;
 
       case "listingsByPortfolios":

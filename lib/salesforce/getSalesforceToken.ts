@@ -9,13 +9,22 @@ interface SalesforceToken {
   signature: string;
 }
 
-export async function getSalesforceToken(): Promise<SalesforceToken> {
+export async function getSalesforceToken(
+  simulateError: boolean = false,
+): Promise<SalesforceToken> {
+  if (simulateError) {
+    throw new Error("Simulated token fetch error");
+  }
+
   const params = new URLSearchParams();
   params.append("grant_type", "password");
   params.append("client_id", process.env.SALESFORCE_CLIENT_ID!);
   params.append("client_secret", process.env.SALESFORCE_CLIENT_SECRET!);
   params.append("username", process.env.SALESFORCE_USERNAME!);
-  params.append("password", process.env.SALESFORCE_PASSWORD!);
+  params.append(
+    "password",
+    process.env.SALESFORCE_PASSWORD! + process.env.SALESFORCE_SECURITY_TOKEN!,
+  );
 
   try {
     const response = await axios.post<SalesforceToken>(
