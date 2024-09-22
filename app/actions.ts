@@ -1,7 +1,5 @@
 "use server";
 
-import { userProfileOptions } from "@/types/userProfileTypes";
-import { getQueryClient } from "@/utils/get-query-client";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { getConfig } from "@/utils/supabase/config";
 import { createServerClient } from "@/utils/supabase/server";
@@ -245,10 +243,6 @@ export const verifyOtpAction = async (formData: FormData) => {
 export const signOutAction = async () => {
   const supabase = createServerClient();
   await supabase.auth.signOut();
-
-  // Clear user profile data
-  const queryClient = getQueryClient();
-  queryClient.setQueryData(userProfileOptions.queryKey, null);
 
   return redirect("/sign-in");
 };

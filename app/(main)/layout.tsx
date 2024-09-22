@@ -38,7 +38,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-scroll">{children}</main>
+        <main className="mx-4 flex h-full w-full items-center justify-center overflow-y-scroll py-4 2xl:mx-auto">
+          <div className="h-full w-full max-w-6xl">{children}</div>
+        </main>
       </div>
     </div>
   );
