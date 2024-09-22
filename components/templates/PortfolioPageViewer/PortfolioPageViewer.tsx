@@ -4,9 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState, useRef, useEffect } from "react";
 import LocationTab from "./LocationTab/LocationTab";
-import PhotoRender from "./PhotoRender/PhotoRender";
-import PhotoRenderB from "./PhotoRender/PhotoRenderB";
-import PhotoRenderC from "./PhotoRender/PhotoRenderC";
 import HeadlineSection from "./HeadlineSection/HeadlineSection";
 import AddressSection from "./AddressSection/AddressSection";
 import FinanceCopySection from "./FinanceCopySection/FinanceCopySection";
@@ -14,10 +11,17 @@ import FinanceAmountSection from "./FinanceAmountSection/FinanceAmountSection";
 import BottomPageBorder from "./BottomPageBorder/BottomPageBorder";
 import PropertyCopySection from "./PropertyCopySection/PropertyCopySection";
 import ContactSection from "./ContactSection/ContactSection";
+import PhotoRenderNEW from "./PhotoRender/PhotoRenderNEW";
 
 const A4_ASPECT_RATIO = 297 / 210; // height / width
 
-const PortfolioPageViewer = () => {
+interface PortfolioPageViewerProps {
+  selectedPropertyId: string | null;
+}
+
+const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
+  selectedPropertyId,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [zoom, setZoom] = useState(1);
@@ -88,6 +92,25 @@ const PortfolioPageViewer = () => {
     );
   }, [queryClient, previewSettings?.zoom, scale]);
 
+  if (!selectedPropertyId) {
+    return (
+      <div
+        ref={containerRef}
+        className="relative flex h-full w-full items-center justify-center overflow-auto"
+      >
+        <div
+          className="flex items-center justify-center border-2 border-dashed border-gray-300 bg-transparent text-gray-500"
+          style={{
+            width: `${210 * scale}px`,
+            height: `${297 * scale}px`,
+          }}
+        >
+          Select a property or sandbox mode to get started
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={containerRef} className="relative h-full w-full overflow-auto">
       <div
@@ -119,12 +142,14 @@ const PortfolioPageViewer = () => {
           {/* A4 content */}
           {/* State Tab */}
           <LocationTab />
-
+          {/* 
           <PhotoRender />
 
           <PhotoRenderB />
 
-          <PhotoRenderC />
+          <PhotoRenderC /> */}
+
+          <PhotoRenderNEW />
 
           <HeadlineSection />
 
@@ -139,17 +164,6 @@ const PortfolioPageViewer = () => {
           <ContactSection />
 
           <BottomPageBorder />
-
-          {/* <div
-            className="absolute bottom-[15%] left-[10%]"
-            style={{
-              fontSize: `${14 * scale * (previewSettings?.zoom ?? 1)}px`,
-              width: `${150 * scale * (previewSettings?.zoom ?? 1)}px`,
-            }}
-          >
-            This is a longer paragraph of text that will wrap based on the
-            scaled width.
-          </div> */}
         </div>
       </div>
     </div>
