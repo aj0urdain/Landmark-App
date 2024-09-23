@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { saleTypeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { saleTypeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import SaleTypeDropdown from "./SaleTypeDropdown/SaleTypeDropdown";
 import ClosingTimePicker from "./ExpressionsOfInterest/ClosingTimePicker/ClosingTimePicker";
 import ClosingDatePicker from "./ExpressionsOfInterest/ClosingDatePicker/ClosingDatePicker";

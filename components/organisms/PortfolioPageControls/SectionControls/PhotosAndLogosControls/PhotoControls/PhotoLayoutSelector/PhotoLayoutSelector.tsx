@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   photoDataOptions,
   updatePhotoCount,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { Square, Rows2, LayoutPanelTop, LayoutGrid } from "lucide-react";
 import {
   Select,

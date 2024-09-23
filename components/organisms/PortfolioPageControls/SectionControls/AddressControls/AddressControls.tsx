@@ -1,40 +1,28 @@
 import React from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  AddressData,
-  addressDataOptions,
-  updateAddress,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { useQuery } from "@tanstack/react-query";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import StateSelector from "./StateSelector/StateSelector";
+import {
+  documentDataOptions,
+  useUpdateDocumentData,
+  AddressData,
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 
-const AddressControls: React.FC = () => {
-  const queryClient = useQueryClient();
-  const { data: addressData } = useQuery(addressDataOptions);
+const AddressControls: React.FC<{ documentId: number }> = ({ documentId }) => {
+  const { data: documentData } = useQuery(documentDataOptions(documentId));
+  const updateDocumentData = useUpdateDocumentData();
 
-  const updateAddressMutation = useMutation({
-    mutationFn: (newAddressData: AddressData) => {
-      if (!addressData) throw new Error("Address data not available");
-      return updateAddress(newAddressData);
-    },
-    onSuccess: (newAddressData) => {
-      queryClient.setQueryData(addressDataOptions.queryKey, newAddressData);
-    },
-  });
+  if (!documentData) return null;
 
-  if (!addressData) return null;
+  const { addressData } = documentData;
 
   const handleInputChange = (key: keyof AddressData, value: string) => {
-    if (addressData) {
-      updateAddressMutation.mutate({ ...addressData, [key]: value });
-    }
-  };
-
-  const handleStateSelect = (state: string) => {
-    if (addressData) {
-      updateAddressMutation.mutate({ ...addressData, state });
-    }
+    updateDocumentData(documentId, (prevData) => ({
+      ...prevData,
+      addressData: { ...prevData.addressData, [key]: value },
+    }));
   };
 
   return (
@@ -51,10 +39,7 @@ const AddressControls: React.FC = () => {
             placeholder="Enter suburb..."
           />
         </div>
-        <StateSelector
-          selectedState={addressData.state}
-          onStateSelect={handleStateSelect}
-        />
+        <StateSelector />
       </div>
       <div className="space-y-0.5">
         <Label htmlFor="additional" className="text-xs text-muted-foreground">

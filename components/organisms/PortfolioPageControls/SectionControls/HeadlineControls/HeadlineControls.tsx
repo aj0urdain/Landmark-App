@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   headlineDataOptions,
   updateHeadline,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 

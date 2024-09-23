@@ -7,7 +7,7 @@ import {
   agentsDataOptions,
   updateAgents,
   Agent,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { agentsConfig } from "@/lib/agentsConfig";
 import {
   Table,

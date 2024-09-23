@@ -4,7 +4,7 @@ import {
   saleTypeDataOptions,
   updateSaleType,
   SaleTypeData,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

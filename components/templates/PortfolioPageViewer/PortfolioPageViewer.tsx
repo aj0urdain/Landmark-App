@@ -11,7 +11,8 @@ import FinanceAmountSection from "./FinanceAmountSection/FinanceAmountSection";
 import BottomPageBorder from "./BottomPageBorder/BottomPageBorder";
 import PropertyCopySection from "./PropertyCopySection/PropertyCopySection";
 import ContactSection from "./ContactSection/ContactSection";
-import PhotoRenderNEW from "./PhotoRender/PhotoRenderNEW";
+import PhotoRender from "./PhotoRender/PhotoRender";
+import LogoSection from "./LogoSection/LogoSection";
 
 const A4_ASPECT_RATIO = 297 / 210; // height / width
 
@@ -142,16 +143,12 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
           {/* A4 content */}
           {/* State Tab */}
           <LocationTab />
-          {/* 
+
           <PhotoRender />
 
-          <PhotoRenderB />
-
-          <PhotoRenderC /> */}
-
-          <PhotoRenderNEW />
-
           <HeadlineSection />
+
+          <LogoSection />
 
           <AddressSection />
 

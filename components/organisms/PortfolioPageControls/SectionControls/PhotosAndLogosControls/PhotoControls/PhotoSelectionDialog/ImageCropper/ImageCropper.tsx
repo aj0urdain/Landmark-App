@@ -12,7 +12,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   photoDataOptions,
   updatePhoto,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { getAspectRatio } from "@/utils/sandbox/document-generator/portfolio-page/getAspectRatio";
 
 interface ImageCropperProps {

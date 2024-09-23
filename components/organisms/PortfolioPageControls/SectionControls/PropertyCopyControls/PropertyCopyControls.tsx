@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   propertyCopyDataOptions,
   updatePropertyCopyData,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 
 const PropertyCopyControls: React.FC = () => {
   const queryClient = useQueryClient();

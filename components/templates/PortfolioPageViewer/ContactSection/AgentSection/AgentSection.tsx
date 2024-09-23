@@ -1,7 +1,7 @@
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { textAlgorithm } from "@/utils/sandbox/document-generator/portfolio-page/textAlgorithm";
 import Image from "next/image";
-import { agentsDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { agentsDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 
 const AgentSection = () => {
   const queryClient = useQueryClient();

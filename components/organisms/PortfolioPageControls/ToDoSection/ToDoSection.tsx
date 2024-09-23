@@ -11,7 +11,7 @@ import {
   propertyCopyDataOptions,
   agentsDataOptions,
   saleTypeDataOptions,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 
 const ToDoSection: React.FC = () => {
   const { data: photoData } = useQuery(photoDataOptions);

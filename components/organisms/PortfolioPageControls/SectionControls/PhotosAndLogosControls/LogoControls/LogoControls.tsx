@@ -4,7 +4,7 @@ import {
   logoDataOptions,
   updateLogoCount,
   updateLogoOrientation,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -61,6 +61,7 @@ const LogoControls: React.FC = () => {
               <SelectValue placeholder="Number of logos" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="0">No Logo</SelectItem>
               {[1, 2].map((num) => (
                 <SelectItem key={num} value={num.toString()}>
                   {num} {num === 1 ? "Logo" : "Logos"}
@@ -70,45 +71,49 @@ const LogoControls: React.FC = () => {
           </Select>
         </div>
 
-        <div className="w-full space-y-0.5">
-          <Label
-            htmlFor="logo-orientation"
-            className="ml-2 text-xs text-muted-foreground"
-          >
-            Logo Orientation
-          </Label>
-          <Select
-            value={logoData.logoOrientation}
-            onValueChange={(value: "horizontal" | "vertical") =>
-              updateLogoOrientationMutation.mutate(value)
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Logo orientation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="horizontal">Horizontal</SelectItem>
-              <SelectItem value="vertical">Vertical</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {logoData.logoCount > 0 && (
+          <div className="w-full space-y-0.5">
+            <Label
+              htmlFor="logo-orientation"
+              className="ml-2 text-xs text-muted-foreground"
+            >
+              Logo Orientation
+            </Label>
+            <Select
+              value={logoData.logoOrientation}
+              onValueChange={(value: "horizontal" | "vertical") =>
+                updateLogoOrientationMutation.mutate(value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Logo orientation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="horizontal">Horizontal</SelectItem>
+                <SelectItem value="vertical">Vertical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
-      <div
-        className={`grid gap-4 ${
-          logoData.logoOrientation === "horizontal"
-            ? "grid-cols-2"
-            : "grid-cols-1"
-        } rounded-lg border border-slate-800 p-4`}
-      >
-        {Array.from({ length: logoData.logoCount }).map((_, index) => (
-          <LogoSelectionDialog
-            key={index}
-            index={index}
-            logoUrl={logoData.logos[index]}
-          />
-        ))}
-      </div>
+      {logoData.logoCount > 0 && (
+        <div
+          className={`grid gap-4 ${
+            logoData.logoOrientation === "horizontal"
+              ? "grid-cols-2"
+              : "grid-cols-1"
+          } rounded-lg border border-slate-800 p-4`}
+        >
+          {Array.from({ length: logoData.logoCount }).map((_, index) => (
+            <LogoSelectionDialog
+              key={index}
+              index={index}
+              logoUrl={logoData.logos[index]}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

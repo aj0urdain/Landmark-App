@@ -1,6 +1,6 @@
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { textAlgorithm } from "@/utils/sandbox/document-generator/portfolio-page/textAlgorithm";
-import { propertyCopyDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { propertyCopyDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 
 const PropertyCopySection = () => {
   const queryClient = useQueryClient();

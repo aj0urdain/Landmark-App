@@ -1,29 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { createBrowserClient } from "@/utils/supabase/client";
 
 import PropertySelector from "./PropertySelector/PropertySelector";
 import ToDoSection from "./ToDoSection/ToDoSection";
 import SectionSelector from "./SectionSelector/SectionSelector";
 import SectionControls from "./SectionControls/SectionControls";
-import { Property, SectionName } from "@/types/portfolioControlsTypes";
+import { SectionName } from "@/types/portfolioControlsTypes";
 import { useQuery } from "@tanstack/react-query";
-import {
-  getProfileFromID,
-  UserProfile,
-} from "@/utils/supabase/supabase-queries";
-import { User } from "lucide-react";
 
-interface PropertyData {
-  id: string;
-  street_number: string;
-  streets: { street_name: string };
-  suburbs: { suburb_name: string };
-  lead_agent: string;
-}
+import { User } from "lucide-react";
+import {
+  documentDataOptions,
+  portfolioPagePropertyOptions,
+  leadAgentProfileOptions,
+  useSavePortfolioDocument,
+  DocumentData,
+  propertiesOptions,
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
+
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { ToastAction } from "@/components/ui/toast";
+import { SaveDocumentError } from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queriesOLD";
 
 const PortfolioPageControls = ({
   isDisabled,
@@ -35,109 +36,161 @@ const PortfolioPageControls = ({
   const [selectedSection, setSelectedSection] = useState<SectionName | null>(
     null,
   );
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [myProperties, setMyProperties] = useState<Property[]>([]);
-  const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [propertySelectorOpen, setPropertySelectorOpen] = useState(false);
-
-  const [leadAgentProfile, setLeadAgentProfile] = useState<UserProfile | null>(
-    null,
-  );
 
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const selectedPropertyId = searchParams.get("property");
+  const documentId = searchParams.get("document");
 
-  const { data: propertyData } = useQuery({
-    queryKey: ["property", selectedPropertyId],
-    queryFn: async () => {
-      if (!selectedPropertyId) return null;
-      const supabase = createBrowserClient();
-      const { data, error } = await supabase
-        .from("properties")
-        .select(
-          `
-          id,
-          street_number,
-          streets (street_name),
-          suburbs (suburb_name),
-          lead_agent
-        `,
-        )
-        .eq("id", selectedPropertyId)
-        .single();
+  const { data: documentData } = useQuery(
+    documentDataOptions(Number(documentId)),
+  );
+  const { data: propertyData } = useQuery(
+    portfolioPagePropertyOptions(selectedPropertyId),
+  );
+  const { data: leadAgentProfile } = useQuery(
+    leadAgentProfileOptions(propertyData?.lead_agent),
+  );
+  const { data: properties } = useQuery(propertiesOptions());
 
-      if (error) throw error;
-      return data as unknown as PropertyData;
-    },
-    enabled: !!selectedPropertyId,
-  });
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (propertyData?.lead_agent) {
-      getProfileFromID(propertyData.lead_agent).then((profile) => {
-        setLeadAgentProfile(profile);
-      });
-    }
-  }, [propertyData?.lead_agent]);
-
-  useEffect(() => {
-    const fetchProperties = async () => {
-      const supabase = createBrowserClient();
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData.user?.id;
-
-      const { data, error } = await supabase.from("properties").select(`
-          id,
-          street_number,
-          streets(street_name),
-          suburbs(suburb_name, postcode),
-          states(state_name, short_name),
-          associated_agents,
-          property_type,
-          lead_agent
-        `);
-
-      if (error) {
-        console.log(`property fetch fucked it`);
-        console.error("Error fetching properties:", error);
-        return;
-      }
-
-      console.log(data);
-
-      setProperties(data as unknown as Property[]);
-
-      const myProps = data.filter(
-        (prop) =>
-          prop.lead_agent === userId ||
-          prop?.associated_agents?.includes(userId),
-      );
-      setMyProperties(myProps as unknown as Property[]);
-
-      const allProps = data.filter(
-        (prop) =>
-          prop.lead_agent !== userId &&
-          !prop?.associated_agents?.includes(userId),
-      );
-      setAllProperties(allProps as unknown as Property[]);
-    };
-
-    fetchProperties();
-  }, []);
+  const savePortfolioMutation = useSavePortfolioDocument();
 
   const handlePropertySelect = (id: string) => {
-    // Create a new URLSearchParams object with only the property parameter
     const newParams = new URLSearchParams();
     newParams.set("property", id);
-
-    // Push the new URL, effectively removing all other parameters
     router.push(`${pathname}?${newParams.toString()}`, {
       scroll: false,
     });
     setPropertySelectorOpen(false);
+  };
+
+  const areNecessaryFieldsCompleted = () => {
+    if (!documentData) return false;
+    const {
+      addressData,
+      headlineData,
+      financeData,
+      propertyCopyData,
+      agentsData,
+      saleTypeData,
+    } = documentData;
+    return (
+      !!addressData?.suburb &&
+      !!addressData?.state &&
+      !!addressData?.street &&
+      !!headlineData?.headline &&
+      !!financeData?.financeCopy &&
+      !!financeData?.financeType &&
+      !!financeData?.financeAmount &&
+      !!propertyCopyData?.propertyCopy &&
+      agentsData?.agents &&
+      agentsData.agents.length > 0 &&
+      !!saleTypeData?.saleType &&
+      (saleTypeData.saleType !== "auction" || !!saleTypeData.auctionId) &&
+      (saleTypeData.saleType !== "expression" ||
+        (saleTypeData.expressionOfInterest &&
+          !!saleTypeData.expressionOfInterest.closingTime &&
+          !!saleTypeData.expressionOfInterest.closingAmPm &&
+          !!saleTypeData.expressionOfInterest.closingDate))
+    );
+  };
+
+  const handleSave = async () => {
+    if (!selectedPropertyId || !documentId) {
+      toast({
+        title: "Error",
+        description: "No property or document selected",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const result = await savePortfolioMutation.mutateAsync({
+        documentId: Number(documentId),
+        documentData: documentData as DocumentData,
+      });
+
+      // Update URL with new document ID and version number
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.set("document", result.documentId.toString());
+      newParams.set("version", result.versionNumber.toString());
+      router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
+
+      // Show success toast
+      toast({
+        title: "Success",
+        description: "Document saved successfully",
+        action: <ToastAction altText="View">View</ToastAction>,
+      });
+    } catch (error) {
+      console.error("Error saving document:", error);
+      // Cast the error to our custom type
+      const saveError = error as SaveDocumentError;
+      if (saveError.toastData) {
+        toast({
+          ...saveError.toastData,
+          action: (
+            <ToastAction altText={saveError.toastData.action}>
+              {saveError.toastData.action}
+            </ToastAction>
+          ),
+        });
+      } else {
+        // Fallback toast if no toast data is available
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!areNecessaryFieldsCompleted()) {
+      toast({
+        title: "Error",
+        description: "Please complete all necessary fields before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Perform the same save operation as handleSave
+      // You might want to add additional logic for submission here
+      await handleSave();
+
+      toast({
+        title: "Success",
+        description: "Document submitted successfully",
+        action: <ToastAction altText="View document">View</ToastAction>,
+      });
+    } catch (error) {
+      console.error("Error submitting document:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit document",
+        variant: "destructive",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -145,9 +198,9 @@ const PortfolioPageControls = ({
       <div className="mb-4">
         <Label>Choose a property</Label>
         <PropertySelector
-          properties={properties}
-          myProperties={myProperties}
-          allProperties={allProperties}
+          properties={properties?.allProperties || []}
+          myProperties={properties?.myProperties || []}
+          allProperties={properties?.allProperties || []}
           selectedPropertyId={selectedPropertyId}
           onSelect={handlePropertySelect}
           propertySelectorOpen={propertySelectorOpen}
@@ -178,6 +231,20 @@ const PortfolioPageControls = ({
       {!isDisabled && canEdit && (
         <div className="mb-4">
           <Separator className="my-8" />
+
+          <div className="flex space-x-4">
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save"}
+            </Button>
+
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting || !areNecessaryFieldsCompleted()}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+
           <ToDoSection />
           <SectionSelector
             onValueChange={(value) => setSelectedSection(value as SectionName)}

@@ -16,7 +16,7 @@ import FileUpload from "./FileUpload/FileUpload";
 import UrlInput from "./UrlInput/UrlInput";
 import CloudImages from "./CloudImages/CloudImages";
 import ImageCropper from "./ImageCropper/ImageCropper";
-import { photoDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { photoDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 
 interface PhotoSelectionDialogProps {
   index: number;

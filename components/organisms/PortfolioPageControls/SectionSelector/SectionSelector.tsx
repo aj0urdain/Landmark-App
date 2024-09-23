@@ -19,7 +19,7 @@ import {
   propertyCopyDataOptions,
   agentsDataOptions,
   saleTypeDataOptions,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { Dot } from "@/components/atoms/Dot/Dot";
 
 interface SectionSelectorProps {
@@ -128,7 +128,11 @@ const SectionSelector: React.FC<SectionSelectorProps> = ({ onValueChange }) => {
               {
                 name: "Enter EOI Details",
                 isNecessary: true,
-                isDone: !!saleTypeData?.expressionOfInterest?.closingDate,
+                isDone:
+                  saleTypeData?.expressionOfInterest &&
+                  !!saleTypeData.expressionOfInterest.closingTime &&
+                  !!saleTypeData.expressionOfInterest.closingAmPm &&
+                  !!saleTypeData.expressionOfInterest.closingDate,
               },
             ]
           : []),

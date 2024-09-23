@@ -1,7 +1,7 @@
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { textAlgorithm } from "@/utils/sandbox/document-generator/portfolio-page/textAlgorithm";
 import Image from "next/image";
-import { saleTypeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { saleTypeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import { format, parseISO } from "date-fns";
 import { createBrowserClient } from "@/utils/supabase/client";
 

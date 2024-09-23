@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { textAlgorithm } from "@/utils/sandbox/document-generator/portfolio-page/textAlgorithm";
-import { financeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { financeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 
 const FinanceAmountSection = () => {
   const queryClient = useQueryClient();

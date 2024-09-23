@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   financeDataOptions,
   updateFinanceData,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from "@/utils/sandbox/document-generator/portfolio-page/PortfolioQueries/portfolio-queries";
 import FinanceCopyInput from "./FinanceCopyInput/FinanceCopyInput";
 import FinanceTypeSelect from "./FinanceTypeSelect/FinanceTypeSelect";
 import FinanceAmountInput from "./FinanceAmountInput/FinanceAmountInput";
