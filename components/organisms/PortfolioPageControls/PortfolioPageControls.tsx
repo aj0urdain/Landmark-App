@@ -17,6 +17,14 @@ import {
 } from "@/utils/supabase/supabase-queries";
 import { User } from "lucide-react";
 
+interface PropertyData {
+  id: string;
+  street_number: string;
+  streets: { street_name: string };
+  suburbs: { suburb_name: string };
+  lead_agent: string;
+}
+
 const PortfolioPageControls = ({
   isDisabled,
   canEdit,
@@ -62,7 +70,7 @@ const PortfolioPageControls = ({
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as PropertyData;
     },
     enabled: !!selectedPropertyId,
   });
