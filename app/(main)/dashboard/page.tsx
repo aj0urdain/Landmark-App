@@ -1,5 +1,5 @@
 import WelcomeCard from "@/components/molecules/DashboardCards/WelcomeCard/WelcomeCard";
-// import ReferenceCard from "@/components/molecules/DashboardCards/ReferenceCard/ReferenceCard";
+import ReferenceCard from "@/components/molecules/DashboardCards/ReferenceCard/ReferenceCard";
 import CompanyCarousel from "@/components/molecules/DashboardCards/CompanyCarousel/CompanyCarousel";
 
 import { DashboardCardRow } from "@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow";
@@ -8,7 +8,7 @@ import AgentPropertiesCard from "@/components/molecules/DashboardCards/AgentProp
 
 export default function DashboardPage() {
   return (
-    <div className="grid h-full w-full flex-col gap-4">
+    <div className="grid w-full grid-flow-dense flex-col gap-4">
       <DashboardFilter />
       <DashboardCardRow topRow={true}>
         <div className="col-span-5">
@@ -23,17 +23,6 @@ export default function DashboardPage() {
           <AgentPropertiesCard />
         </div>
       </DashboardCardRow>
-      {/* <DashboardCardRow>
-        <div className="col-span-4 max-h-[275px]">
-          <ReferenceCard />
-        </div>
-        <div className="col-span-3 max-h-[275px]">
-          <ReferenceCard />
-        </div>
-        <div className="col-span-5 max-h-[275px]">
-          <ReferenceCard />
-        </div>
-      </DashboardCardRow>
       <DashboardCardRow>
         <div className="col-span-4 max-h-[275px]">
           <ReferenceCard />
@@ -45,17 +34,6 @@ export default function DashboardPage() {
           <ReferenceCard />
         </div>
       </DashboardCardRow>
-      <DashboardCardRow>
-        <div className="col-span-4 max-h-[275px]">
-          <ReferenceCard />
-        </div>
-        <div className="col-span-3 max-h-[275px]">
-          <ReferenceCard />
-        </div>
-        <div className="col-span-5 max-h-[275px]">
-          <ReferenceCard />
-        </div>
-      </DashboardCardRow> */}
     </div>
   );
 }
