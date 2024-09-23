@@ -37,7 +37,7 @@ const FinanceCopyInput: React.FC<FinanceCopyInputProps> = ({
         value={value}
         onChange={handleChange}
         placeholder="Enter finance copy here... (Each line will be a separate block)"
-        rows={10}
+        rows={8}
       />
     </div>
   );
