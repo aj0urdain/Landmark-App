@@ -8,8 +8,6 @@ interface TokenData {
 
 const tokenCache = new Map<string, TokenData>();
 
-tokenCache.set("salesforce", { token: "INVALID_TOKEN" });
-
 export async function getToken(
   key: string = "salesforce",
   simulateError: boolean = false,
