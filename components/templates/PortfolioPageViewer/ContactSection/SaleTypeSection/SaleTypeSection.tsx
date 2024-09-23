@@ -2,108 +2,142 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { textAlgorithm } from "@/utils/sandbox/document-generator/portfolio-page/textAlgorithm";
 import Image from "next/image";
 import { saleTypeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
-// import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { createBrowserClient } from "@/utils/supabase/client";
 
 const SaleTypeSection = () => {
   const queryClient = useQueryClient();
   const { data: saleTypeData } = useQuery(saleTypeDataOptions);
 
-  // const textHeaderProps = textAlgorithm("contactHeader", queryClient);
-  // const textProps = textAlgorithm("agents", queryClient);
+  const { data: auctionData } = useQuery({
+    queryKey: ["auction", saleTypeData?.auctionId],
+    queryFn: async () => {
+      if (!saleTypeData?.auctionId) return null;
+      const supabase = createBrowserClient();
+      const { data, error } = await supabase
+        .from("auctions")
+        .select(
+          `
+          *,
+          auction_locations (name),
+          auction_venues (name)
+        `,
+        )
+        .eq("id", saleTypeData.auctionId)
+        .single();
+
+      if (error) throw error;
+      console.log("Auction data:", data);
+      return data;
+    },
+    enabled: saleTypeData?.saleType === "auction" && !!saleTypeData?.auctionId,
+  });
+
+  const placeholderAuctionData = {
+    date: new Date().toISOString(),
+    auction_venues: { name: "Venue TBA" },
+    auction_locations: { name: "Location TBA" },
+  };
+
+  const textHeaderProps = textAlgorithm("contactHeader", queryClient);
+  const textProps = textAlgorithm("agents", queryClient);
   const footNoteProps = textAlgorithm("footNote", queryClient);
 
   const isAuction = saleTypeData?.saleType === "auction";
 
-  // const removeLeadingZero = (time: string | undefined) => {
-  //   return time ? time.replace(/^0/, "") : "";
-  // };
+  const removeLeadingZero = (time: string | undefined) => {
+    return time ? time.replace(/^0/, "") : "";
+  };
+
+  const formatAuctionTime = (dateString: string) => {
+    const date = parseISO(dateString);
+    const formattedTime = format(date, "h:mma");
+    return formattedTime.toLowerCase() + " AEST";
+  };
 
   const renderSaleTypeContent = () => {
-    return <div>Hello</div>;
-
-    // if (isAuction) {
-    //   return (
-    //     <>
-    //       <div className="space-y-[5%]">
-    //         <p
-    //           className={`${textHeaderProps.getTailwind()} w-full font-black`}
-    //           style={textHeaderProps.getStyle()}
-    //         >
-    //           Investment Portfolio Auction
-    //         </p>
-    //         {/* <p
-    //           className={`${textHeaderProps.getTailwind()} w-full font-black`}
-    //           style={textHeaderProps.getStyle()}
-    //         >
-    //           Auction
-    //         </p> */}
-    //       </div>
-    //       <div className="flex h-full w-full flex-col items-start justify-start gap-[1.75%]">
-    //         <p
-    //           className={`${textProps.getTailwind()} w-full`}
-    //           style={textProps.getStyle()}
-    //         >
-    //           {removeLeadingZero(saleTypeData?.auctionTime)}
-    //           <span className="lowercase">
-    //             {saleTypeData?.auctionAmPm}
-    //           </span>{" "}
-    //           AEST
-    //         </p>
-    //         <p
-    //           className={`${textProps.getTailwind()} w-full`}
-    //           style={textProps.getStyle()}
-    //         >
-    //           {saleTypeData?.auctionDate &&
-    //             format(new Date(saleTypeData.auctionDate), "EEEE d MMMM")}{" "}
-    //         </p>
-    //         <p
-    //           className={`${textProps.getTailwind()} w-full`}
-    //           style={textProps.getStyle()}
-    //         >
-    //           {saleTypeData?.auctionVenue}
-    //         </p>
-    //       </div>
-    //     </>
-    //   );
-    // } else {
-    //   return (
-    //     <>
-    //       <div className="space-y-[5%]">
-    //         <p
-    //           className={`${textHeaderProps.getTailwind()} w-full font-black`}
-    //           style={textHeaderProps.getStyle()}
-    //         >
-    //           For Sale by
-    //         </p>
-    //         <p
-    //           className={`${textHeaderProps.getTailwind()} w-full font-black`}
-    //           style={textHeaderProps.getStyle()}
-    //         >
-    //           Expressions of Interest
-    //         </p>
-    //       </div>
-    //       <div className="flex h-full w-full flex-col items-start justify-start gap-[1.75%]">
-    //         <p
-    //           className={`${textProps.getTailwind()} w-full`}
-    //           style={textProps.getStyle()}
-    //         >
-    //           Closing {removeLeadingZero(saleTypeData?.closingTime)}
-    //           <span className="lowercase">
-    //             {saleTypeData?.closingAmPm}
-    //           </span>{" "}
-    //           AEST
-    //         </p>
-    //         <p
-    //           className={`${textProps.getTailwind()} w-full`}
-    //           style={textProps.getStyle()}
-    //         >
-    //           {saleTypeData?.closingDate &&
-    //             format(new Date(saleTypeData.closingDate), "EEEE d MMMM yyyy")}
-    //         </p>
-    //       </div>
-    //     </>
-    //   );
-    // }
+    if (isAuction) {
+      const displayData = auctionData || placeholderAuctionData;
+      const date = displayData?.date ? new Date(displayData.date) : new Date();
+      return (
+        <>
+          <div className="space-y-[5%]">
+            <p
+              className={`${textHeaderProps.getTailwind()} w-full font-black`}
+              style={textHeaderProps.getStyle()}
+            >
+              Investment Portfolio Auction
+            </p>
+          </div>
+          <div className="flex h-full w-full flex-col items-start justify-start gap-[1.75%]">
+            <p
+              className={`${textProps.getTailwind()} w-full`}
+              style={textProps.getStyle()}
+            >
+              {formatAuctionTime(date.toISOString())}
+            </p>
+            <p
+              className={`${textProps.getTailwind()} w-full`}
+              style={textProps.getStyle()}
+            >
+              {format(date, "EEEE d MMMM yyyy")}
+            </p>
+            <p
+              className={`${textProps.getTailwind()} w-full`}
+              style={textProps.getStyle()}
+            >
+              {displayData.auction_venues?.name ?? "Venue TBA"},{" "}
+              {displayData.auction_locations?.name ?? "Location TBA"}
+            </p>
+          </div>
+        </>
+      );
+    } else {
+      // Existing code for expression of interest
+      return (
+        <>
+          <div className="space-y-[5%]">
+            <p
+              className={`${textHeaderProps.getTailwind()} w-full font-black`}
+              style={textHeaderProps.getStyle()}
+            >
+              For Sale by
+            </p>
+            <p
+              className={`${textHeaderProps.getTailwind()} w-full font-black`}
+              style={textHeaderProps.getStyle()}
+            >
+              Expressions of Interest
+            </p>
+          </div>
+          <div className="flex h-full w-full flex-col items-start justify-start gap-[1.75%]">
+            <p
+              className={`${textProps.getTailwind()} w-full`}
+              style={textProps.getStyle()}
+            >
+              Closing{" "}
+              {removeLeadingZero(
+                saleTypeData?.expressionOfInterest?.closingTime,
+              )}
+              <span className="lowercase">
+                {saleTypeData?.expressionOfInterest?.closingAmPm}
+              </span>{" "}
+              AEST
+            </p>
+            <p
+              className={`${textProps.getTailwind()} w-full`}
+              style={textProps.getStyle()}
+            >
+              {saleTypeData?.expressionOfInterest?.closingDate &&
+                format(
+                  new Date(saleTypeData.expressionOfInterest.closingDate),
+                  "EEEE d MMMM yyyy",
+                )}
+            </p>
+          </div>
+        </>
+      );
+    }
   };
 
   return (
