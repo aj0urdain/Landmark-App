@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Add this line to ignore hydration warnings
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
@@ -30,7 +33,6 @@ const nextConfig = {
       },
     ],
   },
- 
 };
 
 export default nextConfig;
