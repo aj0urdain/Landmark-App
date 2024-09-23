@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { userProfileOptions } from "@/types/userProfileTypes";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Filter } from "lucide-react";
 
 export default function DashboardFilter() {
   const {
@@ -14,9 +16,9 @@ export default function DashboardFilter() {
 
   if (isLoading) {
     return (
-      <Card className="relative h-full w-full overflow-visible p-6">
-        <div className="animate-pulse">Loading...</div>
-      </Card>
+      <div className="flex w-full animate-pulse gap-2">
+        <Button variant="outline">Loading..</Button>
+      </div>
     );
   }
 
@@ -29,10 +31,18 @@ export default function DashboardFilter() {
   }
 
   return (
-    <div className="flex w-full gap-2">
-      <Button variant="outline">All</Button>
+    <div className="flex w-full animate-slide-down-fade-in items-center gap-2">
+      <Filter className="mr-2 size-4" />
+      <Button variant="default" size="sm" className="rounded-full px-6 py-2">
+        All
+      </Button>
       {userProfile?.departments?.map((department, index) => (
-        <Button variant="outline" key={index}>
+        <Button
+          variant="outline"
+          key={index}
+          size="sm"
+          className="rounded-full px-6 py-2 text-muted-foreground"
+        >
           {department}
         </Button>
       ))}
