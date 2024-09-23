@@ -64,7 +64,14 @@ const ToDoSection: React.FC = () => {
 
   return (
     <div className="mb-2 flex items-center justify-between">
-      <Label>To Do:</Label>
+      <Label>
+        <p
+          className={`${!Object.values(incompleteItems).some((count) => count > 0) && "text-muted"}`}
+        >
+          To Do Before Submission:
+        </p>
+      </Label>
+
       <div className="flex space-x-2">
         {Object.entries(incompleteItems).map(([section, count]) => {
           if (count > 0) {
