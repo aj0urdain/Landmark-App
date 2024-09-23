@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { userProfileOptions } from "@/types/userProfileTypes";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+
 import { Filter } from "lucide-react";
 
 export default function DashboardFilter() {
