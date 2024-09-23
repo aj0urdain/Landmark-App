@@ -1,4 +1,12 @@
-import { queryOptions } from "@tanstack/react-query";
+import { createBrowserClient } from "@/utils/supabase/client";
+import { getProfileFromID } from "@/utils/supabase/supabase-queries";
+import {
+  QueryClient,
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 // import { createClient } from "@/utils/supabase/client";
 
 interface PhotoData {
@@ -95,7 +103,7 @@ export const logoDataOptions = queryOptions({
     // Fetch logo data from Supabase
     // For now, we'll return a dummy structure
     return {
-      logoCount: 1,
+      logoCount: 0,
       logoOrientation: "horizontal",
       logos: [""],
     };
@@ -330,6 +338,8 @@ export const updateAgents = async (
     agents: newAgents,
   };
 
+  console.log("newAgentsData", newAgentsData);
+
   // Here you would update the data in Supabase
   // await supabase.from('agents').update(newAgentsData).eq('id', currentAgentsData.id);
 
@@ -371,4 +381,293 @@ export const updateSaleType = async (
   console.log("Updating sale type", newSaleTypeData);
 
   return newSaleTypeData;
+};
+
+export interface DocumentData {
+  addressData: AddressData;
+  headlineData: HeadlineData;
+  photoData: PhotoData;
+  financeData: FinanceData;
+  propertyCopyData: PropertyCopyData;
+  agentsData: AgentsData;
+  saleTypeData: SaleTypeData;
+  logoData: LogoData;
+}
+
+export interface Property {
+  id: string;
+  street_number: string;
+  streets: { street_name: string };
+  suburbs: { suburb_name: string; postcode: string };
+  states: { state_name: string; short_name: string };
+  associated_agents: string[];
+  property_type: string;
+  lead_agent: string;
+}
+
+export interface PropertiesData {
+  allProperties: Property[];
+  myProperties: Property[];
+  otherProperties: Property[];
+}
+
+export interface SaveDocumentError extends Error {
+  toastData?: {
+    title: string;
+    description: string;
+    variant: "default" | "destructive";
+    action: string;
+  };
+}
+
+// Function to save the document
+export const savePortfolioDocument = async (
+  documentId: number,
+  userId: string,
+  documentData: DocumentData,
+): Promise<{ documentId: number; versionNumber: number }> => {
+  const supabase = createBrowserClient();
+
+  await supabase
+    .from("documents")
+    .update({ document_data: documentData })
+    .eq("id", documentId);
+
+  const { data: latestVersion } = await supabase
+    .from("document_history")
+    .select("version_number")
+    .eq("document_id", documentId)
+    .order("version_number", { ascending: false })
+    .limit(1)
+    .single();
+
+  const newVersionNumber = latestVersion?.version_number + 1 || 1;
+
+  await supabase.from("document_history").insert({
+    document_id: documentId,
+    edited_by: userId,
+    version_number: newVersionNumber,
+    document_snapshot: documentData,
+    status_id: 1,
+    change_summary: "Document update",
+  });
+
+  return { documentId, versionNumber: newVersionNumber };
+};
+
+// Mutation hook for saving the document
+export const useSavePortfolioDocument = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      documentId,
+      documentData,
+    }: {
+      documentId: number;
+      documentData: DocumentData;
+    }) => {
+      const supabase = createBrowserClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No authenticated user found");
+
+      return savePortfolioDocument(documentId, user.id, documentData);
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["documentData", variables.documentId],
+      });
+    },
+  });
+};
+
+// Query option for fetching property data
+export const portfolioPagePropertyOptions = (
+  selectedPropertyId: string | null,
+) =>
+  queryOptions({
+    queryKey: ["portfolioPageProperty", selectedPropertyId],
+    queryFn: async () => {
+      if (!selectedPropertyId) return null;
+      const supabase = createBrowserClient();
+      const { data, error } = await supabase
+        .from("properties")
+        .select(
+          `
+          id,
+          street_number,
+          streets (street_name),
+          suburbs (suburb_name),
+          states (short_name),
+          lead_agent
+        `,
+        )
+        .eq("id", selectedPropertyId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedPropertyId,
+  });
+
+// Query option for fetching lead agent profile
+export const leadAgentProfileOptions = (leadAgentId: string | undefined) =>
+  queryOptions({
+    queryKey: ["leadAgentProfile", leadAgentId],
+    queryFn: () => getProfileFromID(leadAgentId || ""),
+    enabled: !!leadAgentId,
+  });
+
+// Query option for fetching properties
+export const propertiesOptions = () =>
+  queryOptions<PropertiesData>({
+    queryKey: ["properties"],
+    queryFn: async () => {
+      const supabase = createBrowserClient();
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+
+      const { data, error } = await supabase.from("properties").select(`
+          id,
+          street_number,
+          streets(street_name),
+          suburbs(suburb_name, postcode),
+          states(state_name, short_name),
+          associated_agents,
+          property_type,
+          lead_agent
+        `);
+
+      if (error) throw new Error(`Error fetching properties: ${error.message}`);
+
+      const allProperties = data as unknown as Property[];
+      const myProperties = allProperties.filter(
+        (prop) =>
+          prop.lead_agent === userId ||
+          prop?.associated_agents?.includes(userId || ""),
+      );
+      const otherProperties = allProperties.filter(
+        (prop) =>
+          prop.lead_agent !== userId &&
+          !prop?.associated_agents?.includes(userId || ""),
+      );
+
+      return {
+        allProperties,
+        myProperties,
+        otherProperties,
+      } as PropertiesData;
+    },
+  });
+
+const updateQueryKeys = (
+  queryClient: QueryClient,
+  documentSnapshot: DocumentData,
+) => {
+  // Update headline data
+  queryClient.setQueryData(
+    headlineDataOptions.queryKey,
+    documentSnapshot.headlineData,
+  );
+
+  // Update finance data
+  queryClient.setQueryData(
+    financeDataOptions.queryKey,
+    documentSnapshot.financeData,
+  );
+
+  // Update address data
+  queryClient.setQueryData(
+    addressDataOptions.queryKey,
+    documentSnapshot.addressData,
+  );
+
+  // Update photo data
+  queryClient.setQueryData(
+    photoDataOptions.queryKey,
+    documentSnapshot.photoData,
+  );
+
+  // Update property copy data
+  queryClient.setQueryData(
+    propertyCopyDataOptions.queryKey,
+    documentSnapshot.propertyCopyData,
+  );
+
+  // Update agents data
+  queryClient.setQueryData(
+    agentsDataOptions.queryKey,
+    documentSnapshot.agentsData,
+  );
+
+  // Update sale type data
+  queryClient.setQueryData(
+    saleTypeDataOptions.queryKey,
+    documentSnapshot.saleTypeData,
+  );
+
+  // Update logo data
+  queryClient.setQueryData(logoDataOptions.queryKey, documentSnapshot.logoData);
+};
+
+export const useDocumentSetup = (selectedPropertyId: string | null) => {
+  const queryClient = useQueryClient();
+  console.log("selectedPropertyId", selectedPropertyId);
+
+  return useQuery({
+    queryKey: ["documentData", selectedPropertyId],
+    queryFn: async () => {
+      if (!selectedPropertyId) return null;
+
+      const supabase = createBrowserClient();
+
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+
+      // need to get the right document first
+      const { data: documentData, error: documentError } = await supabase
+        .from("documents")
+        .select("id, document_owner")
+        .eq("property_id", selectedPropertyId)
+        .single();
+
+      if (documentError) {
+        console.error("Error fetching document:", documentError);
+        throw documentError;
+      }
+
+      console.log("documentData", documentData);
+
+      // Fetch latest version number and document snapshot
+      const { data: latestVersionData, error: versionError } = await supabase
+        .from("document_history")
+        .select("version_number, document_snapshot")
+        .eq("document_id", documentData.id)
+        .order("version_number", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (versionError) {
+        console.error("Error fetching latest version:", versionError);
+        throw versionError;
+      }
+
+      console.log("latestVersionData", latestVersionData);
+
+      const docId = selectedPropertyId;
+      const versionNumber = latestVersionData.version_number;
+      const documentSnapshot = latestVersionData.document_snapshot;
+      const canEdit = documentData.document_owner === userId;
+
+      console.log("canEdit", canEdit);
+
+      updateQueryKeys(queryClient, documentSnapshot);
+
+      return { docId, versionNumber, documentSnapshot, canEdit };
+    },
+    enabled: !!selectedPropertyId,
+  });
 };
