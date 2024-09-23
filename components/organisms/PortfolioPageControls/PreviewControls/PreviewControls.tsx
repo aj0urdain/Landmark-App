@@ -56,7 +56,7 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({ isDisabled }) => {
     updateSettings.mutate({ showOverlay: !previewSettings?.showOverlay });
   const handleTogglePageSide = () =>
     updateSettings.mutate({
-      pageSide: previewSettings?.pageSide === "left" ? "right" : "left",
+      pageSide: previewSettings?.pageSide === "left" ? "right" : "right",
     });
 
   if (!previewSettings || isDisabled) return null;
