@@ -18,11 +18,12 @@
     "build": "next build",
     "start": "next start",
     "prepare": "husky",
-    "lint": "next lint",
+    "lint": "next lint --dir . --fix",
     "prettier": "prettier --write .",
     "my-custom-script": "linter --arg1 --arg2",
     "format": "prettier --write .",
-    "test": "jest"
+    "test": "jest",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.0",
