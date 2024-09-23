@@ -16,6 +16,7 @@ import {
   UserProfile,
 } from "@/utils/supabase/supabase-queries";
 import { User } from "lucide-react";
+import SaveControls from "./SaveControls/SaveControls";
 
 interface PropertyData {
   id: string;
@@ -178,10 +179,15 @@ const PortfolioPageControls = ({
       {!isDisabled && canEdit && (
         <div className="mb-4">
           <Separator className="my-8" />
-          <ToDoSection />
-          <SectionSelector
-            onValueChange={(value) => setSelectedSection(value as SectionName)}
-          />
+          <div className="flex flex-col gap-4">
+            <SaveControls />
+            <ToDoSection />
+            <SectionSelector
+              onValueChange={(value) =>
+                setSelectedSection(value as SectionName)
+              }
+            />
+          </div>
           <Separator className="my-8" />
           {selectedSection && (
             <div className="mt-4">
