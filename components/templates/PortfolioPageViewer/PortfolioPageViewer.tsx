@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import LocationTab from "./LocationTab/LocationTab";
 import HeadlineSection from "./HeadlineSection/HeadlineSection";
 import AddressSection from "./AddressSection/AddressSection";
@@ -22,6 +22,7 @@ interface PortfolioPageViewerProps {
   renderEmpty: boolean;
   renderError: boolean;
   isLoading: boolean;
+  key: number;
 }
 
 const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
@@ -29,10 +30,9 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
   renderEmpty,
   renderError,
   isLoading,
+  key,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const [zoom, setZoom] = useState(1);
   const queryClient = useQueryClient();
 
   const { data: previewSettings } = useQuery({
@@ -41,6 +41,7 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
     data:
       | {
           zoom: number;
+          scale: number;
           overlayOpacity: number;
           showOverlay: boolean;
           pageSide: "left" | "right";
@@ -48,21 +49,30 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
       | undefined;
   };
 
-  useEffect(() => {
-    const updateScale = () => {
-      if (containerRef.current) {
-        const containerWidth = containerRef.current.clientWidth;
-        const containerHeight = containerRef.current.clientHeight;
-        const containerAspectRatio = containerHeight / containerWidth;
+  const updateScale = () => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.clientWidth;
+      const containerHeight = containerRef.current.clientHeight;
+      const containerAspectRatio = containerHeight / containerWidth;
 
-        if (containerAspectRatio > A4_ASPECT_RATIO) {
-          setScale(containerWidth / 210);
-        } else {
-          setScale(containerHeight / 297);
-        }
+      let newScale;
+      if (containerAspectRatio > A4_ASPECT_RATIO) {
+        newScale = containerWidth / 210;
+      } else {
+        newScale = containerHeight / 297;
       }
-    };
 
+      queryClient.setQueryData(
+        ["previewSettings"],
+        (oldData: typeof previewSettings) => ({
+          ...oldData,
+          scale: newScale,
+        }),
+      );
+    }
+  };
+
+  useEffect(() => {
     updateScale();
     window.addEventListener("resize", updateScale);
     return () => window.removeEventListener("resize", updateScale);
@@ -71,7 +81,7 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
   useEffect(() => {
     if (containerRef.current && previewSettings?.zoom) {
       const container = containerRef.current;
-      const prevZoom = zoom;
+      const prevZoom = previewSettings.zoom;
       const newZoom = previewSettings.zoom;
 
       // Calculate the center point
@@ -83,22 +93,8 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
         (centerX * newZoom) / prevZoom - container.clientWidth / 2;
       container.scrollTop =
         (centerY * newZoom) / prevZoom - container.clientHeight / 2;
-
-      setZoom(newZoom);
     }
-  }, [previewSettings?.zoom, zoom]);
-
-  useEffect(() => {
-    // Update previewSettings with both zoom and scale
-    queryClient.setQueryData(
-      ["previewSettings"],
-      (oldData: typeof previewSettings) => ({
-        ...oldData,
-        zoom: previewSettings?.zoom ?? 1,
-        scale: scale,
-      }),
-    );
-  }, [queryClient, previewSettings?.zoom, scale]);
+  }, [previewSettings?.zoom]);
 
   if (!selectedPropertyId || renderEmpty || isLoading) {
     return (
@@ -109,8 +105,8 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
         <div
           className="flex items-center justify-center border-2 border-dashed border-gray-300 bg-transparent text-gray-500"
           style={{
-            width: `${210 * scale}px`,
-            height: `${297 * scale}px`,
+            width: `${210 * (previewSettings?.scale ?? 1) * (previewSettings?.zoom ?? 1)}px`,
+            height: `${297 * (previewSettings?.scale ?? 1) * (previewSettings?.zoom ?? 1)}px`,
           }}
         >
           {renderError && <p>Error loading property data</p>}
@@ -132,12 +128,16 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
   }
 
   return (
-    <div ref={containerRef} className="relative h-full w-full overflow-auto">
+    <div
+      ref={containerRef}
+      key={key}
+      className="relative h-full w-full overflow-auto"
+    >
       <div
         className="relative"
         style={{
-          width: `${210 * scale * zoom}px`,
-          height: `${297 * scale * zoom}px`,
+          width: `${210 * (previewSettings?.scale ?? 1) * (previewSettings?.zoom ?? 1)}px`,
+          height: `${297 * (previewSettings?.scale ?? 1) * (previewSettings?.zoom ?? 1)}px`,
           margin: "auto",
         }}
       >
@@ -160,7 +160,7 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
             />
           )}
           {/* A4 content */}
-          {/* State Tab */}
+
           <LocationTab />
 
           <PhotoRender />
