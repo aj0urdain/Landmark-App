@@ -428,10 +428,19 @@ export const savePortfolioDocument = async (
 ): Promise<{ documentId: number; versionNumber: number }> => {
   const supabase = createBrowserClient();
 
-  await supabase
+  console.log("documentData", documentData);
+
+  const { data: updatedDocument, error: updateError } = await supabase
     .from("documents")
     .update({ document_data: documentData })
     .eq("id", documentId);
+
+  if (updateError) {
+    console.error("Error updating document", updateError);
+    throw updateError;
+  }
+
+  console.log("updatedDocument", updatedDocument);
 
   const { data: latestVersion } = await supabase
     .from("document_history")
@@ -440,6 +449,8 @@ export const savePortfolioDocument = async (
     .order("version_number", { ascending: false })
     .limit(1)
     .single();
+
+  console.log("latestVersion", latestVersion);
 
   const newVersionNumber = latestVersion?.version_number + 1 || 1;
 
@@ -451,6 +462,8 @@ export const savePortfolioDocument = async (
     status_id: 1,
     change_summary: "Document update",
   });
+
+  console.log("newVersionNumber", newVersionNumber);
 
   return { documentId, versionNumber: newVersionNumber };
 };
@@ -615,59 +628,130 @@ const updateQueryKeys = (
 
 export const useDocumentSetup = (selectedPropertyId: string | null) => {
   const queryClient = useQueryClient();
-  console.log("selectedPropertyId", selectedPropertyId);
 
   return useQuery({
     queryKey: ["documentData", selectedPropertyId],
     queryFn: async () => {
       if (!selectedPropertyId) return null;
 
+      if (selectedPropertyId === "sandbox") {
+        // Exit early for sandbox mode
+        return {
+          docId: "sandbox",
+          versionNumber: 1,
+          documentSnapshot: {} as DocumentData, // Empty document data
+          canEdit: true, // Allow editing in sandbox mode
+          isAuthorised: true,
+        };
+      }
+
       const supabase = createBrowserClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No authenticated user found");
 
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData.user?.id;
+      const userId = user.id;
 
-      // need to get the right document first
-      const { data: documentData, error: documentError } = await supabase
-        .from("documents")
-        .select("id, document_owner")
-        .eq("property_id", selectedPropertyId)
+      // Fetch property data
+      const { data: propertyData, error: propertyError } = await supabase
+        .from("properties")
+        .select("id, lead_agent")
+        .eq("id", selectedPropertyId)
         .single();
 
-      if (documentError) {
-        console.error("Error fetching document:", documentError);
-        throw documentError;
-      }
+      if (propertyError) throw propertyError;
+      if (!propertyData) throw new Error("Property not found");
 
-      console.log("documentData", documentData);
+      const isAuthorised = propertyData.lead_agent === userId;
 
-      // Fetch latest version number and document snapshot
-      const { data: latestVersionData, error: versionError } = await supabase
-        .from("document_history")
-        .select("version_number, document_snapshot")
-        .eq("document_id", documentData.id)
-        .order("version_number", { ascending: false })
-        .limit(1)
-        .single();
+      // Fetch or create document
+      const documentData = await fetchOrCreateDocument(
+        propertyData.id,
+        userId,
+        isAuthorised,
+      );
 
-      if (versionError) {
-        console.error("Error fetching latest version:", versionError);
-        throw versionError;
-      }
+      // Fetch latest version
+      const latestVersionData = await fetchLatestVersion(documentData.id);
 
-      console.log("latestVersionData", latestVersionData);
+      const result = {
+        docId: selectedPropertyId,
+        versionNumber: latestVersionData.version_number,
+        documentSnapshot: latestVersionData.document_snapshot,
+        canEdit: documentData.document_owner === userId,
+        isAuthorised,
+      };
 
-      const docId = selectedPropertyId;
-      const versionNumber = latestVersionData.version_number;
-      const documentSnapshot = latestVersionData.document_snapshot;
-      const canEdit = documentData.document_owner === userId;
+      updateQueryKeys(queryClient, result.documentSnapshot);
 
-      console.log("canEdit", canEdit);
-
-      updateQueryKeys(queryClient, documentSnapshot);
-
-      return { docId, versionNumber, documentSnapshot, canEdit };
+      return result;
     },
     enabled: !!selectedPropertyId,
   });
 };
+
+async function fetchOrCreateDocument(
+  propertyId: string,
+  userId: string,
+  isAuthorised: boolean,
+) {
+  const supabase = createBrowserClient();
+  const { data: existingDoc, error: docError } = await supabase
+    .from("documents")
+    .select("id, document_owner")
+    .eq("property_id", propertyId)
+    .eq("document_type_id", 2)
+    .single();
+
+  if (docError && docError.code !== "PGRST116") throw docError;
+
+  if (existingDoc) return existingDoc;
+
+  if (!isAuthorised) throw new Error("Not authorized to create document");
+
+  const { data: newDoc, error: createError } = await supabase
+    .from("documents")
+    .insert({
+      property_id: propertyId,
+      document_type_id: 2,
+      document_owner: userId,
+    })
+    .select()
+    .single();
+
+  if (createError) throw createError;
+
+  await createInitialVersion(newDoc.id, userId);
+
+  return newDoc;
+}
+
+async function createInitialVersion(documentId: string, userId: string) {
+  const supabase = createBrowserClient();
+  const { error: versionError } = await supabase
+    .from("document_history")
+    .insert({
+      document_id: documentId,
+      version_number: 1,
+      document_snapshot: {},
+      edited_by: userId,
+      change_summary: "Initial document creation",
+    });
+
+  if (versionError) throw versionError;
+}
+
+async function fetchLatestVersion(documentId: string) {
+  const supabase = createBrowserClient();
+  const { data: latestVersion, error: versionError } = await supabase
+    .from("document_history")
+    .select("version_number, document_snapshot")
+    .eq("document_id", documentId)
+    .order("version_number", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (versionError) throw versionError;
+  return latestVersion;
+}

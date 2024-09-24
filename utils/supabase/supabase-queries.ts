@@ -53,8 +53,8 @@ export async function getProfileFromID(
   const supabase = createBrowserClient();
 
   const { data, error } = await supabase
-    .from("user_profiles")
-    .select("id, first_name, last_name, email, profile_picture")
+    .from("user_profile_complete")
+    .select("*")
     .eq("id", userId)
     .single();
 
@@ -62,6 +62,8 @@ export async function getProfileFromID(
     console.error("Error fetching user profile:", error);
     return null;
   }
+
+  console.log(`data from ${userId}`, data);
 
   return data;
 }
