@@ -29,9 +29,6 @@ export default function CompanyCarousel() {
             <AuctionCountdown />
           </CarouselItem>
           <CarouselItem className="flex h-full items-center justify-center">
-            <AuctionCountdown />
-          </CarouselItem>
-          <CarouselItem className="flex h-full items-center justify-center">
             <IndustryNews />
           </CarouselItem>
         </CarouselContent>

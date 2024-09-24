@@ -13,7 +13,7 @@ export function DashboardCardRow({
     <div
       className={cn(
         "grid h-full w-full grid-cols-12 gap-4",
-        topRow ? "max-h-[320px]" : "max-h-[275px]",
+        topRow && "max-h-[320px]",
       )}
     >
       {children}

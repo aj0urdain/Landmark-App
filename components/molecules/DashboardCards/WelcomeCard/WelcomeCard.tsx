@@ -33,16 +33,16 @@ export default function WelcomeCard() {
       <div className="relative z-10 flex h-full w-2/5 animate-slide-down-fade-in flex-col justify-between">
         <div>
           <div className="relative z-10 flex h-full flex-col gap-1">
-            <p className="text-sm text-muted-foreground">
-              {userProfile.branches?.[0] || "No Branch Assigned"}
-            </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {userProfile?.first_name || "No Name Assigned"}{" "}
               {userProfile?.last_name || "No Name Assigned"}
             </p>
-            <h3 className="text-base font-medium">
+            <h3 className="font-bold">
               {userProfile.roles?.[0] || "No Role Assigned"}
             </h3>
+            <p className="text-sm text-muted-foreground">
+              {userProfile.branches?.[0] || "No Branch Assigned"}
+            </p>
           </div>
         </div>
         <div className="flex flex-col gap-4">
