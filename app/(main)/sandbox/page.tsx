@@ -62,7 +62,7 @@ const SandboxPage = () => {
             </div>
             <div>
               <Button
-                onClick={() => handleClick(tool.link)}
+                onClick={() => handleClick()}
                 variant="outline"
                 disabled={tool.disabled}
               >
