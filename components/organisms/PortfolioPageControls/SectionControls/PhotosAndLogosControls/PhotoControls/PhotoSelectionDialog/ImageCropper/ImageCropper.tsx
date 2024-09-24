@@ -14,6 +14,7 @@ import {
   updatePhoto,
 } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
 import { getAspectRatio } from "@/utils/sandbox/document-generator/portfolio-page/getAspectRatio";
+import { createBrowserClient } from "@/utils/supabase/client";
 
 interface ImageCropperProps {
   src: string;
@@ -53,11 +54,14 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
 
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [scale, setScale] = useState(1);
   const imgRef = useRef<HTMLImageElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const aspect = photoData
     ? getAspectRatio(photoData.photoCount, index)
     : 16 / 9;
+
+  console.log(scale);
 
   const updatePhotoMutation = useMutation({
     mutationFn: (newPhotoData: {
@@ -82,17 +86,25 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
 
   const onImageLoad = useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {
-      const { width, height } = e.currentTarget;
+      const { width, height, naturalWidth, naturalHeight } = e.currentTarget;
       const savedCrop = photoData?.photos[index].crop;
+
+      // Calculate scale
+      const containerWidth = 800; // Adjust this to your container width
+      const containerHeight = 600; // Adjust this to your container height
+      const widthScale = containerWidth / naturalWidth;
+      const heightScale = containerHeight / naturalHeight;
+      const newScale = Math.min(widthScale, heightScale, 1);
+      setScale(newScale);
 
       if (savedCrop) {
         // Convert saved crop to percentage
         const percentCrop: Crop = {
           unit: "%",
-          x: (savedCrop.x / width) * 100,
-          y: (savedCrop.y / height) * 100,
-          width: (savedCrop.width / width) * 100,
-          height: (savedCrop.height / height) * 100,
+          x: (savedCrop.x / naturalWidth) * 100,
+          y: (savedCrop.y / naturalHeight) * 100,
+          width: (savedCrop.width / naturalWidth) * 100,
+          height: (savedCrop.height / naturalHeight) * 100,
         };
         setCrop(percentCrop);
       } else {
@@ -122,8 +134,9 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
 
-      canvas.width = completedCrop.width;
-      canvas.height = completedCrop.height;
+      // Set canvas size to match the original image size
+      canvas.width = completedCrop.width * scaleX;
+      canvas.height = completedCrop.height * scaleY;
 
       ctx.drawImage(
         image,
@@ -133,24 +146,49 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
         completedCrop.height * scaleY,
         0,
         0,
-        completedCrop.width,
-        completedCrop.height,
+        canvas.width,
+        canvas.height,
       );
 
-      canvas.toBlob((blob) => {
+      canvas.toBlob(async (blob) => {
         if (!blob) {
           console.error("Canvas is empty");
           return;
         }
-        const croppedImageUrl = URL.createObjectURL(blob);
+
+        const supabase = createBrowserClient();
+        const file = new File([blob], `cropped_image_${Date.now()}.jpg`, {
+          type: "image/jpeg",
+        });
+
+        const { data, error } = await supabase.storage
+          .from("user_uploads")
+          .upload(`cropped_images/${file.name}`, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        console.log(data);
+
+        if (error) {
+          console.error("Error uploading file:", error);
+          return;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from("user_uploads")
+          .getPublicUrl(`cropped_images/${file.name}`);
+
+        const croppedImageUrl = urlData.publicUrl;
+
         updatePhotoMutation.mutate({
           original: src,
           cropped: croppedImageUrl,
           crop: {
-            x: completedCrop.x,
-            y: completedCrop.y,
-            width: completedCrop.width,
-            height: completedCrop.height,
+            x: completedCrop.x * scaleX,
+            y: completedCrop.y * scaleY,
+            width: completedCrop.width * scaleX,
+            height: completedCrop.height * scaleY,
           },
         });
       }, "image/jpeg");
@@ -170,7 +208,12 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
           src={src}
           alt="Crop me"
           onLoad={onImageLoad}
-          style={{ maxHeight: "2500px", width: "auto" }}
+          style={{
+            maxHeight: "600px",
+            maxWidth: "800px",
+            width: "auto",
+            height: "auto",
+          }}
           crossOrigin="anonymous"
         />
       </ReactCrop>

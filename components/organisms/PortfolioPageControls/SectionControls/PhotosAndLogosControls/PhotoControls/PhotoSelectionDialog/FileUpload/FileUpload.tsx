@@ -1,16 +1,42 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
+import { createBrowserClient } from "@/utils/supabase/client";
 
 interface FileUploadProps {
   onFileSelect: (fileUrl: string) => void;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const fileUrl = URL.createObjectURL(e.target.files[0]);
-      onFileSelect(fileUrl);
+      const file = e.target.files[0];
+      const supabase = createBrowserClient();
+
+      // Upload file to Supabase storage
+      const { data, error } = await supabase.storage
+        .from("user_uploads")
+        .upload(`${file.name}`, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (error) {
+        console.error("Error uploading file:", error);
+        return;
+      }
+
+      console.log("File uploaded successfully:", data);
+
+      // Get the public URL of the uploaded file
+      const { data: urlData } = supabase.storage
+        .from("user_uploads")
+        .getPublicUrl(`${file.name}`);
+
+      // Pass the public URL to onFileSelect
+
+      console.log("Public URL:", urlData.publicUrl);
+      onFileSelect(urlData.publicUrl);
     }
   };
 
