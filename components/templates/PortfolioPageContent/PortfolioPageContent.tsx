@@ -47,25 +47,24 @@ const PortfolioPageContent = () => {
 
   if (!previewSettings) return null;
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error loading data</div>;
-  }
-
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-4">
       <div className="flex h-full w-full flex-row items-center justify-center gap-4">
         <PortfolioPageControls
-          isDisabled={!selectedPropertyId}
+          isDisabled={!selectedPropertyId || isLoading}
           canEdit={canEdit}
+          renderError={isError}
+          isLoading={isLoading}
         />
         <div className="relative z-10 flex h-full w-[55%] flex-col gap-4">
           <PreviewControls isDisabled={!selectedPropertyId} />
           <Card className="flex h-full overflow-hidden">
-            <PortfolioPageViewer selectedPropertyId={selectedPropertyId} />
+            <PortfolioPageViewer
+              isLoading={isLoading}
+              renderEmpty={isLoading}
+              renderError={isError}
+              selectedPropertyId={selectedPropertyId}
+            />
           </Card>
         </div>
       </div>

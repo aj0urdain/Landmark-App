@@ -19,10 +19,16 @@ const A4_ASPECT_RATIO = 297 / 210; // height / width
 
 interface PortfolioPageViewerProps {
   selectedPropertyId: string | null;
+  renderEmpty: boolean;
+  renderError: boolean;
+  isLoading: boolean;
 }
 
 const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
   selectedPropertyId,
+  renderEmpty,
+  renderError,
+  isLoading,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -94,7 +100,7 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
     );
   }, [queryClient, previewSettings?.zoom, scale]);
 
-  if (!selectedPropertyId) {
+  if (!selectedPropertyId || renderEmpty || isLoading) {
     return (
       <div
         ref={containerRef}
@@ -107,7 +113,19 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
             height: `${297 * scale}px`,
           }}
         >
-          Select a property or sandbox mode to get started
+          {renderError && <p>Error loading property data</p>}
+          {renderEmpty && (
+            <p>Select a property or sandbox mode to get started</p>
+          )}
+          {isLoading && <p>Loading...</p>}
+          {!selectedPropertyId &&
+            !isLoading &&
+            !renderError &&
+            !renderEmpty && (
+              <p className="animate-pulse text-lg text-foreground">
+                Select a property or sandbox mode to get started!
+              </p>
+            )}
         </div>
       </div>
     );
