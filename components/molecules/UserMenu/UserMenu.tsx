@@ -48,9 +48,9 @@ export function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-full">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>Settings</DropdownMenuItem>
-        <DropdownMenuItem>Support</DropdownMenuItem>
+        {/* <DropdownMenuSeparator /> */}
+        {/* <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem>Support</DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
