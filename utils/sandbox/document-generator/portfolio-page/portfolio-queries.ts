@@ -7,6 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 // import { createClient } from "@/utils/supabase/client";
 
 interface PhotoData {
@@ -423,17 +424,55 @@ export interface SaveDocumentError extends Error {
 // Function to save the document
 export const savePortfolioDocument = async (
   documentId: number,
-  userId: string,
   documentData: DocumentData,
 ): Promise<{ documentId: number; versionNumber: number }> => {
   const supabase = createBrowserClient();
 
   console.log("documentData", documentData);
 
+  console.log("documentId", documentId);
+
+  // Fetch the current document to check ownership and editors
+  const { data: currentDocument, error: fetchError } = await supabase
+    .from("documents")
+    .select("document_owner, editors")
+    .eq("id", documentId)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching document:", fetchError);
+    throw fetchError;
+  }
+
+  console.log("Current document:", currentDocument);
+
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    console.error("Error getting user:", userError);
+    throw userError;
+  }
+
+  const userId = userData.user?.id;
+  console.log("Current user ID:", userId);
+
+  const canEdit =
+    currentDocument.document_owner === userId ||
+    (currentDocument.editors && currentDocument.editors.includes(userId));
+
+  console.log("Can edit:", canEdit);
+
+  if (!canEdit) {
+    throw new Error("User does not have permission to edit this document");
+  }
+
+  console.log("documentId", documentId);
+  console.log("Updating document data", documentData);
+
   const { data: updatedDocument, error: updateError } = await supabase
     .from("documents")
     .update({ document_data: documentData })
-    .eq("id", documentId);
+    .eq("id", documentId)
+    .single();
 
   if (updateError) {
     console.error("Error updating document", updateError);
@@ -442,7 +481,7 @@ export const savePortfolioDocument = async (
 
   console.log("updatedDocument", updatedDocument);
 
-  const { data: latestVersion } = await supabase
+  const { data: latestVersion, error: versionError } = await supabase
     .from("document_history")
     .select("version_number")
     .eq("document_id", documentId)
@@ -450,18 +489,31 @@ export const savePortfolioDocument = async (
     .limit(1)
     .single();
 
+  if (versionError) {
+    console.error("Error fetching latest version", versionError);
+    throw versionError;
+  }
+
   console.log("latestVersion", latestVersion);
 
-  const newVersionNumber = latestVersion?.version_number + 1 || 1;
+  const newVersionNumber = latestVersion?.version_number
+    ? latestVersion.version_number + 1
+    : 1;
 
-  await supabase.from("document_history").insert({
-    document_id: documentId,
-    edited_by: userId,
-    version_number: newVersionNumber,
-    document_snapshot: documentData,
-    status_id: 1,
-    change_summary: "Document update",
-  });
+  const { error: insertError } = await supabase
+    .from("document_history")
+    .insert({
+      document_id: documentId,
+      version_number: newVersionNumber,
+      document_snapshot: documentData,
+      status_id: 1,
+      change_summary: "Document update",
+    });
+
+  if (insertError) {
+    console.error("Error inserting new version", insertError);
+    throw insertError;
+  }
 
   console.log("newVersionNumber", newVersionNumber);
 
@@ -480,13 +532,9 @@ export const useSavePortfolioDocument = () => {
       documentId: number;
       documentData: DocumentData;
     }) => {
-      const supabase = createBrowserClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("No authenticated user found");
-
-      return savePortfolioDocument(documentId, user.id, documentData);
+      console.log("documentId", documentId);
+      console.log("documentData", documentData);
+      return savePortfolioDocument(documentId, documentData);
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
@@ -628,6 +676,9 @@ const updateQueryKeys = (
 
 export const useDocumentSetup = (selectedPropertyId: string | null) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   return useQuery({
     queryKey: ["documentData", selectedPropertyId],
@@ -639,8 +690,8 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
         return {
           docId: "sandbox",
           versionNumber: 1,
-          documentSnapshot: {} as DocumentData, // Empty document data
-          canEdit: true, // Allow editing in sandbox mode
+          documentSnapshot: {} as DocumentData,
+          canEdit: true,
           isAuthorised: true,
         };
       }
@@ -668,7 +719,6 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
       // Fetch or create document
       const documentData = await fetchOrCreateDocument(
         propertyData.id,
-        userId,
         isAuthorised,
       );
 
@@ -676,7 +726,7 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
       const latestVersionData = await fetchLatestVersion(documentData.id);
 
       const result = {
-        docId: selectedPropertyId,
+        docId: documentData.id,
         versionNumber: latestVersionData.version_number,
         documentSnapshot: latestVersionData.document_snapshot,
         canEdit: documentData.document_owner === userId,
@@ -684,6 +734,22 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
       };
 
       updateQueryKeys(queryClient, result.documentSnapshot);
+
+      // Update URL parameters if necessary
+      const currentDocId = searchParams.get("document");
+      const currentVersion = searchParams.get("version");
+
+      if (
+        result.docId.toString() !== currentDocId ||
+        result.versionNumber.toString() !== currentVersion
+      ) {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set("document", result.docId.toString());
+        newParams.set("version", result.versionNumber.toString());
+        router.push(`${pathname}?${newParams.toString()}`, {
+          scroll: false,
+        });
+      }
 
       return result;
     },
@@ -693,10 +759,16 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
 
 async function fetchOrCreateDocument(
   propertyId: string,
-  userId: string,
   isAuthorised: boolean,
 ) {
   const supabase = createBrowserClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("No authenticated user found");
+
+  const userId = user.id;
+
   const { data: existingDoc, error: docError } = await supabase
     .from("documents")
     .select("id, document_owner")
