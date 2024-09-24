@@ -15,9 +15,13 @@ import { Minus, Plus, Settings, RotateCcw, ArrowLeftRight } from "lucide-react";
 // import { useSearchParams } from "next/navigation";
 interface PreviewControlsProps {
   isDisabled: boolean;
+  setRerenderKey: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const PreviewControls: React.FC<PreviewControlsProps> = ({ isDisabled }) => {
+const PreviewControls: React.FC<PreviewControlsProps> = ({
+  isDisabled,
+  setRerenderKey,
+}) => {
   const queryClient = useQueryClient();
   const [slidersOpen, setSlidersOpen] = useState(false);
 
@@ -61,7 +65,10 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({ isDisabled }) => {
     updateSettings.mutate({
       zoom: Math.max((previewSettings?.zoom || 0) - 0.1, 0.5),
     });
-  const handleResetZoom = () => updateSettings.mutate({ zoom: 1 });
+  const handleResetZoom = () => {
+    updateSettings.mutate({ zoom: 1 });
+    setRerenderKey((prevKey) => prevKey + 1);
+  };
   const handleToggleOverlay = () =>
     updateSettings.mutate({ showOverlay: !previewSettings?.showOverlay });
   const handleTogglePageSide = () =>

@@ -47,28 +47,6 @@ const SaveControls = () => {
 
   const savePortfolioMutation = useSavePortfolioDocument();
 
-  // const areNecessaryFieldsCompleted = () => {
-  //   return (
-  //     !!addressData?.suburb &&
-  //     !!addressData?.state &&
-  //     !!addressData?.street &&
-  //     !!headlineData?.headline &&
-  //     !!financeData?.financeCopy &&
-  //     !!financeData?.financeType &&
-  //     !!financeData?.financeAmount &&
-  //     !!propertyCopyData?.propertyCopy &&
-  //     agentsData?.agents &&
-  //     agentsData.agents.length > 0 &&
-  //     !!saleTypeData?.saleType &&
-  //     (saleTypeData.saleType !== "auction" || !!saleTypeData.auctionId) &&
-  //     (saleTypeData.saleType !== "expression" ||
-  //       (saleTypeData.expressionOfInterest &&
-  //         !!saleTypeData.expressionOfInterest.closingTime &&
-  //         !!saleTypeData.expressionOfInterest.closingAmPm &&
-  //         !!saleTypeData.expressionOfInterest.closingDate))
-  //   );
-  // };
-
   const handleSave = async () => {
     if (!selectedPropertyId || !documentId) {
       toast({
@@ -96,11 +74,25 @@ const SaveControls = () => {
         } as DocumentData,
       });
 
-      // Update URL with new document ID and version number
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.set("document", result.documentId.toString());
-      newParams.set("version", result.versionNumber.toString());
-      router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
+      console.log("Save result:", result);
+
+      // Create a new query object with updated parameters
+      const newQuery = {
+        ...Object.fromEntries(searchParams.entries()),
+        property: selectedPropertyId.toString() as string,
+        document: result.documentId.toString() as string,
+        version: result.versionNumber.toString() as string,
+      };
+
+      console.log(
+        "New URL:",
+        `${pathname}?${new URLSearchParams(newQuery).toString()}`,
+      );
+
+      console.log("pathname");
+      console.log(pathname);
+
+      router.push(`${pathname}?${new URLSearchParams(newQuery).toString()}`);
 
       // Show success toast
       toast({
