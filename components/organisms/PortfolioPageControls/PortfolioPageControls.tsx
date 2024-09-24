@@ -29,9 +29,13 @@ interface PropertyData {
 const PortfolioPageControls = ({
   isDisabled,
   canEdit,
+  renderError,
+  isLoading,
 }: {
   isDisabled: boolean;
   canEdit: boolean;
+  renderError: boolean;
+  isLoading: boolean;
 }) => {
   const [selectedSection, setSelectedSection] = useState<SectionName | null>(
     null,
@@ -169,11 +173,22 @@ const PortfolioPageControls = ({
                 {leadAgentProfile?.first_name} {leadAgentProfile?.last_name}
               </p>
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No property selected
+          ) : selectedPropertyId === "sandbox" ? (
+            <div className="flex flex-col gap-2">
+              <h1 className="text-lg font-bold">Sandbox mode</h1>
+              <p className="text-sm text-muted-foreground">
+                This is a sandbox mode. Feel free to chop and change as you
+                please, but you can&apos;t save a sandbox!
+              </p>
+            </div>
+          ) : isLoading ? (
+            <p className="animate-pulse text-sm text-muted-foreground">
+              Loading property data...
             </p>
+          ) : (
+            <p>No property selected</p>
           )}
+          {renderError && <p>Error loading property data</p>}
         </CardContent>
       </div>
       {!isDisabled && canEdit && (

@@ -31,8 +31,8 @@ const CloudImages: React.FC<CloudImagesProps> = ({ onPhotoSelect }) => {
   });
 
   return (
-    <div className="max-h-[300px] overflow-y-auto">
-      <Table>
+    <div className="flex h-full items-start justify-start overflow-y-auto">
+      <Table className="h-full">
         <TableHeader>
           <TableRow>
             <TableHead>Preview</TableHead>

@@ -18,6 +18,11 @@ const databaseLogos = [
     label: "McDonalds",
     url: "https://i.imgur.com/qiJX3cq.png",
   },
+  {
+    value: "pearl-energy",
+    label: "Pearl Energy",
+    url: "https://i.imgur.com/RpRAfXx.png",
+  },
 ];
 
 const LogoDatabase: React.FC<LogoDatabaseProps> = ({ onLogoSelect }) => {

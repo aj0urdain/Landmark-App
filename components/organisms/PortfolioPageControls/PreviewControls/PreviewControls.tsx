@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Minus, Plus, Settings, RotateCcw, ArrowLeftRight } from "lucide-react";
+// import { useSearchParams } from "next/navigation";
 interface PreviewControlsProps {
   isDisabled: boolean;
 }
@@ -19,6 +20,15 @@ interface PreviewControlsProps {
 const PreviewControls: React.FC<PreviewControlsProps> = ({ isDisabled }) => {
   const queryClient = useQueryClient();
   const [slidersOpen, setSlidersOpen] = useState(false);
+
+  // const searchParams = useSearchParams();
+
+  // useEffect(() => {
+  //   const asyncResetZoom = async () => {
+  //     await handleResetZoom();
+  //   };
+  //   asyncResetZoom();
+  // }, [searchParams]);
 
   const { data: previewSettings } = useQuery({
     queryKey: ["previewSettings"],
@@ -56,7 +66,7 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({ isDisabled }) => {
     updateSettings.mutate({ showOverlay: !previewSettings?.showOverlay });
   const handleTogglePageSide = () =>
     updateSettings.mutate({
-      pageSide: previewSettings?.pageSide === "left" ? "right" : "right",
+      pageSide: previewSettings?.pageSide === "left" ? "right" : "left",
     });
 
   if (!previewSettings || isDisabled) return null;

@@ -110,7 +110,7 @@ const PhotoSelectionDialog: React.FC<PhotoSelectionDialogProps> = ({
         </div>
       </DialogTrigger>
       <DialogContent className="h-full max-h-[90%] max-w-7xl overflow-y-scroll">
-        <DialogHeader>
+        <DialogHeader className="flex h-fit flex-col items-start justify-start gap-2">
           <div className="flex items-center justify-start gap-2">
             {step !== "method" && (
               <Button variant="ghost" size="sm" onClick={handleBack}>
@@ -123,9 +123,7 @@ const PhotoSelectionDialog: React.FC<PhotoSelectionDialogProps> = ({
             Choose a method to add your photo, then crop it to fit.
           </DialogDescription>
         </DialogHeader>
-        <div className="h-full max-h-[90%] overflow-y-auto py-4">
-          {renderStepContent()}
-        </div>
+        <div className="h-full overflow-y-auto py-4">{renderStepContent()}</div>
       </DialogContent>
     </Dialog>
   );
