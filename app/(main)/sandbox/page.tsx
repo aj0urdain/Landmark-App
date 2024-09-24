@@ -1,55 +1,73 @@
+"use client";
+
 import React from "react";
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const tools = [
   {
     title: "Document Generator",
     description: "Create custom reports and documents",
+    link: "/sandbox/document-generator/portfolio-page",
+    disabled: false,
   },
   {
     title: "Chart Generator",
     description: "Visualize data with interactive charts",
+    disabled: true,
   },
   {
     title: "Yield Calculator",
     description: "Compute and analyze investment yields",
+    disabled: true,
   },
   {
     title: "Property Comparison",
     description: "Compare multiple properties side by side",
+    disabled: true,
   },
   {
     title: "Market Trends",
     description: "Stay updated with the latest market insights",
+    disabled: true,
   },
 ];
 
 const SandboxPage = () => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push("/sandbox/document-generator/portfolio-page");
+  };
+
   return (
     <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 p-4 lg:grid-cols-2">
       {tools.map((tool) => (
-        <Card key={tool.title} className="flex overflow-hidden">
-          <div className="relative w-2/5">
-            <Image
-              src="/images/burgess-rawson-login-bg.jpg"
-              alt={tool.title}
-              layout="fill"
-              objectFit="cover"
-            />
-          </div>
-          <div className="flex w-3/5 flex-col">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">{tool.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
+        <Card key={tool.title} className="flex h-[200px] overflow-hidden p-6">
+          <div className="flex w-full flex-col justify-between">
+            <div className="flex flex-col gap-2">
+              <h1
+                className={`text-xl font-bold ${
+                  tool.disabled ? "text-muted" : ""
+                }`}
+              >
+                {tool.title}
+              </h1>
+
               <p className="text-sm text-muted-foreground">
                 {tool.description}
               </p>
-            </CardContent>
-            <div className="p-4">
-              <Button className="w-full">Use Tool</Button>
+            </div>
+            <div>
+              <Button
+                onClick={() => handleClick(tool.link)}
+                variant="outline"
+                disabled={tool.disabled}
+              >
+                {tool.disabled ? "Coming Soon" : "Use Tool"}
+              </Button>
             </div>
           </div>
         </Card>

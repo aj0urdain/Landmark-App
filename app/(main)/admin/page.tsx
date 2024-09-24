@@ -11,10 +11,10 @@ function AdminPage() {
     <div className="mx-auto flex h-full max-w-6xl flex-col items-center justify-center gap-4 py-4">
       <Card className="h-full w-full">
         <CardHeader>
-          <CardTitle>Updates</CardTitle>
-          <CardDescription>Manage your updates here</CardDescription>
+          <CardTitle>Admin Dashboard</CardTitle>
+          <CardDescription>Access administrator settings here</CardDescription>
         </CardHeader>
-        <CardContent className="h-full w-full">Testing</CardContent>
+        <CardContent className="h-full w-full">Controls to come!</CardContent>
       </Card>
     </div>
   );

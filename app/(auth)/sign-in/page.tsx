@@ -15,6 +15,10 @@ import {
   Message,
 } from "@/components/atoms/FormMessage/FormMessage";
 import { createBrowserClient } from "@/utils/supabase/client";
+import { Dot } from "@/components/atoms/Dot/Dot";
+import { LogoWordmark } from "@/components/atoms/LogoWordmark/LogoWordmark";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 type ActionResult = { error: string } | { success: string };
 
@@ -80,7 +84,7 @@ export default function SignIn() {
 
   return (
     <div className="flex h-screen w-full">
-      <div className="hidden w-1/2 bg-muted lg:block">
+      <div className="relative hidden w-1/2 bg-muted lg:block">
         <Image
           src="/images/burgess-rawson-login-bg.jpg"
           alt="Burgess Rawson Login Background"
@@ -88,6 +92,35 @@ export default function SignIn() {
           height={1365}
           className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
+        <div className="w-full">
+          <div className="absolute inset-0 flex w-full flex-col items-center justify-center">
+            <div className="w-full max-w-xl">
+              <LogoWordmark />
+            </div>
+
+            <Separator className="my-8 w-full max-w-lg bg-foreground" />
+
+            <div className="flex items-center justify-center gap-8">
+              <div className="flex items-center gap-2">
+                <Dot size="small" />
+                <Dot size="large" />
+                <div className="font-lexia text-4xl font-extrabold uppercase tracking-wider text-white">
+                  Landmark
+                </div>
+                <Dot size="large" />
+                <Dot size="small" />
+              </div>
+              <div>
+                <Badge
+                  className="animate-pulse bg-blue-500 px-4 text-sm uppercase text-white"
+                  variant="outline"
+                >
+                  Beta
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="flex w-full items-center justify-center lg:w-1/2">
         <div className="mx-auto w-full max-w-[380px] px-4">
