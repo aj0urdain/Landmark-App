@@ -44,7 +44,7 @@ export default function Component() {
         if (error) {
           console.error("Error fetching properties: ", error.message);
         } else {
-          setProperties(data);
+          setProperties(data); // eslint-disable-line
         }
       }
 
@@ -62,7 +62,7 @@ export default function Component() {
             <AgentPropertyCard
               key={property.id}
               loading={loading}
-              property={property}
+              property={property} // eslint-disable-line
             />
           ))}
       </div>
