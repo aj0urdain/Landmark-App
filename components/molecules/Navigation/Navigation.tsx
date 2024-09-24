@@ -30,7 +30,7 @@ const links = [
     icon: ShieldCheck,
     label: "Admin",
     access: ["Technology", "Senior Leadership Team"],
-    disabled: false,
+    disabled: true,
   },
   {
     href: "/dashboard",
@@ -51,14 +51,14 @@ const links = [
     icon: CheckSquare,
     label: "Tasks",
     access: [],
-    disabled: false,
+    disabled: true,
   },
   {
     href: "/properties",
     icon: HousePlus,
     label: "Properties",
     access: [],
-    disabled: false,
+    disabled: true,
   },
   {
     href: "/sandbox",

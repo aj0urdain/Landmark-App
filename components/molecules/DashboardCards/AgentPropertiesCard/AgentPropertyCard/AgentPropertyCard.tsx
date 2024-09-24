@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Property } from "@/types/portfolioControlsTypes";
 import { getProfileFromID } from "@/utils/supabase/supabase-queries";
 import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
+
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -78,6 +78,7 @@ const AgentPropertyCard = ({
               {leadAgentData?.first_name} {leadAgentData?.last_name}
             </h3>
             <p className="text-xs text-muted-foreground">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {leadAgentData?.roles?.[0]}
             </p>
           </div>
