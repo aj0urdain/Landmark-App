@@ -12,7 +12,7 @@ type Attempt = { timestamp: string; success: boolean };
 export const signInWithPasswordAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   if (!email || !password) {
     return { error: "Email and password are required" };
@@ -37,7 +37,7 @@ export const signInWithPasswordAction = async (formData: FormData) => {
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const origin = headers().get("origin");
 
@@ -125,7 +125,7 @@ export const verifyOtpAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
   const token = formData.get("token") as string;
 
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   if (!email || !token) {
     return { error: "Email and OTP are required" };
@@ -241,7 +241,7 @@ export const verifyOtpAction = async (formData: FormData) => {
 };
 
 export const signOutAction = async () => {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
   await supabase.auth.signOut();
 
   return redirect("/sign-in");
