@@ -1,7 +1,7 @@
-import PropertiesContent from "@/components/templates/ListingsPage/PropertiesContent/PropertiesContent";
+import React from "react";
 
 const PropertiesPage = () => {
-  return <PropertiesContent />;
+  return <div>PropertiesPage</div>;
 };
 
 export default PropertiesPage;

@@ -12,6 +12,11 @@ import {
   ShieldCheck,
   FolderTree,
   FileCode,
+  Users,
+  BookText,
+  LayoutDashboard,
+  CalendarRange,
+  WandSparkles,
 } from "lucide-react";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -33,32 +38,11 @@ const links = [
     disabled: true,
   },
   {
-    href: "/dashboard",
-    icon: Home,
-    label: "Dashboard",
+    href: "/create",
+    icon: WandSparkles,
+    label: "Create",
     access: [],
     disabled: false,
-  },
-  {
-    href: "/news",
-    icon: Newspaper,
-    label: "News",
-    access: [],
-    disabled: true,
-  },
-  {
-    href: "/tasks",
-    icon: CheckSquare,
-    label: "Tasks",
-    access: [],
-    disabled: true,
-  },
-  {
-    href: "/properties",
-    icon: HousePlus,
-    label: "Properties",
-    access: [],
-    disabled: true,
   },
   {
     href: "/sandbox",
@@ -68,27 +52,62 @@ const links = [
     disabled: false,
   },
   {
-    href: "/mailouts",
-    icon: Mail,
-    label: "Mailouts",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    label: "Dashboard",
     access: [],
-    disabled: true,
+    disabled: false,
   },
   {
-    href: "/analytics",
-    icon: LineChart,
-    label: "Analytics",
+    href: "/events",
+    icon: CalendarRange,
+    label: "Events",
     access: [],
-    disabled: true,
+    disabled: false,
   },
   {
-    href: "/directory",
+    href: "/tasks",
+    icon: CheckSquare,
+    label: "Tasks",
+    access: [],
+    disabled: false,
+  },
+  {
+    href: "/news",
+    icon: Newspaper,
+    label: "News",
+    access: [],
+    disabled: false,
+  },
+  {
+    href: "/properties",
+    icon: HousePlus,
+    label: "Properties",
+    access: [],
+    disabled: false,
+  },
+  { type: "separator" },
+  {
+    href: "/library",
     icon: FolderTree,
-    label: "Directory",
+    label: "Library",
     access: [],
-    disabled: true,
+    disabled: false,
   },
-
+  {
+    href: "/people",
+    icon: Users,
+    label: "People",
+    access: [],
+    disabled: false,
+  },
+  {
+    href: "/wiki",
+    icon: BookText,
+    label: "Wiki",
+    access: [],
+    disabled: false,
+  },
   { type: "separator" },
   {
     href: "/updates",
@@ -104,10 +123,12 @@ export const Navigation = React.memo(function Navigation({
 }: NavigationProps) {
   const { data: userProfile } = useQuery(userProfileOptions);
 
-  const showAdmin = hasDepartmentAccess(
-    userProfile?.departments,
-    links[0].access || [],
-  );
+  // const showAdmin = hasDepartmentAccess(
+  //   userProfile?.departments,
+  //   links[0].access || [],
+  // );
+
+  const showAdmin = true;
 
   return (
     <nav className="flex flex-col gap-2 pt-4">
@@ -121,14 +142,28 @@ export const Navigation = React.memo(function Navigation({
           >
             {links[0].label}
           </NavLink>
-          <Separator className="my-2 w-2/3" />
+          <NavLink
+            href={links[1].href || ""}
+            icon={links[1].icon || Home}
+            isCollapsed={isCollapsed}
+            disabled={links[1].disabled}
+          >
+            {links[1].label}
+          </NavLink>
+          <NavLink
+            href={links[2].href || ""}
+            icon={links[2].icon || Home}
+            isCollapsed={isCollapsed}
+            disabled={links[2].disabled}
+          >
+            {links[2].label}
+          </NavLink>
+          <Separator className="my-4" />
         </>
       )}
-      {links.slice(1).map((link, index) => {
+      {links.slice(3).map((link, index) => {
         if (link.type === "separator") {
-          return (
-            <Separator key={`separator-${index}`} className="my-2 w-2/3" />
-          );
+          return <Separator key={`separator-${index}`} className="my-4" />;
         }
         return (
           <NavLink
