@@ -48,7 +48,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
       <div
         className={`relative hidden w-full flex-col transition-all duration-300 ease-in-out md:flex ${
-          isInboxCollapsed ? "max-w-16" : "max-w-96"
+          isInboxCollapsed ? "max-w-16" : "max-w-64"
         }`}
       >
         <Inbox isCollapsed={isInboxCollapsed} toggleSidebar={toggleInbox} />
