@@ -46,7 +46,7 @@ export function Inbox({
   return (
     <div
       className={`flex h-full w-full flex-col transition-all duration-300 ease-in-out ${
-        isCollapsed ? "max-w-16" : "max-w-96"
+        isCollapsed ? "max-w-16" : "max-w-64"
       }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -75,9 +75,12 @@ export function Inbox({
         {/* Placeholder for notifications */}
         <div className="flex flex-col gap-4 overflow-y-scroll px-4">
           {showContent &&
-            new Array(30).fill(null).map((_, index) => (
+            new Array(6).fill(null).map((_, index) => (
               <Card key={index} className="animate-slide-down-fade-in p-4">
-                <p>Notification {index + 1}</p>
+                <h1 className="font-semibold">Notification {index + 1}</h1>
+                <p className="text-xs text-muted-foreground">
+                  This is a notification description.
+                </p>
               </Card>
             ))}
         </div>
