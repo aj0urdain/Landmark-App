@@ -1,14 +1,43 @@
 import { Dot } from "@/components/atoms/Dot/Dot";
 import { LogoWordmark } from "@/components/atoms/LogoWordmark/LogoWordmark";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+  Component,
+  GraduationCap,
+  Home,
+  LibraryBig,
+  MapPin,
+} from "lucide-react";
 import React from "react";
+
+const wikiLinks = [
+  {
+    name: "Home",
+    icon: Home,
+    href: "/wiki",
+  },
+  {
+    name: "Library",
+    icon: LibraryBig,
+    href: "/wiki/library",
+  },
+  {
+    name: "Departments",
+    icon: Component,
+    href: "/wiki/departments",
+  },
+  {
+    name: "Branches",
+    icon: MapPin,
+    href: "/wiki/branches",
+  },
+  {
+    name: "Learn",
+    icon: GraduationCap,
+    href: "/wiki/learn",
+  },
+];
 
 const WikiPage = () => {
   return (
@@ -18,17 +47,23 @@ const WikiPage = () => {
           <div className="flex items-center gap-4">
             <LogoWordmark className="h-10 w-auto" />
             <Dot size="small" className="mt-1 animate-pulse bg-foreground" />
-            <h1 className="mt-1 font-lexia text-xl font-bold uppercase tracking-wider">
+            <h1 className="mt-2 font-lexia text-xl font-bold uppercase tracking-wider">
               Wiki
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost">About</Button>
-            <Button variant="ghost">Departments</Button>
-            <Button variant="ghost">Branches</Button>
+          <div className="flex items-center gap-8">
+            {wikiLinks.map((link) => (
+              <Button
+                key={link.name}
+                variant="ghost"
+                className="flex items-center gap-1 p-0 px-2 transition-all duration-150 hover:border-b hover:border-b-foreground hover:bg-transparent"
+              >
+                <link.icon className="h-3 w-3" />
+                {link.name}
+              </Button>
+            ))}
           </div>
         </CardTitle>
-        <CardDescription>This is the wiki page.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
