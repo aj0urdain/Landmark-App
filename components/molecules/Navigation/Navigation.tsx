@@ -5,9 +5,7 @@ import {
   Home,
   Newspaper,
   CheckSquare,
-  Mail,
   Box,
-  LineChart,
   HousePlus,
   ShieldCheck,
   FolderTree,
@@ -19,11 +17,11 @@ import {
   WandSparkles,
 } from "lucide-react";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+// import { useQuery } from "@tanstack/react-query";
 
-import { hasDepartmentAccess } from "@/utils/permissions";
+// import { hasDepartmentAccess } from "@/utils/permissions";
 import { Separator } from "@/components/ui/separator";
-import { userProfileOptions } from "@/types/userProfileTypes";
+// import { userProfileOptions } from "@/types/userProfileTypes";
 
 interface NavigationProps {
   isCollapsed: boolean;
@@ -121,7 +119,7 @@ const links = [
 export const Navigation = React.memo(function Navigation({
   isCollapsed,
 }: NavigationProps) {
-  const { data: userProfile } = useQuery(userProfileOptions);
+  // const { data: userProfile } = useQuery(userProfileOptions);
 
   // const showAdmin = hasDepartmentAccess(
   //   userProfile?.departments,
