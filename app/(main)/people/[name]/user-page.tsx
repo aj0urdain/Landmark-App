@@ -128,12 +128,12 @@ export function UserPage() {
                 {data.first_name} {data.last_name}
               </p>
 
-              <div className="animate-slide-up-fade-in ml-2 flex items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+              <div className="ml-2 flex animate-slide-up-fade-in items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                 <div className="flex items-center gap-2">
                   <IdCard />
                   {data?.roles?.map((role: string) => role).join(", ")}
                 </div>
-                <div className="animate-slide-right-fade-in flex gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                <div className="flex animate-slide-right-fade-in gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                   {data.departments?.map((department: string) => (
                     <DepartmentBadge
                       key={department}
@@ -156,7 +156,7 @@ export function UserPage() {
               <Separator className="w-full" />
             </div> */}
 
-            <div className="animate-slide-left-fade-in ml-2 flex flex-col justify-start gap-6 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+            <div className="ml-2 flex animate-slide-left-fade-in flex-col justify-start gap-6 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
               {data.work_anniversary && (
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs font-extralight text-muted-foreground">
@@ -222,7 +222,7 @@ export function UserPage() {
               alt="Profile Picture"
               width={400}
               height={400}
-              className="animate-slide-up-fade-in h-full w-auto object-cover opacity-0 [animation-delay:_0.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
+              className="h-full w-auto animate-slide-up-fade-in object-cover opacity-0 [animation-delay:_0.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
             />
           </div>
         )}
@@ -261,7 +261,7 @@ export function UserPage() {
           <div className="flex w-full animate-slide-down-fade-in gap-4 py-6">
             <Card className="max-h-full w-2/3 overflow-y-scroll">
               <CardHeader className="space-y-4">
-                <CardTitle className="text-3xl font-semibold text-foreground/80">
+                <CardTitle className="text-2xl font-semibold text-foreground/90">
                   {data?.biography_title || "Biography"}
                 </CardTitle>
                 <CardDescription className="whitespace-pre-line leading-snug">
