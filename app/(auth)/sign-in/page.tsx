@@ -102,13 +102,13 @@ export default function SignIn() {
 
             <div className="flex items-center justify-center gap-8">
               <div className="flex items-center gap-2">
-                <Dot size="small" />
-                <Dot size="large" />
+                <Dot size="small" className="bg-white" />
+                <Dot size="large" className="bg-white" />
                 <div className="font-lexia text-4xl font-extrabold uppercase tracking-wider text-white">
                   Landmark
                 </div>
-                <Dot size="large" />
-                <Dot size="small" />
+                <Dot size="large" className="bg-white" />
+                <Dot size="small" className="bg-white" />
               </div>
               <div>
                 <Badge
