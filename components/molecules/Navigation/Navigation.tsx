@@ -8,9 +8,7 @@ import {
   Box,
   HousePlus,
   ShieldCheck,
-  FolderTree,
   FileCode,
-  Users,
   BookText,
   LayoutDashboard,
   CalendarRange,
@@ -22,6 +20,14 @@ import React from "react";
 // import { hasDepartmentAccess } from "@/utils/permissions";
 import { Separator } from "@/components/ui/separator";
 // import { userProfileOptions } from "@/types/userProfileTypes";
+
+import {
+  LibraryBig,
+  Component,
+  MapPin,
+  Users,
+  GraduationCap,
+} from "lucide-react";
 
 interface NavigationProps {
   isCollapsed: boolean;
@@ -85,26 +91,21 @@ const links = [
     disabled: false,
   },
   { type: "separator" },
-  {
-    href: "/library",
-    icon: FolderTree,
-    label: "Library",
-    access: [],
-    disabled: false,
-  },
-  {
-    href: "/people",
-    icon: Users,
-    label: "People",
-    access: [],
-    disabled: false,
-  },
+
   {
     href: "/wiki",
     icon: BookText,
     label: "Wiki",
     access: [],
     disabled: false,
+    subsections: [
+      { name: "Home", href: "/wiki", icon: Home },
+      { name: "Library", href: "/wiki/library", icon: LibraryBig },
+      { name: "Departments", href: "/wiki/departments", icon: Component },
+      { name: "Branches", href: "/wiki/branches", icon: MapPin },
+      { name: "People", href: "/wiki/people", icon: Users },
+      { name: "Learn", href: "/wiki/learn", icon: GraduationCap },
+    ],
   },
   { type: "separator" },
   {
@@ -132,36 +133,23 @@ export const Navigation = React.memo(function Navigation({
     <nav className="flex flex-col gap-2 pt-4">
       {showAdmin && (
         <>
-          <NavLink
-            href={links[0].href || ""}
-            icon={links[0].icon || Home}
-            isCollapsed={isCollapsed}
-            disabled={links[0].disabled}
-          >
-            {links[0].label}
-          </NavLink>
-          <NavLink
-            href={links[1].href || ""}
-            icon={links[1].icon || Home}
-            isCollapsed={isCollapsed}
-            disabled={links[1].disabled}
-          >
-            {links[1].label}
-          </NavLink>
-          <NavLink
-            href={links[2].href || ""}
-            icon={links[2].icon || Home}
-            isCollapsed={isCollapsed}
-            disabled={links[2].disabled}
-          >
-            {links[2].label}
-          </NavLink>
+          {links.slice(0, 3).map((link) => (
+            <NavLink
+              key={link.href}
+              href={link.href || ""}
+              icon={link.icon ?? Home}
+              isCollapsed={isCollapsed}
+              disabled={link.disabled}
+            >
+              {link.label}
+            </NavLink>
+          ))}
           <Separator className="my-4" />
         </>
       )}
-      {links.slice(3).map((link, index) => {
+      {links.slice(3).map((link) => {
         if (link.type === "separator") {
-          return <Separator key={`separator-${index}`} className="my-4" />;
+          return <Separator key={`separator-${link.href}`} className="my-4" />;
         }
         return (
           <NavLink
@@ -170,6 +158,7 @@ export const Navigation = React.memo(function Navigation({
             icon={link.icon ?? Home}
             isCollapsed={isCollapsed}
             disabled={link.disabled}
+            subsections={link.subsections}
           >
             {link.label}
           </NavLink>
