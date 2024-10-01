@@ -26,6 +26,7 @@ import {
 import {
   BookUser,
   Briefcase,
+  Building2,
   Cake,
   CalendarHeart,
   IdCard,
@@ -45,6 +46,7 @@ import {
 import { Label } from "@/components/ui/label";
 import EmailContact from "@/components/atoms/EmailContact/EmailContact";
 import PhoneContact from "@/components/atoms/PhoneContact/PhoneContact";
+import { Separator } from "@/components/ui/separator";
 
 export function UserPage() {
   const params = useParams();
@@ -128,12 +130,12 @@ export function UserPage() {
                 {data.first_name} {data.last_name}
               </p>
 
-              <div className="ml-2 flex animate-slide-up-fade-in items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+              <div className="animate-slide-up-fade-in ml-2 flex items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                 <div className="flex items-center gap-2">
                   <IdCard />
                   {data?.roles?.map((role: string) => role).join(", ")}
                 </div>
-                <div className="flex animate-slide-right-fade-in gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                <div className="animate-slide-right-fade-in flex gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                   {data.departments?.map((department: string) => (
                     <DepartmentBadge
                       key={department}
@@ -156,7 +158,7 @@ export function UserPage() {
               <Separator className="w-full" />
             </div> */}
 
-            <div className="ml-2 flex animate-slide-left-fade-in flex-col justify-start gap-6 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+            <div className="animate-slide-left-fade-in ml-2 flex flex-col justify-start gap-6 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
               {data.work_anniversary && (
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs font-extralight text-muted-foreground">
@@ -222,7 +224,7 @@ export function UserPage() {
               alt="Profile Picture"
               width={400}
               height={400}
-              className="h-full w-auto animate-slide-up-fade-in object-cover opacity-0 [animation-delay:_0.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
+              className="animate-slide-up-fade-in h-full w-auto object-cover opacity-0 [animation-delay:_0.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
             />
           </div>
         )}
@@ -259,12 +261,12 @@ export function UserPage() {
         </TabsList>
         <TabsContent value="overview">
           <div className="flex w-full animate-slide-down-fade-in gap-4 py-6">
-            <Card className="max-h-full w-2/3 overflow-y-scroll">
-              <CardHeader className="space-y-4">
-                <CardTitle className="text-2xl font-semibold text-foreground/90">
+            <Card className="h-fit max-h-full w-2/3 overflow-y-scroll py-4">
+              <CardHeader className="flex flex-col gap-6">
+                <CardTitle className="italicf border-l-2 border-l-muted pl-4 text-4xl">
                   {data?.biography_title || "Biography"}
                 </CardTitle>
-                <CardDescription className="whitespace-pre-line leading-snug">
+                <CardDescription className="whitespace-pre-line px-4 text-justify leading-snug">
                   {data?.biography_description ||
                     "No biography available. Speak to an administrator to have your biography completed."}
                 </CardDescription>
@@ -296,10 +298,30 @@ export function UserPage() {
                 </CardHeader>
               </Card>
 
-              <Card className="h-fit">
+              <Card className="h-fit w-full">
                 <CardHeader className="space-y-4">
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold text-muted-foreground/80">
-                    <Briefcase className="h-4 w-4" />
+                  <CardTitle className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground/80">
+                    <Building2 className="h-3 w-3" />
+                    Office
+                  </CardTitle>
+                  <CardDescription className="whitespace-pre-line leading-snug">
+                    <div className="flex flex-col gap-6">
+                      <div className="flex flex-col items-start justify-start gap-0.5">
+                        <p className="text-sm font-medium text-foreground/80">
+                          Level 20, 150 Lonsdale Street
+                        </p>
+                        <p className="text-xs text-muted-foreground/80">
+                          Melbourne VIC 3000
+                        </p>
+                      </div>
+                    </div>
+                  </CardDescription>
+                </CardHeader>
+                <Separator className="mx-6 w-[calc(100%-48px)] bg-muted" />
+
+                <CardHeader className="space-y-4">
+                  <CardTitle className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground/80">
+                    <Briefcase className="h-3 w-3" />
                     Working Hours
                   </CardTitle>
                   <CardDescription className="whitespace-pre-line leading-snug">
@@ -307,7 +329,9 @@ export function UserPage() {
                       {workingHours.map(({ day, hours }) => (
                         <div key={day} className="flex justify-between">
                           <span className="font-medium">{day}</span>
-                          <span>{hours}</span>
+                          <span className="font-semibold text-foreground/80">
+                            {hours}
+                          </span>
                         </div>
                       ))}
                       <div className="flex justify-between">
