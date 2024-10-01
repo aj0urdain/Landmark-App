@@ -309,9 +309,11 @@ export function UserPage() {
                       <div className="flex flex-col items-start justify-start gap-0.5">
                         <p className="text-sm font-medium text-foreground/80">
                           Level 20, 150 Lonsdale Street
+                          {/* hardcoded values TODO: create branch_location table */}
                         </p>
                         <p className="text-xs text-muted-foreground/80">
                           Melbourne VIC 3000
+                          {/* hardcoded values TODO: create branch_location table */}
                         </p>
                       </div>
                     </div>
