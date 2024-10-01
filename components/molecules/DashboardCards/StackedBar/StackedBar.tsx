@@ -78,7 +78,7 @@ export function StackedBar() {
               <Bar
                 key={key}
                 dataKey="avgSalePrice"
-                fill={chartConfig[key].color}
+                fill={chartConfig[key].color} // eslint-disable-line
                 radius={4}
                 name={key}
               />
