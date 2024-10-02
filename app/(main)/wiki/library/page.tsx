@@ -13,6 +13,26 @@ const LibraryPage = () => {
           Industry Snapshots library 4. Auction results library 5. Capability
           statement library 6. IM/submission
         </p>
+
+        {/* Premium IM PDF, Premium IM Submission, Premium IM Working Folder (IM + SUBMISSION), Market Share */}
+        {/* Industry Reports */}
+        {/* Industry Snapshots */}
+        {/* Auction Results */}
+        {/* Capability Statement */}
+        {/* IM/Submission */}
+        {/* Icon Library */}
+        {/* Needs to be maintainable pngs */}
+        {/* Fonts */}
+        {/* Colors */}
+        {/* Typography */}
+        {/* Icons */}
+        {/* Images */}
+        {/* Videos */}
+        {/* Audio */}
+        {/* Documents */}
+        {/* Spreadsheets */}
+        {/* Presentations */}
+        {/* Databases */}
       </CardContent>
     </Card>
   );
