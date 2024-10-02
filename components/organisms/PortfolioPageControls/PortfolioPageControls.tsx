@@ -118,14 +118,14 @@ const PortfolioPageControls = ({
       const myProps = data.filter(
         (prop) =>
           prop.lead_agent === userId ||
-          prop?.associated_agents?.includes(userId),
+          prop?.associated_agents?.includes(userId as string),
       );
       setMyProperties(myProps as unknown as Property[]);
 
       const allProps = data.filter(
         (prop) =>
           prop.lead_agent !== userId &&
-          !prop?.associated_agents?.includes(userId),
+          !prop?.associated_agents?.includes(userId as string),
       );
       setAllProperties(allProps as unknown as Property[]);
     };
