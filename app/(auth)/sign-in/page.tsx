@@ -29,8 +29,9 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(false);
   const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
 
   const isAllowedDomain = (email: string) => {
     const domain = email.split("@")[1];
@@ -72,8 +73,8 @@ export default function SignIn() {
 
       if (data && !error) {
         const allowedDomainsArray = data.value;
-        console.log("Allowed domains:", allowedDomainsArray);
-        setAllowedDomains(allowedDomainsArray);
+
+        setAllowedDomains(allowedDomainsArray as string[]);
       } else {
         console.error("Error fetching allowed domains:", error);
       }
