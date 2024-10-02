@@ -29,16 +29,16 @@ const chartData = [
 
 const chartConfig = {
   June: {
-    label: "June",
-    color: "hsl(var(--blue))",
+    label: "June" as string,
+    color: "hsl(var(--blue))" as string,
   },
   August: {
-    label: "August",
-    color: "hsl(var(--green))",
+    label: "August" as string,
+    color: "hsl(var(--green))" as string,
   },
   September: {
-    label: "September",
-    color: "hsl(var(--red))",
+    label: "September" as string,
+    color: "hsl(var(--red))" as string,
   },
 } satisfies ChartConfig;
 
@@ -78,7 +78,7 @@ export function StackedBar() {
               <Bar
                 key={key}
                 dataKey="avgSalePrice"
-                fill={chartConfig[key].color} // eslint-disable-line
+                fill={chartConfig[key as keyof typeof chartConfig].color} // eslint-disable-line
                 radius={4}
                 name={key}
               />
