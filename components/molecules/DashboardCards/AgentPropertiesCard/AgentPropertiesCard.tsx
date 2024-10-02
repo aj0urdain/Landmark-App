@@ -4,17 +4,13 @@ import { useState, useEffect } from "react";
 import { createBrowserClient } from "@/utils/supabase/client";
 
 import AgentPropertyCard from "./AgentPropertyCard/AgentPropertyCard";
+import { Database } from "@/types/supabaseTypes";
 
-interface Property {
-  id: string;
-  street_number: string;
-  streets: { street_name: string } | null;
-  suburbs: { suburb_name: string; postcode: string } | null;
-  states: { state_name: string; short_name: string } | null;
-  associated_agents: string[] | null;
-  property_type: string;
-  lead_agent: string;
-}
+type Property = Database["public"]["Tables"]["properties"]["Row"] & {
+  streets: Database["public"]["Tables"]["streets"]["Row"] | null;
+  suburbs: Database["public"]["Tables"]["suburbs"]["Row"] | null;
+  states: Database["public"]["Tables"]["states"]["Row"] | null;
+};
 
 export default function Component() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -44,7 +40,7 @@ export default function Component() {
         if (error) {
           console.error("Error fetching properties: ", error.message);
         } else {
-          setProperties(data); // eslint-disable-line
+          setProperties(data as Property[]); // eslint-disable-line
         }
       }
 
