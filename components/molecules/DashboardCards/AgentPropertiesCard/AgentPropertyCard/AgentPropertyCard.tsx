@@ -2,12 +2,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Property } from "@/types/portfolioControlsTypes";
+import { Database } from "@/types/supabaseTypes";
 import { getProfileFromID } from "@/utils/supabase/supabase-queries";
 import { useQuery } from "@tanstack/react-query";
 
 import { useRouter } from "next/navigation";
 import React from "react";
+
+type Property = Database["public"]["Tables"]["properties"]["Row"] & {
+  streets: Database["public"]["Tables"]["streets"]["Row"] | null;
+  suburbs: Database["public"]["Tables"]["suburbs"]["Row"] | null;
+  states: Database["public"]["Tables"]["states"]["Row"] | null;
+};
 
 const AgentPropertyCard = ({
   loading,
@@ -78,13 +84,13 @@ const AgentPropertyCard = ({
               {leadAgentData?.first_name} {leadAgentData?.last_name}
             </h3>
             <p className="text-xs text-muted-foreground">
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {leadAgentData?.roles?.[0]}
+              insert role
+              {/* need to fix this */}
             </p>
           </div>
         </div>
         <Button
-          onClick={() => handleRedirect(property.id)}
+          onClick={() => handleRedirect(property.id.toString())}
           className="mt-2"
           size="sm"
           variant="outline"
