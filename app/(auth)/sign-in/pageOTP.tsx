@@ -268,7 +268,7 @@ export default function SignIn() {
       if (data && !error) {
         const allowedDomainsArray = data.value;
         console.log("Allowed domains:", allowedDomainsArray);
-        setAllowedDomains(allowedDomainsArray);
+        setAllowedDomains(allowedDomainsArray as string[]);
       } else {
         console.error("Error fetching allowed domains:", error);
       }
