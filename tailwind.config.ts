@@ -77,6 +77,10 @@ const config = {
         metro: ["var(--font-metro-sans)"], // Add Metro Sans as a new option
       },
       keyframes: {
+        gradient: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
         "accordion-down": {
           from: {
             height: "0",
@@ -143,6 +147,7 @@ const config = {
         },
       },
       animation: {
+        gradient: "gradient 15s ease infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "spin-slow": "spin-slow 3s linear infinite",
@@ -151,6 +156,13 @@ const config = {
         "slide-up-fade-in": "slide-up-fade-in 0.3s ease-out forwards",
         "slide-left-fade-in": "slide-left-fade-in 0.3s ease-out forwards",
         "slide-right-fade-in": "slide-right-fade-in 0.3s ease-out forwards",
+      },
+      backgroundImage: {
+        "gradient-animation":
+          "linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff)",
+      },
+      backgroundSize: {
+        "gradient-animation": "1200% 1200%",
       },
     },
   },
