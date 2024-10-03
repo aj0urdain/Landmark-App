@@ -77,6 +77,10 @@ const config = {
         metro: ["var(--font-metro-sans)"], // Add Metro Sans as a new option
       },
       keyframes: {
+        "fade-in-out": {
+          "0%, 100%": { opacity: "0" },
+          "10%, 90%": { opacity: "1" },
+        },
         gradient: {
           "0%, 100%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
@@ -147,6 +151,7 @@ const config = {
         },
       },
       animation: {
+        "fade-in-out": "fade-in-out 2s ease-in-out",
         gradient: "gradient 15s ease infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
