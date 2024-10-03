@@ -10,15 +10,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Cpu, Hammer } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { userProfileOptions } from "@/types/userProfileTypes";
+import { hasDepartmentAccess } from "@/utils/permissions";
 
 interface NavLinkProps {
   href: string;
   icon: React.ElementType;
   children: React.ReactNode;
   isCollapsed: boolean;
-  disabled?: boolean;
+  comingSoon?: boolean;
   subsections?: { name: string; href: string; icon: React.ElementType }[];
+  requiredAccess?: string[];
 }
 
 export const NavLink = React.memo(function NavLink({
@@ -26,13 +30,22 @@ export const NavLink = React.memo(function NavLink({
   icon: Icon,
   children,
   isCollapsed,
-  disabled = false,
+  comingSoon = false,
   subsections,
+  requiredAccess = [],
 }: NavLinkProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { data: userProfile } = useQuery(userProfileOptions);
+
+  const hasAccess = hasDepartmentAccess(
+    userProfile?.departments,
+    requiredAccess,
+  );
+  const isDisabled = comingSoon && !hasAccess;
+
   const isActive =
     pathname === href ||
     (pathname.startsWith(`${href}/`) && href !== "/wiki" && href !== "/");
@@ -54,9 +67,10 @@ export const NavLink = React.memo(function NavLink({
             <button
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation(); // Add this line
                 setIsExpanded(!isExpanded);
               }}
-              className="ml-auto"
+              className="relative z-10 ml-auto" // Add relative and z-10
             >
               <ChevronDown
                 className={cn(
@@ -81,20 +95,51 @@ export const NavLink = React.memo(function NavLink({
           ? "bg-primary text-primary-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
     isCollapsed ? "w-10 h-10 justify-center mx-auto" : "px-4 mx-4",
-    disabled && "opacity-50 cursor-not-allowed",
+    isDisabled && "opacity-50 cursor-not-allowed",
     isLoading && "animate-pulse [animation-duration:2s]",
   );
 
   const linkElement = (
     <>
-      {disabled ? (
-        <div className={linkClass}>{linkContent}</div>
+      {isDisabled ? (
+        <TooltipProvider delayDuration={100}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={`${linkClass} group`}>
+                {linkContent}
+                {!isCollapsed && comingSoon && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    {/* <Construction className="h-4 w-4" /> */}
+
+                    <Hammer className="h-4 w-4 group-hover:animate-spin" />
+                  </div>
+                )}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent
+              side="right"
+              align="center"
+              sideOffset={10}
+              className="flex cursor-pointer items-center gap-1 bg-muted text-xs text-blue-500"
+              onClick={() => {
+                router.push("/wiki/people/aaron-girton");
+              }}
+            >
+              <Cpu className="h-4 w-4 animate-pulse" />
+
+              <p>
+                Under construction by{" "}
+                <span className="font-bold underline"> @Aaron!</span>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ) : (
         <Link
           href={href}
           className={linkClass}
           onClick={(e) => {
-            if (!disabled && !isActive) {
+            if (!isDisabled && !isActive) {
               e.preventDefault();
               setIsLoading(true);
               router.push(href);

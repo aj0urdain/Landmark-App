@@ -15,11 +15,8 @@ import {
   WandSparkles,
 } from "lucide-react";
 import React from "react";
-// import { useQuery } from "@tanstack/react-query";
 
-// import { hasDepartmentAccess } from "@/utils/permissions";
 import { Separator } from "@/components/ui/separator";
-// import { userProfileOptions } from "@/types/userProfileTypes";
 
 import {
   LibraryBig,
@@ -38,57 +35,67 @@ const links = [
     href: "/admin",
     icon: ShieldCheck,
     label: "Admin",
-    access: ["Technology", "Senior Leadership Team"],
-    disabled: true,
+    access: ["Technology, Senior Leadership"],
+    comingSoon: true,
+    requiredAccess: ["Technology"],
   },
   {
     href: "/create",
     icon: WandSparkles,
     label: "Create",
-    access: [],
-    disabled: false,
+    access: ["Technology"],
+    comingSoon: true,
+    requiredAccess: ["Technology"],
   },
   {
     href: "/sandbox",
     icon: Box,
     label: "Sandbox",
-    access: [],
-    disabled: false,
+    access: ["Technology"],
+    comingSoon: false,
+    requiredAccess: ["Technology"],
   },
+  { type: "separator" },
+
   {
     href: "/dashboard",
     icon: LayoutDashboard,
     label: "Dashboard",
     access: [],
-    disabled: false,
+    comingSoon: false,
+    requiredAccess: ["Technology"],
   },
   {
     href: "/events",
     icon: CalendarRange,
     label: "Events",
     access: [],
-    disabled: false,
+    comingSoon: true,
+    requiredAccess: ["Technology"],
   },
   {
     href: "/tasks",
     icon: CheckSquare,
     label: "Tasks",
     access: [],
-    disabled: false,
+    comingSoon: true,
+    requiredAccess: ["Technology"],
   },
   {
     href: "/news",
     icon: Newspaper,
     label: "News",
     access: [],
-    disabled: false,
+    comingSoon: true,
+    requiredAccess: ["Technology"],
   },
   {
     href: "/properties",
     icon: HousePlus,
     label: "Properties",
     access: [],
-    disabled: false,
+    comingSoon: true,
+    requiredAccess: ["Technology"],
   },
   { type: "separator" },
 
@@ -97,7 +104,8 @@ const links = [
     icon: BookText,
     label: "Wiki",
     access: [],
-    disabled: false,
+    comingSoon: false,
+    requiredAccess: [],
     subsections: [
       { name: "Home", href: "/wiki", icon: Home },
       { name: "Library", href: "/wiki/library", icon: LibraryBig },
@@ -113,41 +121,17 @@ const links = [
     icon: FileCode,
     label: " Updates",
     access: [],
-    disabled: false,
+    comingSoon: true,
+    requiredAccess: ["Technology"],
   },
 ];
 
 export const Navigation = React.memo(function Navigation({
   isCollapsed,
 }: NavigationProps) {
-  // const { data: userProfile } = useQuery(userProfileOptions);
-
-  // const showAdmin = hasDepartmentAccess(
-  //   userProfile?.departments,
-  //   links[0].access || [],
-  // );
-
-  const showAdmin = true;
-
   return (
     <nav className="flex flex-col gap-2 pt-4">
-      {showAdmin && (
-        <>
-          {links.slice(0, 3).map((link) => (
-            <NavLink
-              key={link.href}
-              href={link.href || ""}
-              icon={link.icon ?? Home}
-              isCollapsed={isCollapsed}
-              disabled={link.disabled}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-          <Separator className="my-4" />
-        </>
-      )}
-      {links.slice(3).map((link) => {
+      {links.map((link) => {
         if (link.type === "separator") {
           return <Separator key={`separator-${link.href}`} className="my-4" />;
         }
@@ -157,8 +141,9 @@ export const Navigation = React.memo(function Navigation({
             href={link.href || ""}
             icon={link.icon ?? Home}
             isCollapsed={isCollapsed}
-            disabled={link.disabled}
+            comingSoon={link.comingSoon}
             subsections={link.subsections}
+            requiredAccess={link.requiredAccess}
           >
             {link.label}
           </NavLink>

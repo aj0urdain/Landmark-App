@@ -54,7 +54,7 @@ const WikiMenu = () => {
   const pathname = usePathname();
 
   return (
-    <div className="sticky -top-4 z-50 bg-gradient-to-b from-transparent via-background/50 to-background backdrop-blur-3xl">
+    <div className="sticky -top-4 z-30 bg-gradient-to-b from-transparent via-background/50 to-background backdrop-blur-3xl">
       <CardHeader>
         <CardTitle className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">

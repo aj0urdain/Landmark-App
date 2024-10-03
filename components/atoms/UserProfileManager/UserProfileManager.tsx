@@ -7,8 +7,27 @@ export function UserProfileManager() {
   const queryClient = useQueryClient();
   const supabase = createBrowserClient();
 
+  const { data: userProfile } = useQuery({
+    ...userProfileOptions,
+    queryFn: async () => {
+      const response = await fetch("/api/user-profile");
+      if (!response.ok) {
+        throw new Error("Failed to fetch user profile");
+      }
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+  });
+
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    if (userProfile) {
+      console.log("User profile updated:", userProfile);
+    }
+  }, [userProfile]);
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
         queryClient.invalidateQueries({
           queryKey: userProfileOptions.queryKey,
@@ -16,32 +35,10 @@ export function UserProfileManager() {
       }
     });
 
-    // If you need to unsubscribe, you can use data.subscription
     return () => {
-      data.subscription.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, [supabase, queryClient]);
-
-  useQuery({
-    ...userProfileOptions,
-    queryFn: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        return null;
-      }
-
-      const { data, error } = await supabase
-        .from("user_profile_complete")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-  });
 
   useEffect(() => {
     const channel = supabase
@@ -49,9 +46,7 @@ export function UserProfileManager() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "user_profiles" },
-        (payload) => {
-          console.log(`payload:`, payload);
-          console.log(`queryKey:`, userProfileOptions.queryKey);
+        () => {
           queryClient.invalidateQueries({
             queryKey: userProfileOptions.queryKey,
           });
