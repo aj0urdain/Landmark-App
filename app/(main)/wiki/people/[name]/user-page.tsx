@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserProfilePage } from "./_actions/getUserProfilePage";
 import { useParams, usePathname } from "next/navigation";
@@ -47,6 +47,7 @@ import { Label } from "@/components/ui/label";
 import EmailContact from "@/components/atoms/EmailContact/EmailContact";
 import PhoneContact from "@/components/atoms/PhoneContact/PhoneContact";
 import { Separator } from "@/components/ui/separator";
+import BirthdayConfetti from "@/components/molecules/BirthdayConfetti/BirthdayConfetti";
 
 export function UserPage() {
   const params = useParams();
@@ -57,7 +58,21 @@ export function UserPage() {
     queryKey: [...getUserProfilePage.queryKey, name],
   });
 
-  console.log(data?.biography_description);
+  const [showBirthdayMessage, setShowBirthdayMessage] = useState(false);
+
+  const isBirthday = data?.birthday
+    ? new Date(data?.birthday).getDate() === new Date().getDate() &&
+      new Date(data?.birthday).getMonth() === new Date().getMonth()
+    : false;
+
+  useEffect(() => {
+    if (isBirthday) {
+      const timer = setTimeout(() => {
+        setShowBirthdayMessage(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBirthday]);
 
   const pathname = usePathname();
   useEffect(() => {
@@ -126,21 +141,38 @@ export function UserPage() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4">
+      {isBirthday && <BirthdayConfetti delay={3000} />}
       <div className="relative flex h-full min-h-96 items-center justify-between border-b border-b-muted">
         <div className="z-20 flex h-full min-h-96 flex-col justify-between gap-2">
           <div />
           <div className="flex flex-col gap-12">
             <div className="flex flex-col gap-1">
+              {isBirthday && showBirthdayMessage && (
+                <div className="animate-slide-down-fade-in opacity-0 [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                  <div className="mb-4 flex animate-pulse gap-2">
+                    <h1 className="animate-slide-down-fade-in text-3xl font-light uppercase tracking-widest opacity-0 [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                      🥳 🎂
+                    </h1>
+                    <h1 className="animate-slide-down-fade-in text-3xl font-light uppercase tracking-widest opacity-0 [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                      Happy Birthday
+                    </h1>
+                    <h1 className="animate-slide-down-fade-in text-3xl font-light uppercase tracking-widest opacity-0 [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                      🎈 🎉
+                    </h1>
+                  </div>
+                </div>
+              )}
+
               <p className="animate-slide-left-fade-in text-7xl font-extrabold opacity-0 [animation-delay:_1s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                 {data.first_name} {data.last_name}
               </p>
 
-              <div className="animate-slide-up-fade-in ml-2 flex items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+              <div className="ml-2 flex animate-slide-up-fade-in items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                 <div className="flex items-center gap-2">
                   <IdCard />
                   {data?.roles?.map((role: string) => role).join(", ")}
                 </div>
-                <div className="animate-slide-right-fade-in flex gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                <div className="flex animate-slide-right-fade-in gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                   {data.departments?.map((department: string) => (
                     <DepartmentBadge
                       key={department}
@@ -163,7 +195,7 @@ export function UserPage() {
               <Separator className="w-full" />
             </div> */}
 
-            <div className="animate-slide-left-fade-in ml-2 flex flex-col justify-start gap-6 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+            <div className="ml-2 flex animate-slide-left-fade-in flex-col justify-start gap-6 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
               {data.work_anniversary && (
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs font-extralight text-muted-foreground">
@@ -190,7 +222,7 @@ export function UserPage() {
                 </div>
               )}
 
-              {data.birthday && (
+              {data.birthday && !isBirthday && (
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs font-extralight text-muted-foreground">
                     Birthday
@@ -229,7 +261,7 @@ export function UserPage() {
               alt="Profile Picture"
               width={400}
               height={400}
-              className="animate-slide-up-fade-in h-full w-auto object-cover opacity-0 [animation-delay:_0.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
+              className="h-full w-auto animate-slide-up-fade-in object-cover opacity-0 [animation-delay:_0.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
             />
           </div>
         )}
