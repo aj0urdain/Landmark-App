@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createBrowserClient } from "@/utils/supabase/client";
 import { userProfileOptions } from "@/types/userProfileTypes";
@@ -6,34 +6,55 @@ import { userProfileOptions } from "@/types/userProfileTypes";
 export function UserProfileManager() {
   const queryClient = useQueryClient();
   const supabase = createBrowserClient();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const { data: userProfile } = useQuery({
+  const {} = useQuery({
     ...userProfileOptions,
     queryFn: async () => {
-      const response = await fetch("/api/user-profile");
-      if (!response.ok) {
-        throw new Error("Failed to fetch user profile");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      console.log(user);
+      if (!user) {
+        setIsAuthenticated(false);
+        queryClient.clear();
+        return null;
       }
-      return response.json();
+
+      console.log(`we're about to fetch the user profile for ${user.id}`);
+      const { data, error } = await supabase
+        .from("user_profile_complete")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw new Error("Failed to fetch user profile");
+      console.log(`we've got the user profile for ${user.id}, ${data}`);
+
+      return data;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    enabled: isAuthenticated,
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: isAuthenticated ? 5 * 60 * 1000 : false,
   });
 
   useEffect(() => {
-    if (userProfile) {
-      console.log("User profile updated:", userProfile);
-    }
-  }, [userProfile]);
-
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-        queryClient.invalidateQueries({
-          queryKey: userProfileOptions.queryKey,
-        });
-      }
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setIsAuthenticated(!!session);
+        if (event === "SIGNED_IN") {
+          queryClient.invalidateQueries({
+            queryKey: userProfileOptions.queryKey,
+          });
+        } else if (event === "SIGNED_OUT") {
+          queryClient.clear();
+          localStorage.clear();
+          sessionStorage.clear();
+          queryClient.invalidateQueries();
+        }
+      },
+    );
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -41,23 +62,25 @@ export function UserProfileManager() {
   }, [supabase, queryClient]);
 
   useEffect(() => {
-    const channel = supabase
-      .channel("public:user_profiles")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "user_profiles" },
-        () => {
-          queryClient.invalidateQueries({
-            queryKey: userProfileOptions.queryKey,
-          });
-        },
-      )
-      .subscribe();
+    if (isAuthenticated) {
+      const channel = supabase
+        .channel("public:user_profiles")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "user_profiles" },
+          () => {
+            queryClient.invalidateQueries({
+              queryKey: userProfileOptions.queryKey,
+            });
+          },
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, queryClient]);
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [supabase, queryClient, isAuthenticated]);
 
   return null;
 }
