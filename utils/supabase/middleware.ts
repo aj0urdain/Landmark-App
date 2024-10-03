@@ -1,19 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Define the required access for each route
-const routeAccess = {
-  "/admin": ["Technology"],
-  "/create": ["Technology"],
-  "/sandbox": ["Agency", "Technology", "Design", "Senior Leadership"],
-  "/events": ["Technology"],
-  "/tasks": ["Technology"],
-  "/news": ["Technology"],
-  "/wiki": [],
-  "/properties": ["Technology"],
-  "/updates": ["Technology"],
-};
-
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -66,58 +53,6 @@ export async function updateSession(request: NextRequest) {
     const signInUrl = request.nextUrl.clone();
     signInUrl.pathname = "/sign-in";
     return NextResponse.redirect(signInUrl);
-  }
-
-  if (user) {
-    const lastProfileFetch = request.cookies.get("lastProfileFetch")?.value;
-    const now = Math.floor(Date.now() / 1000);
-
-    if (!lastProfileFetch || now - parseInt(lastProfileFetch) > 300) {
-      const { data: userProfile, error } = await supabase
-        .from("user_profile_complete")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (!error && userProfile) {
-        supabaseResponse.cookies.set(
-          "userProfile",
-          JSON.stringify(userProfile),
-          {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60, // 1 week
-          },
-        );
-
-        supabaseResponse.cookies.set("lastProfileFetch", now.toString(), {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 7 * 24 * 60 * 60, // 1 week
-        });
-      }
-    }
-
-    // Check for required access
-    const userProfile = JSON.parse(
-      request.cookies.get("userProfile")?.value || "{}",
-    );
-    const userDepartments = userProfile.departments || [];
-    const requiredAccess =
-      routeAccess[request.nextUrl.pathname as keyof typeof routeAccess] || [];
-
-    if (
-      requiredAccess.length > 0 &&
-      !userDepartments.some((dept: string) =>
-        (requiredAccess as string[]).includes(dept),
-      )
-    ) {
-      const accessDeniedUrl = request.nextUrl.clone();
-      accessDeniedUrl.pathname = "/access-denied";
-      return NextResponse.redirect(accessDeniedUrl);
-    }
   }
 
   return supabaseResponse;
