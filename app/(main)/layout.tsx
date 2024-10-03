@@ -1,5 +1,8 @@
 "use client";
 
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+
 import { useState } from "react";
 
 import { Sidebar } from "@/components/molecules/Sidebar/Sidebar";
@@ -8,6 +11,8 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Header } from "@/components/molecules/Header/Header";
 import { UserProfileManager } from "@/components/atoms/UserProfileManager/UserProfileManager";
 import { Inbox } from "@/components/molecules/Inbox/Inbox";
+
+TimeAgo.addDefaultLocale(en);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
