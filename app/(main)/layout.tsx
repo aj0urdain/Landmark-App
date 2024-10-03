@@ -11,6 +11,7 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Header } from "@/components/molecules/Header/Header";
 import { UserProfileManager } from "@/components/atoms/UserProfileManager/UserProfileManager";
 import { Inbox } from "@/components/molecules/Inbox/Inbox";
+import { AccessControl } from "@/components/atoms/AccessControl/AccessControl";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -48,7 +49,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
         <main className="mx-4 flex h-full w-full items-center justify-center overflow-y-scroll py-4 2xl:mx-auto">
-          <div className="h-full w-full max-w-6xl">{children}</div>
+          <div className="h-full w-full max-w-6xl">
+            <AccessControl>{children}</AccessControl>
+          </div>
         </main>
       </div>
       <div
