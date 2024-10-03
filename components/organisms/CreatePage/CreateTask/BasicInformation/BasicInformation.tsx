@@ -129,20 +129,23 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
         />
       </div>
       <div>
-        <Label htmlFor="assignee_ids">Assign Task to individual users</Label>
+        <Label htmlFor="assignments">Who needs to complete this task?</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-full justify-between">
-              Select assignees
+              Select users or groups..
               <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
             <Command>
-              <CommandInput placeholder="Search users..." className="h-9" />
+              <CommandInput
+                placeholder="Search assignments..."
+                className="h-9"
+              />
               <CommandList>
-                <CommandEmpty>No users found.</CommandEmpty>
-                <CommandGroup>
+                <CommandEmpty>No assignments found.</CommandEmpty>
+                <CommandGroup heading="Users">
                   {users.map((user) => (
                     <CommandItem
                       key={user.id}
@@ -163,31 +166,7 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
                     </CommandItem>
                   ))}
                 </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div>
-        <Label htmlFor="department_ids">
-          Assign Task to specific departments
-        </Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full justify-between">
-              Select departments
-              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
-            <Command>
-              <CommandInput
-                placeholder="Search departments..."
-                className="h-9"
-              />
-              <CommandList>
-                <CommandEmpty>No departments found.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup heading="Departments">
                   {departments.map((dept) => (
                     <CommandItem
                       key={dept.id}
@@ -208,26 +187,7 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
                     </CommandItem>
                   ))}
                 </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div>
-        <Label htmlFor="branch_ids">Assign Task to specific branches</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full justify-between">
-              Select branches
-              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
-            <Command>
-              <CommandInput placeholder="Search branches..." className="h-9" />
-              <CommandList>
-                <CommandEmpty>No branches found.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup heading="Branches">
                   {branches.map((branch) => (
                     <CommandItem
                       key={branch.id}
@@ -253,6 +213,7 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
           </PopoverContent>
         </Popover>
       </div>
+
       <div>
         <Label htmlFor="creator_ids">Who owns this task?</Label>
         <Popover>
