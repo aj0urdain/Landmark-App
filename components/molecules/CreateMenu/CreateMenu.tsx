@@ -23,14 +23,9 @@ const createLinks = [
     href: "/create/task",
   },
   {
-    name: "Property",
-    icon: MapPinHouse,
-    href: "/create/property",
-  },
-  {
-    name: "Blog Post",
-    icon: Rss,
-    href: "/create/blog-post",
+    name: "Announcement",
+    icon: Speech,
+    href: "/create/announcement",
   },
   {
     name: "News Article",
@@ -38,9 +33,14 @@ const createLinks = [
     href: "/create/news-article",
   },
   {
-    name: "Announcement",
-    icon: Speech,
-    href: "/create/announcement",
+    name: "Blog Post",
+    icon: Rss,
+    href: "/create/blog-post",
+  },
+  {
+    name: "Property",
+    icon: MapPinHouse,
+    href: "/create/property",
   },
   {
     name: "Tutorial",
