@@ -69,7 +69,7 @@ export function UserPage() {
     if (isBirthday) {
       const timer = setTimeout(() => {
         setShowBirthdayMessage(true);
-      }, 5000);
+      }, 3500);
       return () => clearTimeout(timer);
     }
   }, [isBirthday]);
@@ -141,7 +141,11 @@ export function UserPage() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4">
-      {isBirthday && <BirthdayConfetti delay={5000} />}
+      {isBirthday && (
+        <div className="z-50">
+          <BirthdayConfetti delay={3500} />
+        </div>
+      )}
       <div className="relative flex h-full min-h-96 items-center justify-between border-b border-b-muted">
         <div className="z-20 flex h-full min-h-96 flex-col justify-between gap-2">
           <div />
@@ -259,7 +263,7 @@ export function UserPage() {
           <div />
         </div>
         {data.profile_picture && (
-          <div className="absolute z-10 flex h-full w-full items-center justify-end overflow-y-hidden">
+          <div className="absolute flex h-full w-full items-center justify-end overflow-y-hidden">
             <Image
               src={data.profile_picture}
               alt="Profile Picture"
