@@ -1,82 +1,8 @@
 import React from "react";
-import {
-  CpuIcon,
-  Award,
-  Building,
-  Megaphone,
-  HandCoins,
-  BadgeDollarSign,
-  Cog,
-  UserSearch,
-  PenTool,
-  Database,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-
-const departmentInfo = [
-  {
-    name: "Technology",
-    icon: CpuIcon,
-    color: "text-blue-500 border-blue-500",
-    link: "technology",
-  },
-  {
-    name: "Senior Leadership",
-    icon: Award,
-    color: "text-purple-500 border-purple-500",
-    link: "senior-leadership",
-  },
-  {
-    name: "Agency",
-    icon: Building,
-    color: "text-green-500 border-green-500",
-    link: "agency",
-  },
-  {
-    name: "Marketing",
-    icon: Megaphone,
-    color: "text-yellow-500 border-yellow-500",
-    link: "marketing",
-  },
-  {
-    name: "Asset Management",
-    icon: HandCoins,
-    color: "text-indigo-500 border-indigo-500",
-    link: "asset-management",
-  },
-  {
-    name: "Finance",
-    icon: BadgeDollarSign,
-    color: "text-red-500 border-red-500",
-    link: "finance",
-  },
-  {
-    name: "Operations",
-    icon: Cog,
-    color: "text-orange-500 border-orange-500",
-    link: "operations",
-  },
-  {
-    name: "Human Resources",
-    icon: UserSearch,
-    color: "text-pink-500 border-pink-500",
-    link: "human-resources",
-  },
-  {
-    name: "Design",
-    icon: PenTool,
-    color: "text-teal-500 border-teal-500",
-    link: "design",
-  },
-  {
-    name: "Data",
-    icon: Database,
-    color: "text-cyan-500 border-cyan-500",
-    link: "data",
-  },
-];
+import { getDepartmentInfo } from "@/utils/getDepartmentInfo";
 
 interface DepartmentBadgeProps {
   department: string;
@@ -89,9 +15,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   list = false,
   size = "medium",
 }) => {
-  const departmentInformation = departmentInfo.find(
-    (info) => info.name === department,
-  );
+  const departmentInformation = getDepartmentInfo(department);
 
   if (!departmentInformation) {
     return null;
