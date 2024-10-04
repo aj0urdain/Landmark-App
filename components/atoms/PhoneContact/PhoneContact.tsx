@@ -38,7 +38,7 @@ const PhoneContact: React.FC<PhoneContactProps> = ({
     <div className="flex items-center justify-start gap-2">
       <div className="flex items-center gap-2 text-muted-foreground">
         <Phone className={iconSizeClasses[size]} />
-        {label && <p className={sizeClasses[size]}>{label}</p>}
+        {label && <span className={sizeClasses[size]}>{label}</span>}
       </div>
       <Link
         href={`tel:${phoneNumber}`}

@@ -15,6 +15,17 @@ const routeAccess = {
   "/updates": ["Technology"],
 };
 
+type Department =
+  | "Agency"
+  | "Data"
+  | "Design"
+  | "Finance"
+  | "Human Resources"
+  | "Marketing"
+  | "Operations"
+  | "Senior Leadership"
+  | "Technology";
+
 export function AccessControl({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -30,7 +41,7 @@ export function AccessControl({ children }: { children: React.ReactNode }) {
       const access =
         requiredAccess.length === 0 ||
         userDepartments.some((dept: string) =>
-          requiredAccess.includes(dept as string),
+          (requiredAccess as Department[]).includes(dept as Department),
         );
 
       setHasAccess(access);
