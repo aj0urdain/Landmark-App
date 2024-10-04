@@ -15,6 +15,11 @@ import EmailContact from "@/components/atoms/EmailContact/EmailContact";
 import PhoneContact from "@/components/atoms/PhoneContact/PhoneContact";
 import { getAllUsers } from "./_actions/getAllUsers";
 
+// Filter by department
+// Filter by branch
+
+// hierarchy, national partners, state partners, senior leadership, agency (leasing) + cadets + admins + asset management teams
+
 export function UsersPage() {
   const { data, isLoading, isError } = useQuery({
     ...getAllUsers,

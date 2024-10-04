@@ -153,7 +153,7 @@ export function UserPage() {
             <div className="flex flex-col gap-1">
               {isBirthday && showBirthdayMessage && (
                 <div className="animate-slide-down-fade-in opacity-0">
-                  <div className="bg-gradient-animation flex w-fit items-center justify-start rounded-3xl p-4">
+                  <div className="flex w-fit items-center justify-start rounded-3xl bg-gradient-animation p-4">
                     <div className="flex animate-pulse items-center justify-center gap-2">
                       <h1 className="animate-slide-down-fade-in text-3xl font-light uppercase tracking-widest opacity-0 [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                         🥳 🎂
@@ -321,7 +321,7 @@ export function UserPage() {
             <div className="flex w-1/3 flex-col gap-4">
               <Card className="h-fit">
                 <CardHeader className="space-y-4">
-                  <CardDescription className="whitespace-pre-line leading-snug">
+                  <div className="whitespace-pre-line leading-snug">
                     <div className="flex flex-col gap-4">
                       <EmailContact email={data.email} size="medium" />
                       {data.business_number && (
@@ -339,7 +339,7 @@ export function UserPage() {
                         />
                       )}
                     </div>
-                  </CardDescription>
+                  </div>
                 </CardHeader>
               </Card>
 
@@ -349,7 +349,7 @@ export function UserPage() {
                     <Building2 className="h-3 w-3" />
                     Office
                   </CardTitle>
-                  <CardDescription className="whitespace-pre-line leading-snug">
+                  <div className="whitespace-pre-line leading-snug">
                     <div className="flex flex-col gap-6">
                       <div className="flex flex-col items-start justify-start gap-0.5">
                         <p className="text-sm font-medium text-foreground/80">
@@ -362,7 +362,7 @@ export function UserPage() {
                         </p>
                       </div>
                     </div>
-                  </CardDescription>
+                  </div>
                 </CardHeader>
                 <Separator className="mx-6 w-[calc(100%-48px)] bg-muted" />
 
@@ -371,26 +371,28 @@ export function UserPage() {
                     <Briefcase className="h-3 w-3" />
                     Working Hours
                   </CardTitle>
-                  <CardDescription className="whitespace-pre-line leading-snug">
+                  <div className="whitespace-pre-line leading-snug">
                     <div className="flex flex-col gap-2">
                       {workingHours.map(({ day, hours }) => (
-                        <div key={day} className="flex justify-between">
-                          <span className="font-medium">{day}</span>
+                        <p key={day} className="flex justify-between text-sm">
+                          <span className="font-medium text-muted-foreground">
+                            {day}
+                          </span>
                           <span className="font-semibold text-foreground/80">
                             {hours}
                           </span>
-                        </div>
+                        </p>
                       ))}
-                      <div className="flex justify-between">
+                      <p className="flex justify-between">
                         <span className="font-medium text-muted">Saturday</span>
                         <span className="text-muted">Not Available</span>
-                      </div>
-                      <div className="flex justify-between">
+                      </p>
+                      <p className="flex justify-between">
                         <span className="font-medium text-muted">Sunday</span>
                         <span className="text-muted">Not Available</span>
-                      </div>
+                      </p>
                     </div>
-                  </CardDescription>
+                  </div>
                 </CardHeader>
               </Card>
             </div>
