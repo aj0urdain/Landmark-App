@@ -3,21 +3,43 @@
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { userProfileOptions } from "@/types/userProfileTypes";
-import { Button } from "@/components/ui/button";
-
 import { Filter } from "lucide-react";
+import { useState, useEffect } from "react";
+import { DepartmentFilterBadge } from "@/components/atoms/DepartmentFilterBadge/DepartmentFilterBadge";
 
-export default function DashboardFilter() {
+export default function DashboardFilter({
+  onFilterChange,
+}: {
+  onFilterChange: (departments: string[]) => void;
+}) {
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const {
     data: userProfile,
     isLoading,
     isError,
-  } = useQuery(userProfileOptions);
+  } = useQuery({
+    ...userProfileOptions,
+    enabled: !isInitialized,
+  });
+
+  useEffect(() => {
+    if (userProfile?.departments && !isInitialized) {
+      setSelectedFilters(userProfile.departments);
+      onFilterChange(userProfile.departments);
+      setIsInitialized(true);
+    }
+  }, [userProfile, isInitialized, onFilterChange]);
 
   if (isLoading) {
     return (
       <div className="flex w-full animate-pulse gap-2">
-        <Button variant="outline">Loading..</Button>
+        <DepartmentFilterBadge
+          department="Loading.."
+          isSelected={false}
+          onClick={() => {}}
+        />
       </div>
     );
   }
@@ -30,22 +52,37 @@ export default function DashboardFilter() {
     );
   }
 
+  const handleFilterClick = (department: string) => {
+    const newFilters = selectedFilters.includes(department)
+      ? selectedFilters.filter((d) => d !== department)
+      : [...selectedFilters, department];
+    setSelectedFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
   return (
-    <div className="flex w-full animate-slide-down-fade-in items-center gap-2">
-      <Filter className="mr-2 size-4" />
-      <Button variant="default" size="sm" className="rounded-full px-6 py-2">
-        All
-      </Button>
-      {userProfile?.departments?.map((department, index) => (
-        <Button
-          variant="outline"
-          key={index}
-          size="sm"
-          className="rounded-full px-6 py-2 text-muted-foreground"
-        >
-          {department}
-        </Button>
-      ))}
+    <div className="flex w-full animate-slide-down-fade-in flex-wrap items-center gap-4">
+      <div className="flex items-center gap-2">
+        <Filter className="size-3 text-muted-foreground" />
+        <span className="text-xs font-medium uppercase text-muted-foreground">
+          Filter
+        </span>
+      </div>
+      <div className="flex flex-wrap items-center gap-4">
+        <DepartmentFilterBadge
+          department="Burgess Rawson"
+          isSelected={selectedFilters.includes("Burgess Rawson")}
+          onClick={() => handleFilterClick("Burgess Rawson")}
+        />
+        {userProfile?.departments?.map((department) => (
+          <DepartmentFilterBadge
+            key={department}
+            department={department}
+            isSelected={selectedFilters.includes(department)}
+            onClick={() => handleFilterClick(department)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
