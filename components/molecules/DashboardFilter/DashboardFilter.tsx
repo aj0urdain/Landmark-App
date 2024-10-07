@@ -12,7 +12,7 @@ export default function DashboardFilter({
 }: {
   onFilterChange: (departments: string[]) => void;
 }) {
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   const {
@@ -26,8 +26,9 @@ export default function DashboardFilter({
 
   useEffect(() => {
     if (userProfile?.departments && !isInitialized) {
-      setSelectedFilters(userProfile.departments);
-      onFilterChange(userProfile.departments);
+      const allDepartments = ["Burgess Rawson", ...userProfile.departments];
+      setSelectedDepartments(allDepartments);
+      onFilterChange(allDepartments);
       setIsInitialized(true);
     }
   }, [userProfile, isInitialized, onFilterChange]);
@@ -53,11 +54,11 @@ export default function DashboardFilter({
   }
 
   const handleFilterClick = (department: string) => {
-    const newFilters = selectedFilters.includes(department)
-      ? selectedFilters.filter((d) => d !== department)
-      : [...selectedFilters, department];
-    setSelectedFilters(newFilters);
-    onFilterChange(newFilters);
+    const newDepartments = selectedDepartments.includes(department)
+      ? selectedDepartments.filter((d) => d !== department)
+      : [department, ...selectedDepartments];
+    setSelectedDepartments(newDepartments);
+    onFilterChange(newDepartments);
   };
 
   return (
@@ -71,14 +72,14 @@ export default function DashboardFilter({
       <div className="flex flex-wrap items-center gap-4">
         <DepartmentFilterBadge
           department="Burgess Rawson"
-          isSelected={selectedFilters.includes("Burgess Rawson")}
+          isSelected={selectedDepartments.includes("Burgess Rawson")}
           onClick={() => handleFilterClick("Burgess Rawson")}
         />
         {userProfile?.departments?.map((department) => (
           <DepartmentFilterBadge
             key={department}
             department={department}
-            isSelected={selectedFilters.includes(department)}
+            isSelected={selectedDepartments.includes(department)}
             onClick={() => handleFilterClick(department)}
           />
         ))}
