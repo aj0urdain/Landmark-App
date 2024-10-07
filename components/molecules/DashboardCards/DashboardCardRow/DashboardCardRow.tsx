@@ -2,19 +2,21 @@ import { cn } from "@/lib/utils";
 
 interface DashboardCardRowProps {
   children: React.ReactNode;
-  topRow?: boolean;
+  height?: number | string;
 }
 
 export function DashboardCardRow({
   children,
-  topRow = false,
+  height = 240,
 }: DashboardCardRowProps) {
   return (
     <div
       className={cn(
-        "grid h-full w-full grid-cols-12 gap-4",
-        topRow && "max-h-[320px]",
+        "grid w-full animate-slide-down-fade-in grid-cols-12 gap-4 overflow-hidden",
       )}
+      style={{
+        height: typeof height === "number" ? `${height}px` : height,
+      }}
     >
       {children}
     </div>

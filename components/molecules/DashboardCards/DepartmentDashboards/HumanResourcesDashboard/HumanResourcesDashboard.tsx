@@ -7,18 +7,22 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-const HumanResourcesDashboard = () => {
+import DashboardContainer from "@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer";
+
+const HumanResourcesDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
-    <DashboardCardRow>
-      <div className="col-span-12">
-        <Card>
-          <CardHeader>
-            <CardTitle>Human Resources</CardTitle>
-            <CardDescription>Human Resources dashboard!</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    </DashboardCardRow>
+    <DashboardContainer department="Human Resources" isLast={isLast}>
+      <DashboardCardRow>
+        <div className="col-span-12">
+          <Card>
+            <CardHeader>
+              <CardTitle>Human Resources</CardTitle>
+              <CardDescription>Human Resources dashboard!</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </DashboardCardRow>
+    </DashboardContainer>
   );
 };
 

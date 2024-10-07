@@ -6,19 +6,21 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-
-const AssetManagementDashboard = () => {
+import DashboardContainer from "@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer";
+const AssetManagementDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
-    <DashboardCardRow>
-      <div className="col-span-12">
-        <Card>
-          <CardHeader>
-            <CardTitle>Asset Management</CardTitle>
-            <CardDescription>Asset Management dashboard!</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    </DashboardCardRow>
+    <DashboardContainer department="Asset Management" isLast={isLast}>
+      <DashboardCardRow>
+        <div className="col-span-12">
+          <Card>
+            <CardHeader>
+              <CardTitle>Asset Management</CardTitle>
+              <CardDescription>Asset Management dashboard!</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </DashboardCardRow>
+    </DashboardContainer>
   );
 };
 

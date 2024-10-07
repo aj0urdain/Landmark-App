@@ -29,11 +29,12 @@ export default function DashboardPage() {
     isError,
   } = useQuery(userProfileOptions);
 
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
   useEffect(() => {
     if (userProfile?.departments) {
-      setSelectedFilters(userProfile.departments);
+      const allDepartments = ["Burgess Rawson", ...userProfile.departments];
+      setSelectedDepartments(allDepartments);
     }
   }, [userProfile?.departments]);
 
@@ -45,65 +46,66 @@ export default function DashboardPage() {
     return <div>Error loading user profile</div>;
   }
 
-  const handleFilterChange = (filters: string[]) => {
-    setSelectedFilters(filters);
+  const handleFilterChange = (departments: string[]) => {
+    setSelectedDepartments(departments);
   };
 
-  const shouldShowDashboard = (department: string) => {
-    if (department === "Burgess Rawson") return true;
-    return selectedFilters.includes(department);
+  const renderDashboards = () => {
+    return selectedDepartments.map((department, index) => {
+      const isLast = index === selectedDepartments.length - 1;
+      switch (department) {
+        case "Burgess Rawson":
+          return <BurgessRawsonDashboard key={department} isLast={isLast} />;
+        case "Senior Leadership":
+          return <SeniorLeadershipDashboard key={department} isLast={isLast} />;
+        case "Technology":
+          return <TechnologyDashboard key={department} isLast={isLast} />;
+        case "Agency":
+          return <AgencyDashboard key={department} isLast={isLast} />;
+        case "Finance":
+          return <FinanceDashboard key={department} isLast={isLast} />;
+        case "Human Resources":
+          return <HumanResourcesDashboard key={department} isLast={isLast} />;
+        case "Asset Management":
+          return <AssetManagementDashboard key={department} isLast={isLast} />;
+        case "Design":
+          return <DesignDashboard key={department} isLast={isLast} />;
+        case "Marketing":
+          return <MarketingDashboard key={department} isLast={isLast} />;
+        case "Operations":
+          return <OperationsDashboard key={department} isLast={isLast} />;
+        case "Data":
+          return <DataDashboard key={department} isLast={isLast} />;
+        default:
+          return null;
+      }
+    });
   };
 
   return (
-    <div className="grid w-full grid-flow-dense flex-col gap-4">
-      <DashboardCardRow topRow={true}>
-        <div className="col-span-5">
-          <WelcomeCard />
-        </div>
-        <div className="col-span-7 flex items-center justify-center">
-          <CompanyCarousel />
-        </div>
-      </DashboardCardRow>
-      <Separator className="my-8" />
-      <DashboardFilter onFilterChange={handleFilterChange} />
+    <div className="flex w-full flex-col gap-8">
+      <div className="grid w-full gap-4">
+        <DashboardCardRow height={320}>
+          <div className="col-span-5 h-full max-h-[320px]">
+            <WelcomeCard />
+          </div>
+          <div className="col-span-7 flex h-full max-h-[320px] items-center justify-center">
+            <CompanyCarousel />
+          </div>
+        </DashboardCardRow>
+      </div>
 
-      {/* Burgess Rawson - Always visible */}
-      <BurgessRawsonDashboard />
+      <div className="flex flex-col gap-8">
+        <Separator className="w-full" />
 
-      {/* Senior Leadership */}
-      {shouldShowDashboard("Senior Leadership") && (
-        <SeniorLeadershipDashboard />
-      )}
+        <DashboardFilter onFilterChange={handleFilterChange} />
+        <Separator className="w-16" />
+      </div>
 
-      {/* Technology */}
-      {shouldShowDashboard("Technology") && <TechnologyDashboard />}
-
-      {/* Agency */}
-      {shouldShowDashboard("Agency") && <AgencyDashboard />}
-
-      {/* Finance */}
-      {shouldShowDashboard("Finance") && <FinanceDashboard />}
-
-      {/* Human Resources */}
-      {shouldShowDashboard("Human Resources") && <HumanResourcesDashboard />}
-
-      {/* Asset Management */}
-      {shouldShowDashboard("Asset Management") && <AssetManagementDashboard />}
-
-      {/* Design */}
-      {shouldShowDashboard("Design") && <DesignDashboard />}
-
-      {/* Marketing */}
-      {shouldShowDashboard("Marketing") && <MarketingDashboard />}
-
-      {/* Operations */}
-      {shouldShowDashboard("Operations") && <OperationsDashboard />}
-
-      {/* Data */}
-      {shouldShowDashboard("Data") && <DataDashboard />}
-
-      {selectedFilters.length === 0 &&
-        !shouldShowDashboard("Burgess Rawson") && <EmptyDashboard />}
+      <div className="flex flex-col gap-6">
+        {renderDashboards()}
+        {selectedDepartments.length === 0 && <EmptyDashboard />}
+      </div>
     </div>
   );
 }

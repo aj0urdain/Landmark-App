@@ -7,18 +7,22 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-const MarketingDashboard = () => {
+import DashboardContainer from "@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer";
+
+const MarketingDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
-    <DashboardCardRow>
-      <div className="col-span-12">
-        <Card>
-          <CardHeader>
-            <CardTitle>Marketing</CardTitle>
-            <CardDescription>Marketing dashboard!</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    </DashboardCardRow>
+    <DashboardContainer department="Marketing" isLast={isLast}>
+      <DashboardCardRow>
+        <div className="col-span-12 h-full">
+          <Card className="flex h-full flex-col">
+            <CardHeader>
+              <CardTitle>Marketing</CardTitle>
+              <CardDescription>Marketing dashboard!</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </DashboardCardRow>
+    </DashboardContainer>
   );
 };
 export default MarketingDashboard;
