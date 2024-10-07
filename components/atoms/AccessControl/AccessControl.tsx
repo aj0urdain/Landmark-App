@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 const routeAccess = {
   "/admin": ["Technology"],
   "/create": ["Technology"],
-  "/sandbox": ["Agency", "Technology", "Design", "Senior Leadership"],
+  "/sandbox": ["Technology"],
   "/events": ["Technology"],
   "/tasks": ["Technology"],
   "/news": ["Technology"],
