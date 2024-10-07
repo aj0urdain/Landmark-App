@@ -52,7 +52,7 @@ const links = [
     icon: Box,
     label: "Sandbox",
     access: ["Technology"],
-    comingSoon: false,
+    comingSoon: true,
     requiredAccess: ["Technology"],
   },
   { type: "separator" },
