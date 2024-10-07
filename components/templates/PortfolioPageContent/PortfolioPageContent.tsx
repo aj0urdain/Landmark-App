@@ -35,7 +35,8 @@ const PortfolioPageContent = () => {
       <div className="flex h-full w-full flex-row items-center justify-center gap-4">
         <PortfolioPageControls
           isDisabled={!selectedPropertyId || isLoading}
-          canEdit={data?.canEdit ?? false}
+          // canEdit={data?.canEdit ?? false}
+          canEdit={true}
           renderError={isError}
           isLoading={isLoading}
         />
