@@ -99,6 +99,6 @@ export function getDepartmentInfo(
   department: string,
 ): DepartmentInfo | undefined {
   return departmentInfo.find(
-    (info) => info.name.toLowerCase() === department.toLowerCase(),
+    (info) => info.name.toLowerCase() === department?.toLowerCase(),
   );
 }
