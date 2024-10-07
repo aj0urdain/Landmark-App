@@ -708,7 +708,9 @@ export function Inbox({
                           }`}
                         />
                         <div className="flex-1">
-                          <h1 className="line-clamp-2 text-xs font-semibold">
+                          <h1
+                            className={`line-clamp-2 text-xs font-semibold ${showArchive ? "text-muted-foreground line-through" : ""}`}
+                          >
                             {task.title}
                           </h1>
                           <p className="mt-1 text-xs text-muted-foreground">
