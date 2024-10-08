@@ -25,6 +25,7 @@ import {
   Users,
   GraduationCap,
 } from "lucide-react";
+import { FeedbackButton } from "@/components/molecules/Feedback/FeedbackButton/FeedbackButton";
 
 interface NavigationProps {
   isCollapsed: boolean;
@@ -149,6 +150,8 @@ export const Navigation = React.memo(function Navigation({
           </NavLink>
         );
       })}
+      <Separator className="my-4" />
+      <FeedbackButton isCollapsed={isCollapsed} />
     </nav>
   );
 });
