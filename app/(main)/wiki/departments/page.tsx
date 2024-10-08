@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import DepartmentBadge from "@/components/molecules/DepartmentBadge/DepartmentBadge";
 
 const departments = [
@@ -22,8 +28,11 @@ const DepartmentsPage = () => {
     <Card>
       <CardHeader>
         <CardTitle>Departments</CardTitle>
+        <CardDescription>
+          The layout of this page is still under development!
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col items-start justify-start gap-2">
+      <CardContent className="grid grid-cols-4 items-start justify-start gap-12">
         {departments.map((department) => (
           <DepartmentBadge
             key={department}
