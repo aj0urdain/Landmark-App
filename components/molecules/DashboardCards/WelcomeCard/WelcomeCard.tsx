@@ -163,7 +163,7 @@ export default function WelcomeCard() {
           </div>
         </div>
       </div>
-      <div className="absolute -right-8 bottom-0 z-20 h-[100%] animate-slide-down-fade-in overflow-visible">
+      <div className="absolute -right-4 bottom-0 z-20 h-[100%] animate-slide-down-fade-in overflow-visible">
         <Image
           src={
             userProfile.profile_picture || "/images/default-profile-picture.png"
