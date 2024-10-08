@@ -4,6 +4,27 @@ import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { userProfileOptions } from "@/types/userProfileTypes";
+import DepartmentBadge from "@/components/molecules/DepartmentBadge/DepartmentBadge";
+import { IdCard, Sun } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Separator } from "@/components/ui/separator";
+
+const AnimatedDigit = ({
+  digit,
+  prevDigit,
+}: {
+  digit: string;
+  prevDigit: string;
+}) => {
+  const shouldAnimate = digit !== prevDigit;
+  return (
+    <span
+      className={`inline-block rounded-md border border-muted-foreground/5 bg-muted px-1.5 text-lg ${shouldAnimate ? "animate-slide-down-fade-in" : ""}`}
+    >
+      {digit}
+    </span>
+  );
+};
 
 export default function WelcomeCard() {
   const {
@@ -11,6 +32,38 @@ export default function WelcomeCard() {
     isLoading,
     isError,
   } = useQuery(userProfileOptions);
+
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [time, setTime] = useState({
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
+    ampm: "AM",
+  });
+  const [prevTime, setPrevTime] = useState({
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
+    ampm: "AM",
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      setPrevTime(time);
+      setTime({
+        hours: (now.getHours() % 12 || 12).toString().padStart(2, "0"),
+        minutes: now.getMinutes().toString().padStart(2, "0"),
+        seconds: now.getSeconds().toString().padStart(2, "0"),
+        ampm: now.getHours() >= 12 ? "PM" : "AM",
+      });
+      setCurrentTime(now);
+    }, 500);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [time]);
 
   if (isLoading) {
     return (
@@ -29,40 +82,94 @@ export default function WelcomeCard() {
   }
 
   return (
-    <Card className="relative h-full w-full overflow-visible p-6">
-      <div className="relative z-10 flex h-full w-2/5 animate-slide-down-fade-in flex-col justify-between">
-        <div>
-          <div className="relative z-10 flex h-full flex-col gap-1">
-            <p className="text-xs text-muted-foreground">
+    <Card className="relative h-full w-full overflow-hidden p-6">
+      <div className="relative z-10 flex h-full w-3/5 animate-slide-down-fade-in flex-col justify-between">
+        <div className="relative z-10 flex h-full flex-col justify-start gap-3">
+          <div className="flex gap-2">
+            {userProfile?.departments?.map((department: string) => (
+              <DepartmentBadge
+                list
+                size="small"
+                key={department}
+                department={department}
+              />
+            ))}
+          </div>
+          <div className="flex flex-col gap-1">
+            <p className="text-3xl font-bold">
               {userProfile?.first_name || "No Name Assigned"}{" "}
               {userProfile?.last_name || "No Name Assigned"}
             </p>
-            <h3 className="font-bold">
-              {userProfile.roles?.[0] || "No Role Assigned"}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {userProfile.branches?.[0] || "No Branch Assigned"}
-            </p>
+            {userProfile?.roles?.map((role: string) => (
+              <div
+                key={role}
+                className="flex w-fit items-start gap-2 text-sm font-semibold text-muted-foreground"
+              >
+                <IdCard className="h-5 w-5" />
+                {role}
+              </div>
+            ))}
           </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">
-              Hello, {userProfile?.first_name || "No Name Assigned"}!
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Have a great day at work today!
-            </p>
+        <div className="flex w-fit items-center gap-2 rounded-full border border-muted-foreground/10 bg-muted/50 px-4 py-2 text-muted-foreground">
+          <Sun className="h-4 w-4" />
+          <p className="text-sm font-medium">
+            Have a good {time.ampm === "AM" ? "morning" : "afternoon"}!
+          </p>
+        </div>
+
+        <Separator className="my-4 w-2/3" />
+        <div className="flex flex-col gap-2">
+          {/* Today's Date */}
+          <p className="text-sm font-normal text-muted-foreground">
+            {currentTime.toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+
+          {/* Alarm Clock Style Time */}
+          <div className="inline-block">
+            <span className="font-lexia font-bold">
+              <AnimatedDigit
+                digit={time.hours[0]}
+                prevDigit={prevTime.hours[0]}
+              />
+              <AnimatedDigit
+                digit={time.hours[1]}
+                prevDigit={prevTime.hours[1]}
+              />
+              <span className="mx-1 text-sm">:</span>
+              <AnimatedDigit
+                digit={time.minutes[0]}
+                prevDigit={prevTime.minutes[0]}
+              />
+              <AnimatedDigit
+                digit={time.minutes[1]}
+                prevDigit={prevTime.minutes[1]}
+              />
+              <span className="mx-1 text-sm">:</span>
+              <AnimatedDigit
+                digit={time.seconds[0]}
+                prevDigit={prevTime.seconds[0]}
+              />
+              <AnimatedDigit
+                digit={time.seconds[1]}
+                prevDigit={prevTime.seconds[1]}
+              />
+              <span className="ml-2 text-sm">{time.ampm}</span>
+            </span>
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 right-2 z-20 h-[100%] w-1/2 animate-slide-down-fade-in overflow-visible">
+      <div className="absolute -right-8 bottom-0 z-20 h-[100%] animate-slide-down-fade-in overflow-visible">
         <Image
           src={
             userProfile.profile_picture || "/images/default-profile-picture.png"
           }
           alt={`${userProfile.first_name} ${userProfile.last_name}`}
-          className="h-full w-auto overflow-y-visible object-cover opacity-100"
+          className="h-full w-auto overflow-y-visible rounded-r-xl object-cover opacity-100"
           width={200}
           height={200}
         />
