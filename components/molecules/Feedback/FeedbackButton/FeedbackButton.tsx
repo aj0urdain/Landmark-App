@@ -62,20 +62,38 @@ export const FeedbackButton = React.memo(function FeedbackButton({
   useEffect(() => {
     const fetchFeedbackTickets = async () => {
       try {
-        const channels = supabase
+        // Fetch existing tickets
+        const { data, error } = await supabase
+          .from("feedback_tickets")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        setFeedbackTickets(data as unknown as FeedbackTicket[]);
+
+        // Set up real-time listener
+        const channel = supabase
           .channel("listen-feedback-tickets")
           .on(
             "postgres_changes",
             { event: "*", schema: "public", table: "feedback_tickets" },
             (payload) => {
               console.log("Change received!", payload);
-              setFeedbackTickets((prevTickets) => [
-                ...prevTickets,
-                payload.new as FeedbackTicket,
-              ]);
+              setFeedbackTickets((prevTickets) => {
+                const newTicket = payload.new as FeedbackTicket;
+                return [
+                  newTicket,
+                  ...prevTickets.filter((ticket) => ticket.id !== newTicket.id),
+                ];
+              });
             },
           )
           .subscribe();
+
+        // Clean up function
+        return () => {
+          supabase.removeChannel(channel);
+        };
       } catch (error) {
         console.error("Error fetching feedback tickets:", error);
       }
