@@ -12,7 +12,7 @@ const DataDashboard = ({ isLast }: { isLast: boolean }) => {
     <DashboardContainer department="Data" isLast={isLast}>
       <DashboardCardRow>
         <div className="col-span-12">
-          <Card>
+          <Card className="h-full w-full">
             <CardHeader>
               <CardTitle>Data</CardTitle>
               <CardDescription>Data dashboard!</CardDescription>
