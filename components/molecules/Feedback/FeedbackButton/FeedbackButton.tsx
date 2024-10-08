@@ -115,14 +115,25 @@ export const FeedbackButton = React.memo(function FeedbackButton({
       page_url: formData.get("page-url") as string,
       feedback_type: feedbackType,
       description: description,
+      status: "open", // Assuming new tickets are always "open"
+      created_at: new Date().toISOString(), // Add the current timestamp
     };
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("feedback_tickets")
-        .insert([feedbackData]);
+        .insert([feedbackData])
+        .select(); // Add this to return the inserted row
 
       if (error) throw error;
+
+      // Update local state with the new ticket
+      if (data && data.length > 0) {
+        setFeedbackTickets((prevTickets) => [
+          data[0] as FeedbackTicket,
+          ...prevTickets,
+        ]);
+      }
 
       setActiveTab("history");
       setFeedbackType("");
