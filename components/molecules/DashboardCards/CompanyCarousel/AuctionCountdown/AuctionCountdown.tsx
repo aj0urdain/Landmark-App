@@ -82,9 +82,9 @@ export default function AuctionCountdown() {
   return (
     <Card className="flex h-full w-full items-center justify-between">
       <div className="flex h-full w-1/2 flex-col items-start justify-between p-6">
-        <div className="flex items-center justify-center gap-2">
-          <Gavel className="h-5 w-5" />
-          <h1 className="text-xl font-bold">Upcoming Auctions</h1>
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <Gavel className="h-4 w-4" />
+          <h1 className="text-sm font-bold">Upcoming Auctions</h1>
         </div>
 
         <div className="flex w-full flex-col gap-6">
