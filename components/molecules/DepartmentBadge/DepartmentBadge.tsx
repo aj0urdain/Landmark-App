@@ -8,12 +8,14 @@ interface DepartmentBadgeProps {
   department: string;
   list?: boolean;
   size?: "small" | "medium" | "large";
+  className?: string;
 }
 
 const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   department,
   list = false,
   size = "medium",
+  className,
 }) => {
   const departmentInformation = getDepartmentInfo(department);
 
@@ -52,6 +54,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
           list ? "h-auto p-0" : "bg-transparent",
           "transition-colors",
           "p-0",
+          className,
         )}
       >
         <div
