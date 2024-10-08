@@ -1,15 +1,10 @@
 import React from "react";
 import { DashboardCardRow } from "@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import DashboardContainer from "@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer";
 import LiveChat from "@/components/molecules/LiveChat/LiveChat";
+import { Bell, Cake, Calendar, Link2, Timer } from "lucide-react";
 
 const initialMessages = [
   {
@@ -37,24 +32,29 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
     <DashboardContainer department="Burgess Rawson" isLast={isLast}>
       <DashboardCardRow height={420}>
         <div className="col-span-7 flex h-full flex-col gap-4">
-          <Card className="row-span-1 flex h-fit flex-col">
+          <Card className="row-span-1 flex h-1/2 flex-col">
             <CardHeader>
-              <CardTitle>Company Events</CardTitle>
-              <CardDescription>Upcoming events</CardDescription>
+              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                Company Events
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              {/* <p className="font-semibold">Portfolio Auction 156</p> */}
+            <CardContent className="flex flex-col text-sm text-muted">
+              <p>Possible table of events?</p>
+              <p>
+                May include filter to change upcoming events via day/week/month
+              </p>
             </CardContent>
           </Card>
-          <Card className="row-span-1 flex h-fit flex-col">
+          <Card className="row-span-1 flex h-1/2 flex-col">
             <CardHeader>
-              <CardTitle>Company Announcements</CardTitle>
-              <CardDescription>
-                Latest company announcements and news
-              </CardDescription>
+              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Bell className="h-3 w-3" />
+                Company Announcements
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              {/* <p className="font-semibold">Portfolio Auction 156</p> */}
+            <CardContent className="flex flex-col text-sm text-muted">
+              <p>Either show card or multiple cards</p>
             </CardContent>
           </Card>
         </div>
@@ -70,38 +70,51 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
         <div className="col-span-2 h-full">
           <Card className="flex h-full flex-col">
             <CardHeader>
-              <CardTitle>Countdown</CardTitle>
-              <CardDescription>Time remaining until X</CardDescription>
+              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Timer className="h-3 w-3" />
+                Countdown
+              </CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              {/* <p className="text-3xl font-bold">3:45:22</p> */}
+            <CardContent className="flex items-center justify-center text-sm text-muted">
+              <p>
+                choose event to display interactive countdown, otherwise default
+                to next company event
+              </p>
             </CardContent>
           </Card>
         </div>
         <div className="col-span-3 h-full">
           <Card className="flex h-full flex-col">
             <CardHeader>
-              <CardTitle>Upcoming Birthdays</CardTitle>
-              <CardDescription></CardDescription>
+              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Cake className="h-3 w-3" />
+                Birthdays
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              {/* <ul className="space-y-1">
-                <li>Sarah Brown - July 3</li>
-                <li>Tom Wilson - July 8</li>
-                <li>Emma Davis - July 12</li>
-              </ul> */}
+            <CardContent className="text-sm text-muted">
+              <p>
+                Table of birthdays with name, role, and age.
+                <br />
+                <br />
+                Add a filter to change birthdays via day/week/month
+              </p>
             </CardContent>
           </Card>
         </div>
         <div className="col-span-7 h-full">
           <Card className="flex h-full flex-col">
             <CardHeader>
-              <CardTitle>Burgess Rawson Links & Widgets</CardTitle>
-              <CardDescription>
-                Quick access to important resources
-              </CardDescription>
+              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Link2 className="h-3 w-3" />
+                Links and Resources
+              </CardTitle>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent className="text-sm text-muted">
+              <p>
+                Links to commonly used websites and applications, could either
+                be icons with floating tooltips or a table?
+              </p>
+            </CardContent>
           </Card>
         </div>
       </DashboardCardRow>
