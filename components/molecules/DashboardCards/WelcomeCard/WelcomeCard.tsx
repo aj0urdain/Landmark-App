@@ -12,14 +12,16 @@ import { Separator } from "@/components/ui/separator";
 const AnimatedDigit = ({
   digit,
   prevDigit,
+  animate = true,
 }: {
   digit: string;
   prevDigit: string;
+  animate?: boolean;
 }) => {
-  const shouldAnimate = digit !== prevDigit;
+  const shouldAnimate = animate && digit !== prevDigit;
   return (
     <span
-      className={`inline-block rounded-md border border-muted-foreground/5 bg-muted px-1.5 text-lg ${shouldAnimate ? "animate-slide-down-fade-in" : ""}`}
+      className={`inline-block ${shouldAnimate ? "animate-slide-down-fade-in" : ""}`}
     >
       {digit}
     </span>
@@ -58,7 +60,7 @@ export default function WelcomeCard() {
         ampm: now.getHours() >= 12 ? "PM" : "AM",
       });
       setCurrentTime(now);
-    }, 500);
+    }, 1000);
 
     return () => {
       clearInterval(timer);
@@ -111,15 +113,9 @@ export default function WelcomeCard() {
             ))}
           </div>
         </div>
-        <div className="flex w-fit items-center gap-2 rounded-full border border-muted-foreground/10 bg-muted/50 px-4 py-2 text-muted-foreground">
-          <Sun className="h-4 w-4" />
-          <p className="text-sm font-medium">
-            Have a good {time.ampm === "AM" ? "morning" : "afternoon"}!
-          </p>
-        </div>
 
         <Separator className="my-4 w-2/3" />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           {/* Today's Date */}
           <p className="text-sm font-normal text-muted-foreground">
             {currentTime.toLocaleDateString("en-US", {
@@ -130,8 +126,8 @@ export default function WelcomeCard() {
           </p>
 
           {/* Alarm Clock Style Time */}
-          <div className="inline-block">
-            <span className="font-lexia font-bold">
+          <div className="flex items-center gap-2">
+            <div className="font-lexia font-bold">
               <AnimatedDigit
                 digit={time.hours[0]}
                 prevDigit={prevTime.hours[0]}
@@ -140,7 +136,7 @@ export default function WelcomeCard() {
                 digit={time.hours[1]}
                 prevDigit={prevTime.hours[1]}
               />
-              <span className="mx-1 text-sm">:</span>
+              <span className="text-sm text-muted-foreground">:</span>
               <AnimatedDigit
                 digit={time.minutes[0]}
                 prevDigit={prevTime.minutes[0]}
@@ -149,17 +145,19 @@ export default function WelcomeCard() {
                 digit={time.minutes[1]}
                 prevDigit={prevTime.minutes[1]}
               />
-              <span className="mx-1 text-sm">:</span>
-              <AnimatedDigit
-                digit={time.seconds[0]}
-                prevDigit={prevTime.seconds[0]}
-              />
-              <AnimatedDigit
-                digit={time.seconds[1]}
-                prevDigit={prevTime.seconds[1]}
-              />
-              <span className="ml-2 text-sm">{time.ampm}</span>
-            </span>
+
+              <span className="ml-1 text-xs text-muted-foreground">
+                {time.ampm}
+              </span>
+            </div>
+          </div>
+          <Separator className="my-4 w-1/3" />
+
+          <div className="flex w-fit items-center gap-1 text-muted-foreground">
+            <Sun className="h-3 w-3" />
+            <p className="text-xs font-medium">
+              Have a good {time.ampm === "AM" ? "morning" : "afternoon"}!
+            </p>
           </div>
         </div>
       </div>
