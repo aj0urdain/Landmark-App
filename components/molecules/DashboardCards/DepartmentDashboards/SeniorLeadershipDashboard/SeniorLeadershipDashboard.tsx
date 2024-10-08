@@ -12,7 +12,7 @@ const SeniorLeadershipDashboard = ({ isLast }: { isLast: boolean }) => {
     <DashboardContainer department="Senior Leadership" isLast={isLast}>
       <DashboardCardRow>
         <div className="col-span-12">
-          <Card>
+          <Card className="h-full w-full">
             <CardHeader>
               <CardTitle>Senior Leadership</CardTitle>
               <CardDescription>Senior Leadership dashboard!</CardDescription>
