@@ -37,7 +37,7 @@ export function DepartmentFilterBadge({
           ? cn(
               departmentInfo?.color,
               `${bgColorClass} bg-opacity-5`,
-              `${borderColorClass} border`,
+              `${borderColorClass} border border-opacity-50`,
             )
           : "border-muted bg-transparent text-muted",
         className,
