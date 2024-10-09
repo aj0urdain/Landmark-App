@@ -79,7 +79,7 @@ export function EventList({ selectedDate, events }: EventListProps) {
     return (
       <div
         key={event.id}
-        className="mb-4 rounded-md border p-4"
+        className="mb-4 animate-slide-down-fade-in rounded-md border p-4"
         style={{ borderColor: eventColors[event.event_type] }}
       >
         <h3 className="font-bold">{event.title}</h3>
@@ -137,7 +137,7 @@ export function EventList({ selectedDate, events }: EventListProps) {
 
   const renderSection = (title: string, events: Event[]) => {
     return (
-      <div key={title}>
+      <div key={title + events.length} className="animate-slide-down-fade-in">
         <h2 className="mb-2 text-xl font-bold">{title}</h2>
         {events.length > 0 ? (
           events.map(renderEvent)
