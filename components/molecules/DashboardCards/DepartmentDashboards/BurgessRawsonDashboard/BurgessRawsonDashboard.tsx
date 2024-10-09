@@ -6,27 +6,6 @@ import DashboardContainer from "@/components/molecules/DashboardCards/DashboardC
 import LiveChat from "@/components/molecules/LiveChat/LiveChat";
 import { Bell, Cake, Calendar, Link2, Timer } from "lucide-react";
 
-const initialMessages = [
-  {
-    id: 1,
-    sender: "John Doe",
-    content: "Has anyone seen the latest market report?",
-    timestamp: new Date(),
-  },
-  {
-    id: 2,
-    sender: "Jane Smith",
-    content: "I'll be presenting at the next team meeting.",
-    timestamp: new Date(),
-  },
-  {
-    id: 3,
-    sender: "Mike Johnson",
-    content: "Great job on the recent sale, team!",
-    timestamp: new Date(),
-  },
-];
-
 const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
     <DashboardContainer department="Burgess Rawson" isLast={isLast}>
@@ -58,12 +37,8 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
             </CardContent>
           </Card>
         </div>
-        <div className="col-span-5 h-full">
-          <LiveChat
-            chatName="Company"
-            height={420}
-            initialMessages={initialMessages}
-          />
+        <div className="col-span-5 h-full overflow-visible">
+          <LiveChat chatName="company" height={420} />
         </div>
       </DashboardCardRow>
       <DashboardCardRow>
