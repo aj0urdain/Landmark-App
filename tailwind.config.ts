@@ -103,6 +103,16 @@ const config = {
         metro: ["var(--font-metro-sans)"], // Add Metro Sans as a new option
       },
       keyframes: {
+        "float-up": {
+          "0%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "translateY(-20px)",
+          },
+        },
         "fade-in-out": {
           "0%, 100%": { opacity: "0" },
           "10%, 90%": { opacity: "1" },
@@ -175,8 +185,20 @@ const config = {
             transform: "translateX(0)",
           },
         },
+        "float-up-fade-out": {
+          "0%": {
+            opacity: "1",
+            transform: "translateY(0px)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "translateY(-20px)",
+          },
+        },
       },
       animation: {
+        "float-up-fade-out": "float-up-fade-out 0.5s ease-out forwards",
+        "float-up": "float-up 0.5s ease-out forwards",
         "fade-in-out": "fade-in-out 2s ease-in-out",
         gradient: "gradient 15s ease infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
