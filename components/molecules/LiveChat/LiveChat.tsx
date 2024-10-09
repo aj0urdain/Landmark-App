@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send } from "lucide-react";
+import { MessageSquare, Send } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -79,9 +79,12 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
         "*, chat_room_id!inner(id, name), user_id!inner(id, first_name, last_name, profile_picture)",
       )
       .eq("chat_room_id.name", chatName)
-      .order("created_at", { ascending: true });
-
-    console.log(data);
+      .order("created_at", { ascending: false }) // Change to descending order
+      .limit(100) // Limit to 100 messages
+      .then((result) => ({
+        ...result,
+        data: result.data?.reverse(), // Reverse the array to maintain chronological order
+      }));
 
     if (error) {
       console.error("Error fetching messages:", error);
@@ -97,7 +100,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "chat_messages",
         },
@@ -131,16 +134,9 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
 
         if (chatRoomError) throw new Error("Error fetching chat room");
 
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-        if (userError) throw new Error("Error fetching user");
-
         const { error } = await supabase.from("chat_messages").insert({
           content: messageContent,
           chat_room_id: chatRoomData.id,
-          user_id: user?.id || "",
         });
 
         if (error) throw new Error("Error sending message");
@@ -325,11 +321,14 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
       className="flex h-full w-full flex-col overflow-visible"
     >
       <CardHeader>
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-center justify-start gap-2 text-muted-foreground">
           <Dot size="small" className="animate-pulse bg-green-400" />
-          <h2 className="text-sm font-bold capitalize text-muted-foreground">
-            Live {chatName} Chat
-          </h2>
+          <div className="flex items-center gap-1">
+            <MessageSquare className="h-3 w-3" />
+            <h2 className="text-sm font-bold capitalize">
+              {chatName} Chatroom
+            </h2>
+          </div>
         </div>
       </CardHeader>
       <ScrollArea ref={scrollAreaRef} className="relative flex-grow">
