@@ -60,6 +60,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
   const [isSending, setIsSending] = useState(false);
   const [floatingMessage, setFloatingMessage] = useState<string | null>(null);
   const [charCount, setCharCount] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -118,7 +119,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
       setIsSending(true);
       const messageContent = input.trim();
       setInput("");
-      setCharCount(0); // Reset character count
+      setCharCount(0);
       setFloatingMessage(messageContent);
 
       try {
@@ -150,7 +151,10 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
         // Optionally, show an error message to the user
       } finally {
         setIsSending(false);
-        // Don't clear the floating message here
+        // Refocus on the input field
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       }
     }
   }, [input, isSending, supabase, chatName, charCount]);
@@ -350,6 +354,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
             <div className="flex w-full flex-col space-y-1">
               <div className="flex w-full items-center space-x-2">
                 <Input
+                  ref={inputRef}
                   type="text"
                   placeholder={isSending ? "Sending..." : "Type a message..."}
                   value={input}
@@ -357,7 +362,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
                     setInput(e.target.value);
                     setCharCount(e.target.value.length);
                   }}
-                  disabled={isSending}
+                  // disabled={isSending}
                   className={
                     charCount > MESSAGE_CHAR_LIMIT ? "border-red-500" : ""
                   }
