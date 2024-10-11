@@ -77,23 +77,29 @@ export type Database = {
       auctions: {
         Row: {
           created_at: string
-          date: string | null
+          end_date: string | null
           id: number
           location_id: number | null
+          portfolio_id: number | null
+          start_date: string | null
           venue_id: number | null
         }
         Insert: {
           created_at?: string
-          date?: string | null
+          end_date?: string | null
           id?: number
           location_id?: number | null
+          portfolio_id?: number | null
+          start_date?: string | null
           venue_id?: number | null
         }
         Update: {
           created_at?: string
-          date?: string | null
+          end_date?: string | null
           id?: number
           location_id?: number | null
+          portfolio_id?: number | null
+          start_date?: string | null
           venue_id?: number | null
         }
         Relationships: [
@@ -102,6 +108,13 @@ export type Database = {
             columns: ["location_id"]
             isOneToOne: false
             referencedRelation: "auction_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auctions_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
             referencedColumns: ["id"]
           },
           {
@@ -446,6 +459,53 @@ export type Database = {
           },
         ]
       }
+      event_types: {
+        Row: {
+          created_at: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          event_entity_id: number
+          event_start_date: string | null
+          event_type: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          event_entity_id: number
+          event_start_date?: string | null
+          event_type: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          event_entity_id?: number
+          event_start_date?: string | null
+          event_type?: string
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_event_type_fkey"
+            columns: ["event_type"]
+            isOneToOne: false
+            referencedRelation: "event_types"
+            referencedColumns: ["name"]
+          },
+        ]
+      }
       feedback_tickets: {
         Row: {
           created_at: string
@@ -583,6 +643,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      portfolios: {
+        Row: {
+          advertising_period_end: string | null
+          advertising_period_start: string | null
+          created_at: string
+          id: number
+          magazine_deadline: string | null
+          magazine_print: string | null
+          signed_schedule: string | null
+        }
+        Insert: {
+          advertising_period_end?: string | null
+          advertising_period_start?: string | null
+          created_at?: string
+          id?: number
+          magazine_deadline?: string | null
+          magazine_print?: string | null
+          signed_schedule?: string | null
+        }
+        Update: {
+          advertising_period_end?: string | null
+          advertising_period_start?: string | null
+          created_at?: string
+          id?: number
+          magazine_deadline?: string | null
+          magazine_print?: string | null
+          signed_schedule?: string | null
+        }
+        Relationships: []
       }
       properties: {
         Row: {
@@ -1162,6 +1252,32 @@ export type Database = {
       }
     }
     Functions: {
+      fetch_auction_data: {
+        Args: {
+          auction_id: number
+        }
+        Returns: Json
+      }
+      fetch_event_details: {
+        Args: {
+          p_event_id: number
+        }
+        Returns: {
+          event_id: number
+          event_type: string
+          event_data: Json
+        }[]
+      }
+      fetch_portfolio_events: {
+        Args: {
+          portfolio_id: number
+        }
+        Returns: Json
+      }
+      get_all_portfolio_data: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_limited_user_profile: {
         Args: {
           user_id: string

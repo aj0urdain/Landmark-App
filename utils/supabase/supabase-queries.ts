@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { createBrowserClient } from "./client";
 
 export interface Auction {
@@ -11,6 +12,14 @@ export interface Auction {
   };
 }
 
+interface UserProfileEvent {
+  id: string;
+  first_name: string;
+  last_name: string;
+  birthday: string | null;
+  work_anniversary: string | null;
+}
+
 export interface UserProfile {
   id: string;
   first_name: string | null;
@@ -18,6 +27,25 @@ export interface UserProfile {
   email: string | null;
   profile_picture: string | null;
 }
+
+const fetchUserProfileEvents = async () => {
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase
+    .from("user_profile_complete")
+    .select("id, first_name, last_name, birthday, work_anniversary")
+    .not("birthday", "is", null)
+    .not("work_anniversary", "is", null);
+
+  if (error) throw error;
+  return data as UserProfileEvent[];
+};
+
+export const useUserProfileEvents = () => {
+  return useQuery({
+    queryKey: ["userProfileEvents"],
+    queryFn: fetchUserProfileEvents,
+  });
+};
 
 export async function getUpcomingAuctions(limit?: number): Promise<Auction[]> {
   const supabase = createBrowserClient();
@@ -28,13 +56,13 @@ export async function getUpcomingAuctions(limit?: number): Promise<Auction[]> {
     .select(
       `
       id,
-      date,
+      start_date,
       auction_locations(name),
       auction_venues(name)
     `,
     )
-    .gte("date", currentDate)
-    .order("date", { ascending: true })
+    .gte("start_date", currentDate)
+    .order("start_date", { ascending: true })
     .limit(limit ?? 3);
 
   if (error) {
@@ -65,5 +93,5 @@ export async function getProfileFromID(
 
   console.log(`data from ${userId}`, data);
 
-  return data;
+  return data as UserProfile;
 }
