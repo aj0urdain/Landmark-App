@@ -33,7 +33,7 @@ const createTimestamp = (date: Date, hours: number, minutes: number) => {
 export const events: Event[] = [
   {
     id: 1,
-    title: "Company Holiday - New Year's Day",
+    title: "New Year's Day",
     start_date: createTimestamp(addDays(new Date(), 1), 0, 0),
     event_type: "holiday",
     event_span: "single",
