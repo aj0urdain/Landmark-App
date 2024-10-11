@@ -3,12 +3,15 @@
 import React, { useState, useEffect } from "react";
 import Countdown from "react-countdown";
 import { Card } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
 import {
   getUpcomingAuctions,
   Auction,
 } from "@/utils/supabase/supabase-queries";
 import { ChevronsRight, Gavel } from "lucide-react";
+import {
+  EventCalendar,
+  CalendarEvent,
+} from "@/components/molecules/EventCalendar/EventCalendar";
 
 const renderer = ({
   days,
@@ -58,26 +61,12 @@ export default function AuctionCountdown() {
     Brisbane: "#93d4eb",
   };
 
-  const modifiers = auctions.reduce<Record<string, Date[]>>((acc, auction) => {
-    const venueName = auction.auction_locations.name;
-    if (venueName in venueColors) {
-      acc[venueName] = [new Date(auction.date)];
-    }
-    return acc;
-  }, {});
-
-  const modifiersStyles = Object.entries(venueColors).reduce<
-    Record<string, React.CSSProperties>
-  >((acc, [venue, color]) => {
-    acc[venue] = {
-      border: color,
-      borderWidth: "2px",
-      borderStyle: "solid",
-      color: "white",
-      fontWeight: "bold",
-    };
-    return acc;
-  }, {});
+  const calendarEvents: CalendarEvent[] = auctions.map((auction) => ({
+    type: "auction",
+    start_date: auction.start_date,
+    end_date: null,
+    details: { auction_location: auction.auction_locations.name },
+  }));
 
   return (
     <Card className="flex h-full w-full items-center justify-between">
@@ -107,14 +96,14 @@ export default function AuctionCountdown() {
                 >
                   {isClient && (
                     <Countdown
-                      date={new Date(auction.date)}
+                      date={new Date(auction.start_date)}
                       renderer={renderer}
                     />
                   )}
                 </span>
               </p>
               <p className="text-xs text-muted-foreground">
-                {new Date(auction.date).toLocaleDateString("en-US", {
+                {new Date(auction.start_date).toLocaleDateString("en-US", {
                   month: "long",
                   day: "numeric",
                 })}{" "}
@@ -131,24 +120,16 @@ export default function AuctionCountdown() {
       <div className="flex h-full w-1/2 items-center justify-center p-4">
         {isLoading ? (
           <div className="flex items-center justify-center">
-            <Calendar
-              mode="single"
-              disabled={true}
-              defaultMonth={new Date()}
+            <EventCalendar
+              events={[]}
               className="max-h-full max-w-full overflow-hidden rounded-md border shadow"
             />
           </div>
         ) : (
-          <Calendar
-            mode="single"
-            // selected={
-            //   auctions.length > 0 ? new Date(auctions[0].date) : undefined
-            // }
-            disabled={true}
-            modifiers={modifiers}
-            modifiersStyles={modifiersStyles}
+          <EventCalendar
+            events={calendarEvents}
             defaultMonth={
-              auctions.length > 0 ? new Date(auctions[0].date) : undefined
+              auctions.length > 0 ? new Date(auctions[0].start_date) : undefined
             }
             className="max-h-full max-w-full overflow-hidden rounded-md border shadow"
           />
