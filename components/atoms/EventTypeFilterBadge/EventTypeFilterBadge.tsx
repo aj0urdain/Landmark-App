@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getEventTypeInfo } from "@/utils/getEventTypeInfo";
+import { getEventTypeInfo } from "@/utils/eventTypeInfo";
 
 interface EventTypeFilterBadgeProps {
   className?: string;
