@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getEventTypeInfo } from "@/utils/getEventTypeInfo";
+import { getEventTypeInfo } from "@/utils/eventTypeInfo";
 
 export interface Option {
   value: string;
@@ -28,14 +28,16 @@ interface MultiSelectComboboxProps {
   options: Option[];
   selectedValues: string[];
   onChange: (selectedValues: string[]) => void;
+  className?: string;
 }
 
 export function MultiSelectCombobox({
   options,
   selectedValues,
   onChange,
+  className,
 }: MultiSelectComboboxProps) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleSelect = (value: string) => {
     const newSelectedValues = selectedValues.includes(value)
@@ -54,6 +56,8 @@ export function MultiSelectCombobox({
     (option) => option.section === "additional",
   );
 
+  const allSelected = selectedValues.length === options.length;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -61,15 +65,20 @@ export function MultiSelectCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-60 justify-between"
+          className={cn("w-full justify-between", className)}
         >
-          {selectedValues.length > 0
-            ? `${selectedValues.length} selected`
-            : "Select event types..."}
+          {allSelected
+            ? "No filters selected"
+            : selectedValues.length > 0
+              ? `${selectedValues.length} selected`
+              : "Select event types..."}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 p-0">
+      <PopoverContent
+        className="p-0"
+        style={{ width: "var(--radix-popover-trigger-width)" }}
+      >
         <Command>
           <CommandInput placeholder="Search event types..." className="h-9" />
           <CommandList>
