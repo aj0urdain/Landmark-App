@@ -10,7 +10,8 @@ import {
   isAfter,
   isBefore,
   addYears,
-  differenceInYears,
+  addHours,
+  addDays,
 } from "date-fns";
 
 import { useQuery } from "@tanstack/react-query";
@@ -27,6 +28,7 @@ import { EventList } from "@/components/molecules/EventList/EventList";
 import { EventCard } from "@/components/molecules/EventCard/EventCard";
 
 import { EventTypeFilter } from "@/components/molecules/EventTypeFilter/EventTypeFilter";
+import { eventTypeInfo } from "@/utils/eventTypeInfo";
 
 export type Auction = {
   venue: string;
@@ -46,17 +48,16 @@ export type PortfolioEvent = {
   magazine_deadline: string | null;
   advertising_period_end: string | null;
   advertising_period_start: string | null;
+  press_bookings: string | null;
+  hsagesmh_w1: string | null;
+  hsagesmh_w2: string | null;
+  bcm_natives: string | null;
+  afr: string | null;
+  adelaide_advertiser: string | null;
 };
 
 export type Event = {
-  type:
-    | "auction"
-    | "magazine_print"
-    | "signed_schedule"
-    | "magazine_deadline"
-    | "advertising_period"
-    | "birthday"
-    | "work_anniversary";
+  type: keyof typeof eventTypeInfo;
   title: string;
   start_date: string;
   end_date: string | null;
@@ -76,7 +77,7 @@ const generateRecurringEvents = (
   userEvents: UserProfileEvent[],
   currentYear: number,
 ) => {
-  const recurringEvents = [];
+  const recurringEvents: Event[] = [];
   const today = new Date();
 
   userEvents.forEach((userEvent) => {
@@ -147,38 +148,68 @@ export const useUserProfileEvents = () => {
   });
 };
 
-const getUniqueEventTypes = (events: Event[]): string[] => {
-  const types = events.map((event) => event.type);
-  return Array.from(new Set(types));
+const allEventTypes = Object.keys(eventTypeInfo).filter(
+  (key) => key !== "default",
+);
+
+const createEvent = (
+  type: keyof typeof eventTypeInfo,
+  date: string | null,
+  portfolioId: number,
+  details: any = null,
+  title?: string | null,
+): Event | null => {
+  if (!date) return null;
+  const info = eventTypeInfo[type];
+  return {
+    type,
+    title: title || info.label,
+    start_date: date,
+    end_date: null,
+    portfolio_id: portfolioId,
+    details,
+  };
 };
 
-const getEventDetails = (event: Event) => {
-  if (event.type === "birthday" || event.type === "work_anniversary") {
-    const originalDate = parseISO(
-      event.details.birthday || event.details.work_anniversary,
-    );
-    const years = differenceInYears(new Date(event.start_date), originalDate);
+const createAFREvents = (
+  originalDate: string,
+  portfolioId: number,
+): Event[] => {
+  const events: Event[] = [];
+  const baseDate = parseISO(originalDate);
 
-    if (event.type === "birthday") {
-      return `Turning ${years} years old`;
-    } else {
-      return `${years} year${years !== 1 ? "s" : ""} at the company`;
-    }
-  }
+  const newEvent = createEvent("afr", originalDate, portfolioId, null, "AFR");
+  if (newEvent) events.push(newEvent);
 
-  // Handle other event types...
+  const anotherEvent = createEvent(
+    "afr",
+    addHours(baseDate, 24).toISOString(),
+    portfolioId,
+    null,
+    "AFR",
+  );
+  if (anotherEvent) events.push(anotherEvent);
+
+  const anotherEvent2 = createEvent(
+    "afr",
+    addDays(baseDate, 7).toISOString(),
+    portfolioId,
+    null,
+    "AFR",
+  );
+  if (anotherEvent2) events.push(anotherEvent2);
+
+  const anotherEvent3 = createEvent(
+    "afr",
+    addDays(baseDate, 8).toISOString(),
+    portfolioId,
+    null,
+    "AFR",
+  );
+  if (anotherEvent3) events.push(anotherEvent3);
+
+  return events;
 };
-
-const allEventTypes = [
-  "auction",
-  "magazine_print",
-  "signed_schedule",
-  "magazine_deadline",
-  "advertising_period",
-  "birthday",
-  "work_anniversary",
-  "training",
-];
 
 export function CompanyCalendar() {
   const [date, setDate] = useState<Date>(new Date());
@@ -204,73 +235,67 @@ export function CompanyCalendar() {
   } = useUserProfileEvents();
 
   const events = useMemo(() => {
-    if (!portfolioEvents && !userProfileEvents) return [];
+    if (!portfolioEvents) return [];
 
     const allEvents: Event[] = [];
 
-    if (portfolioEvents) {
-      portfolioEvents.forEach((portfolioEvent) => {
-        if (portfolioEvent.auctions) {
-          portfolioEvent.auctions.forEach((auction) => {
-            allEvents.push({
-              type: "auction",
-              title: `Auction in ${auction.auction_location}`,
-              start_date: auction.start_date,
-              end_date: auction.end_date,
-              portfolio_id: portfolioEvent.portfolio_id,
-              details: auction,
-            });
-          });
-        }
+    portfolioEvents.forEach((portfolioEvent) => {
+      if (portfolioEvent.auctions) {
+        portfolioEvent.auctions.forEach((auction) => {
+          const event = createEvent(
+            "auction",
+            auction.start_date,
+            portfolioEvent.portfolio_id,
+            auction,
+            auction.auction_location + " Auction",
+          );
+          if (event) allEvents.push(event);
+        });
+      }
 
-        if (portfolioEvent.magazine_print) {
-          allEvents.push({
-            type: "magazine_print",
-            title: "Magazine Print",
-            start_date: portfolioEvent.magazine_print,
-            end_date: null,
-            portfolio_id: portfolioEvent.portfolio_id,
-            details: null,
-          });
-        }
+      (Object.keys(eventTypeInfo) as Array<keyof typeof eventTypeInfo>).forEach(
+        (eventType) => {
+          if (
+            eventType !== "auction" &&
+            eventType !== "default" &&
+            eventType !== "afr" &&
+            portfolioEvent[eventType as keyof PortfolioEvent]
+          ) {
+            const event = createEvent(
+              eventType,
+              portfolioEvent[eventType as keyof PortfolioEvent] as string,
+              portfolioEvent.portfolio_id,
+            );
+            if (event) allEvents.push(event);
+          }
+        },
+      );
 
-        if (portfolioEvent.signed_schedule) {
-          allEvents.push({
-            type: "signed_schedule",
-            title: "Signed Schedule",
-            start_date: portfolioEvent.signed_schedule,
-            end_date: null,
-            portfolio_id: portfolioEvent.portfolio_id,
-            details: null,
-          });
-        }
+      if (portfolioEvent.afr) {
+        const afrEvents = createAFREvents(
+          portfolioEvent.afr,
+          portfolioEvent.portfolio_id,
+        );
+        allEvents.push(...afrEvents);
+      }
 
-        if (portfolioEvent.magazine_deadline) {
+      if (
+        portfolioEvent.advertising_period_start &&
+        portfolioEvent.advertising_period_end
+      ) {
+        const event = createEvent(
+          "advertising_period",
+          portfolioEvent.advertising_period_start,
+          portfolioEvent.portfolio_id,
+        );
+        if (event) {
           allEvents.push({
-            type: "magazine_deadline",
-            title: "Magazine Deadline",
-            start_date: portfolioEvent.magazine_deadline,
-            end_date: null,
-            portfolio_id: portfolioEvent.portfolio_id,
-            details: null,
-          });
-        }
-
-        if (
-          portfolioEvent.advertising_period_start &&
-          portfolioEvent.advertising_period_end
-        ) {
-          allEvents.push({
-            type: "advertising_period",
-            title: "Advertising Period",
-            start_date: portfolioEvent.advertising_period_start,
+            ...event,
             end_date: portfolioEvent.advertising_period_end,
-            portfolio_id: portfolioEvent.portfolio_id,
-            details: null,
           });
         }
-      });
-    }
+      }
+    });
 
     if (userProfileEvents) {
       allEvents.push(...userProfileEvents);
@@ -342,7 +367,7 @@ export function CompanyCalendar() {
     details: event.details,
   }));
 
-  const eventTypes = useMemo(() => getUniqueEventTypes(events), [events]);
+  // const eventTypes = useMemo(() => getUniqueEventTypes(events), [events]);
 
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(allEventTypes);
@@ -370,7 +395,7 @@ export function CompanyCalendar() {
       ) : (
         <>
           <div className="flex h-80 gap-2">
-            <div className="flex w-full flex-col items-center justify-center gap-4">
+            {/* <div className="flex w-full flex-col items-center justify-center gap-4">
               {format(new Date(), "MMMM d, yyyy")}
               <div className="flex w-full items-center justify-center gap-12">
                 <div className="flex animate-slide-left-fade-in flex-col items-center justify-center gap-1.5 opacity-0 [animation-duration:_2s] [animation-fill-mode:_forwards]">
@@ -398,13 +423,12 @@ export function CompanyCalendar() {
                   </Label>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="flex h-full items-start justify-center">
               <EventCalendar
                 events={calendarEvents}
                 selectedDate={date}
                 onSelectDate={(newDate) => setDate(newDate || new Date())}
-                className=""
               />
               <div className="flex h-full items-center justify-center">
                 <Separator orientation="vertical" className="mx-2 h-1/2" />
