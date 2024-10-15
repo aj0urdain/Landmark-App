@@ -113,6 +113,10 @@ const config = {
             transform: "translateY(-20px)",
           },
         },
+        "gavel-hit": {
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "50%": { transform: "rotate(45deg)" },
+        },
         "fade-in-out": {
           "0%, 100%": { opacity: "0" },
           "10%, 90%": { opacity: "1" },
@@ -197,6 +201,7 @@ const config = {
         },
       },
       animation: {
+        "gavel-hit": "gavel-hit 0.75s ease-in-out infinite",
         "float-up-fade-out": "float-up-fade-out 0.5s ease-out forwards",
         "float-up": "float-up 0.5s ease-out forwards",
         "fade-in-out": "fade-in-out 2s ease-in-out",
