@@ -4,29 +4,11 @@ import {
   MultiSelectCombobox,
   Option,
 } from "@/components/molecules/MultiSelectCombobox/MultiSelectCombobox";
+import { getEventTypeOptions } from "@/utils/eventTypeInfo";
 
-const eventTypeOptions = [
-  { value: "auction", label: "Auction", section: "portfolio" },
-  { value: "magazine_print", label: "Magazine Print", section: "portfolio" },
-  { value: "signed_schedule", label: "Signed Schedule", section: "portfolio" },
-  {
-    value: "magazine_deadline",
-    label: "Magazine Deadline",
-    section: "portfolio",
-  },
-  {
-    value: "advertising_period",
-    label: "Advertising Period",
-    section: "portfolio",
-  },
-  { value: "birthday", label: "Birthdays", section: "personal" },
-  {
-    value: "work_anniversary",
-    label: "Work Anniversaries",
-    section: "personal",
-  },
-  { value: "training", label: "Training", section: "additional" },
-];
+const eventTypeOptions = getEventTypeOptions().filter(
+  (option) => option.value !== "default",
+);
 
 interface EventTypeFilterProps {
   onFilterChange: (selectedTypes: string[]) => void;
