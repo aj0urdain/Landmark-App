@@ -128,9 +128,6 @@ export default function AuctionCountdown() {
         ) : (
           <EventCalendar
             events={calendarEvents}
-            defaultMonth={
-              auctions.length > 0 ? new Date(auctions[0].start_date) : undefined
-            }
             className="max-h-full max-w-full overflow-hidden rounded-md border shadow"
           />
         )}
