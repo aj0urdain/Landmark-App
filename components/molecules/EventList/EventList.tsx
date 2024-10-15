@@ -5,17 +5,10 @@ import {
   endOfMonth,
   isSameDay,
   subMonths,
+  compareAsc,
 } from "date-fns";
 import { Event } from "../CompanyCalendar/CompanyCalendar";
 import { EventCard } from "@/components/molecules/EventCard/EventCard";
-
-const eventTypePriority: Record<string, number> = {
-  auction: 1,
-  magazine_print: 2,
-  signed_schedule: 3,
-  magazine_deadline: 4,
-  advertising_period: 5,
-};
 
 interface EventListProps {
   events: Event[];
@@ -35,7 +28,12 @@ export function EventList({ events }: EventListProps) {
     const monthEnd = endOfMonth(today);
     const twoMonthsAgo = subMonths(today, 2);
 
-    events.forEach((event) => {
+    // Sort all events by start date
+    const sortedEvents = events.sort((a, b) =>
+      compareAsc(parseISO(a.start_date), parseISO(b.start_date)),
+    );
+
+    sortedEvents.forEach((event) => {
       const eventStartDate = parseISO(event.start_date);
       const eventEndDate = event.end_date
         ? parseISO(event.end_date)
@@ -57,17 +55,12 @@ export function EventList({ events }: EventListProps) {
       }
     });
 
-    const sortEvents = (events: Event[]) =>
-      events.sort(
-        (a, b) => eventTypePriority[a.type] - eventTypePriority[b.type],
-      );
-
     return {
-      today: sortEvents(todayEvents),
-      thisWeek: sortEvents(thisWeekEvents),
-      thisMonth: sortEvents(thisMonthEvents),
-      future: sortEvents(futureEvents),
-      previously: sortEvents(previousEvents),
+      today: todayEvents,
+      thisWeek: thisWeekEvents,
+      thisMonth: thisMonthEvents,
+      future: futureEvents,
+      previously: previousEvents,
     };
   }, [events]);
 
