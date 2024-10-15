@@ -2,14 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { createBrowserClient } from "./client";
 
 export interface Auction {
-  id: number;
-  date: string;
-  auction_locations: {
-    name: string;
-  };
-  auction_venues: {
-    name: string;
-  };
+  id: string;
+  start_date: string;
+  auction_locations: { name: string };
+  auction_venues: { name: string };
 }
 
 interface UserProfileEvent {
