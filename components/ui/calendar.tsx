@@ -8,9 +8,12 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
 import { ChevronLeftIcon } from "lucide-react";
+import { isSameWeek } from "date-fns";
+import { Dot } from "../atoms/Dot/Dot";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   enableNavigation?: boolean;
+  selected?: Date;
 };
 
 function Calendar({
@@ -18,12 +21,13 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   enableNavigation = true,
+
   ...props
 }: CalendarProps) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("relative p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -39,7 +43,7 @@ function Calendar({
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
         head_cell:
-          "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
+          "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem] text-center",
         row: "flex w-full mt-2",
         cell: cn(
           "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md",
@@ -71,6 +75,29 @@ function Calendar({
         IconRight: enableNavigation
           ? () => <ChevronRightIcon className="h-4 w-4" />
           : () => null,
+        WeekNumber: ({ number, dates }) => {
+          const isSelectedWeek =
+            props?.selected &&
+            dates.some((date) => isSameWeek(date, props?.selected as Date));
+          return (
+            <div
+              className={cn(
+                "relative flex h-8 w-8 items-center justify-center text-xs transition-all duration-1000",
+                isSelectedWeek
+                  ? "font-bold text-white"
+                  : "font-medium text-muted-foreground/25",
+              )}
+            >
+              {isSelectedWeek && (
+                <Dot
+                  size="small"
+                  className="absolute -left-1 animate-pulse bg-foreground"
+                />
+              )}
+              {number}
+            </div>
+          );
+        },
       }}
       {...props}
     />
