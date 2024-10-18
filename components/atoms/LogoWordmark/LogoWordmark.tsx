@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface LogoWordmarkProps {
   className?: string;
@@ -8,11 +8,11 @@ interface LogoWordmarkProps {
 export function LogoWordmark({ className }: LogoWordmarkProps) {
   return (
     <Image
-      src='/images/burgess-rawson-symbol-and-wordmark.svg'
-      alt='Burgess Rawson Logo'
+      src="/images/burgess-rawson-symbol-and-wordmark.svg"
+      alt="Burgess Rawson Logo"
       width={900}
       height={300}
-      className={cn('w-full h-auto', className)}
+      className={cn("h-auto w-full", className)}
     />
   );
 }

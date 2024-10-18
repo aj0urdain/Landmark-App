@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface DepartmentBadgeProps {
   className?: string;
@@ -12,10 +12,10 @@ export function DepartmentBadge({
 }: DepartmentBadgeProps) {
   return (
     <Badge
-      variant='outline'
+      variant="outline"
       className={cn(
         className,
-        'rounded-2xl max-h-6 select-none border-warning-foreground text-warning-foreground'
+        "max-h-6 select-none rounded-2xl border-warning-foreground text-warning-foreground",
       )}
     >
       {department}

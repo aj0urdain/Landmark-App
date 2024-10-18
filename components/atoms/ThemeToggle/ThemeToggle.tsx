@@ -4,79 +4,46 @@ import * as React from "react";
 import { useTheme } from "next-themes";
 import { Laptop, Moon, Sun } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Dot } from "../Dot/Dot";
 
 export function ThemeToggle() {
-  const [mounted, setMounted] = React.useState(false);
   const { theme, setTheme } = useTheme();
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   const ICON_SIZE = 16;
 
+  const themeOptions = [
+    { value: "light", icon: Sun, label: "Light" },
+    { value: "dark", icon: Moon, label: "Dark" },
+    { value: "system", icon: Laptop, label: "System" },
+  ];
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex gap-2">
-          {theme === "light" ? (
-            <>
-              <Sun
-                key="light"
-                size={ICON_SIZE}
-                className="text-muted-foreground"
-              />
-              <span>Light Mode</span>
-            </>
-          ) : theme === "dark" ? (
-            <>
-              <Moon
-                key="dark"
-                size={ICON_SIZE}
-                className="text-muted-foreground"
-              />
-              <span>Dark Mode</span>
-            </>
-          ) : (
-            <>
-              <Laptop
-                key="system"
-                size={ICON_SIZE}
-                className="text-muted-foreground"
-              />
-              <span>System Mode</span>
-            </>
+    <>
+      {themeOptions.map((option) => (
+        <DropdownMenuItem
+          key={option.value}
+          onClick={() => setTheme(option.value)}
+        >
+          {theme === option.value && (
+            <Dot size="small" className="mr-2 animate-pulse bg-primary" />
           )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-          <DropdownMenuRadioItem className="flex gap-2" value="light">
-            <Sun size={ICON_SIZE} className="text-muted-foreground" />{" "}
-            <span>Light</span>
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2" value="dark">
-            <Moon size={ICON_SIZE} className="text-muted-foreground" />{" "}
-            <span>Dark</span>
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2" value="system">
-            <Laptop size={ICON_SIZE} className="text-muted-foreground" />{" "}
-            <span>System</span>
-          </DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+
+          <option.icon
+            size={ICON_SIZE}
+            className={`mr-2 ${theme === option.value ? "text-accent-foreground" : "text-muted-foreground"}`}
+          />
+          <span
+            className={
+              theme === option.value
+                ? "font-extrabold text-foreground"
+                : "text-muted-foreground"
+            }
+          >
+            {option.label}
+          </span>
+        </DropdownMenuItem>
+      ))}
+    </>
   );
 }
