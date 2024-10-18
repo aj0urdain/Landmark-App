@@ -1,27 +1,23 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getUserProfilePage } from "./_actions/getUserProfilePage";
-import { useParams, usePathname } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getUserProfilePage } from './_actions/getUserProfilePage';
+import { useParams, usePathname } from 'next/navigation';
+import { AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
-import Image from "next/image";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DepartmentBadge from "@/components/molecules/DepartmentBadge/DepartmentBadge";
+import Image from 'next/image';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
 
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   addYears,
   differenceInDays,
   differenceInMonths,
   differenceInYears,
   format,
-} from "date-fns";
+} from 'date-fns';
 
 import {
   BookUser,
@@ -31,23 +27,26 @@ import {
   CalendarHeart,
   IdCard,
   Loader2,
+  MessageCircle,
   Network,
   TrendingUp,
-} from "lucide-react";
+  Trophy,
+} from 'lucide-react';
 
-import BranchBadge from "@/components/molecules/BranchBadge/BranchBadge";
+import BranchBadge from '@/components/molecules/BranchBadge/BranchBadge';
+import { CommentSection } from '@/components/molecules/UserPage/CommentSection/CommentSection';
 
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Label } from "@/components/ui/label";
-import EmailContact from "@/components/atoms/EmailContact/EmailContact";
-import PhoneContact from "@/components/atoms/PhoneContact/PhoneContact";
-import { Separator } from "@/components/ui/separator";
-import BirthdayConfetti from "@/components/molecules/BirthdayConfetti/BirthdayConfetti";
+} from '@/components/ui/tooltip';
+import { Label } from '@/components/ui/label';
+import EmailContact from '@/components/atoms/EmailContact/EmailContact';
+import PhoneContact from '@/components/atoms/PhoneContact/PhoneContact';
+import { Separator } from '@/components/ui/separator';
+import BirthdayConfetti from '@/components/molecules/BirthdayConfetti/BirthdayConfetti';
 
 export function UserPage() {
   const params = useParams();
@@ -96,12 +95,12 @@ export function UserPage() {
     const today = new Date();
     const years = differenceInYears(today, start);
     const months = differenceInMonths(today, start) % 12;
-    return `${years} year${years !== 1 ? "s" : ""}, ${months} month${months !== 1 ? "s" : ""}`;
+    return `${years} year${years !== 1 ? 's' : ''}, ${months} month${months !== 1 ? 's' : ''}`;
   };
 
   const formatBirthday = (birthday: string) => {
     const birthdayDate = new Date(birthday);
-    const formattedDate = format(birthdayDate, "d MMMM");
+    const formattedDate = format(birthdayDate, 'd MMMM');
     const today = new Date();
     let nextBirthday = new Date(
       today.getFullYear(),
@@ -120,23 +119,18 @@ export function UserPage() {
   const calculateDaysUntilAnniversary = (startDate: string) => {
     const start = new Date(startDate);
     const today = new Date();
-    const nextAnniversary = addYears(
-      start,
-      differenceInYears(today, start) + 1,
-    );
+    const nextAnniversary = addYears(start, differenceInYears(today, start) + 1);
     return differenceInDays(nextAnniversary, today);
   };
 
-  const daysUntilAnniversary = calculateDaysUntilAnniversary(
-    data.work_anniversary,
-  );
+  const daysUntilAnniversary = calculateDaysUntilAnniversary(data.work_anniversary);
 
   const workingHours = [
-    { day: "Monday", hours: "8:30am - 5:30pm" },
-    { day: "Tuesday", hours: "8:30am - 5:30pm" },
-    { day: "Wednesday", hours: "8:30am - 5:30pm" },
-    { day: "Thursday", hours: "8:30am - 5:30pm" },
-    { day: "Friday", hours: "8:30am - 5:30pm" },
+    { day: 'Monday', hours: '8:30am - 5:30pm' },
+    { day: 'Tuesday', hours: '8:30am - 5:30pm' },
+    { day: 'Wednesday', hours: '8:30am - 5:30pm' },
+    { day: 'Thursday', hours: '8:30am - 5:30pm' },
+    { day: 'Friday', hours: '8:30am - 5:30pm' },
   ];
 
   return (
@@ -170,15 +164,16 @@ export function UserPage() {
               )}
 
               <p
-                className={`${isBirthday && showBirthdayMessage && "mt-4"} animate-slide-left-fade-in text-7xl font-extrabold opacity-0 [animation-delay:_1s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]`}
+                className={`${isBirthday && showBirthdayMessage && 'mt-4'} animate-slide-left-fade-in text-7xl font-extrabold opacity-0 [animation-delay:_1s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]`}
               >
-                {data.first_name} {data.last_name}
+                <span className="font-medium">{data.first_name}</span>{' '}
+                <span className="font-black">{data.last_name}</span>
               </p>
 
               <div className="ml-2 flex animate-slide-up-fade-in items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                 <div className="flex items-center gap-2">
                   <IdCard />
-                  {data?.roles?.map((role: string) => role).join(", ")}
+                  {data?.roles?.map((role: string) => role).join(', ')}
                 </div>
                 <div className="flex animate-slide-right-fade-in gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                   {data.departments?.map((department: string) => (
@@ -221,9 +216,7 @@ export function UserPage() {
                         side="right"
                         className="bg-transparent text-xs text-muted-foreground"
                       >
-                        <p>
-                          {daysUntilAnniversary} days until work anniversary
-                        </p>
+                        <p>{daysUntilAnniversary} days until work anniversary</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -250,8 +243,8 @@ export function UserPage() {
                         className="bg-transparent text-xs text-muted-foreground"
                       >
                         <p>
-                          {formatBirthday(data?.birthday).daysUntilBirthday}{" "}
-                          days until birthday
+                          {formatBirthday(data?.birthday).daysUntilBirthday} days until
+                          birthday
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -280,12 +273,21 @@ export function UserPage() {
         className="w-full animate-slide-down-fade-in opacity-0 [animation-delay:_2s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
       >
         <TabsList className="h-14 w-full">
-          <TabsTrigger
-            className="flex h-full w-full items-center gap-2"
-            value="overview"
-          >
+          <TabsTrigger className="flex h-full w-full items-center gap-2" value="overview">
             <BookUser className="h-4 w-4" />
             Overview
+          </TabsTrigger>
+          <TabsTrigger className="flex h-full w-full items-center gap-2" value="comments">
+            <MessageCircle className="h-4 w-4" />
+            Comments
+          </TabsTrigger>
+          <TabsTrigger
+            disabled={true}
+            className="flex h-full w-full cursor-not-allowed items-center gap-2"
+            value="achievements"
+          >
+            <Trophy className="h-4 w-4" />
+            Achievements
           </TabsTrigger>
           <TabsTrigger
             disabled={true}
@@ -309,11 +311,11 @@ export function UserPage() {
             <Card className="h-fit max-h-full w-2/3 overflow-y-scroll py-4">
               <CardHeader className="flex flex-col gap-6">
                 <CardTitle className="italicf border-l-2 border-l-muted pl-4 text-4xl">
-                  {data?.biography_title || "Biography"}
+                  {data?.biography_title || 'Biography'}
                 </CardTitle>
                 <CardDescription className="whitespace-pre-line px-4 text-justify leading-snug">
                   {data?.biography_description ||
-                    "No biography available. Speak to an administrator to have your biography completed."}
+                    'No biography available. Speak to an administrator to have your biography completed.'}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -375,9 +377,7 @@ export function UserPage() {
                     <div className="flex flex-col gap-2">
                       {workingHours.map(({ day, hours }) => (
                         <p key={day} className="flex justify-between text-sm">
-                          <span className="font-medium text-muted-foreground">
-                            {day}
-                          </span>
+                          <span className="font-medium text-muted-foreground">{day}</span>
                           <span className="font-semibold text-foreground/80">
                             {hours}
                           </span>
@@ -397,6 +397,9 @@ export function UserPage() {
               </Card>
             </div>
           </div>
+        </TabsContent>
+        <TabsContent value="comments">
+          <CommentSection />
         </TabsContent>
 
         <TabsContent value="performance">

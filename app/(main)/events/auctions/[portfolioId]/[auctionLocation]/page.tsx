@@ -1,25 +1,18 @@
-"use client";
+'use client';
 
-import React from "react";
-import { CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useParams } from "next/navigation";
-import AuctionOverview from "@/components/molecules/AuctionPageContent/AuctionOverview/AuctionOverview";
-import AuctionProperties from "@/components/molecules/AuctionPageContent/AuctionProperties/AuctionProperties";
-import AuctionVenue from "@/components/molecules/AuctionPageContent/AuctionVenue/AuctionVenue";
-import AuctionAttendees from "@/components/molecules/AuctionPageContent/AuctionAttendees/AuctionAttendees";
-import AuctionComments from "@/components/molecules/AuctionPageContent/AuctionComments/AuctionComments";
-import {
-  Building,
-  Gavel,
-  Info,
-  MapPin,
-  MessageCircle,
-  Users,
-} from "lucide-react";
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
-import Countdown from "react-countdown";
+import React from 'react';
+import { CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useParams } from 'next/navigation';
+import AuctionOverview from '@/components/molecules/AuctionPageContent/AuctionOverview/AuctionOverview';
+import AuctionProperties from '@/components/molecules/AuctionPageContent/AuctionProperties/AuctionProperties';
+import AuctionVenue from '@/components/molecules/AuctionPageContent/AuctionVenue/AuctionVenue';
+import AuctionAttendees from '@/components/molecules/AuctionPageContent/AuctionAttendees/AuctionAttendees';
+import AuctionComments from '@/components/molecules/AuctionPageContent/AuctionComments/AuctionComments';
+import { Building, Gavel, Info, MapPin, MessageCircle, Users } from 'lucide-react';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+import Countdown from 'react-countdown';
 
 const renderer = ({
   days,
@@ -53,7 +46,7 @@ const AuctionByPortfolioAndLocationPage = () => {
   const { portfolioId, auctionLocation } = useParams();
 
   // You'll need to fetch the actual auction date from your data source
-  const auctionDate = new Date("2024-10-16T12:00:00"); // Example date
+  const auctionDate = new Date('2024-10-25T12:00:00'); // Example date
 
   return (
     <div className="h-full w-full">
@@ -74,9 +67,7 @@ const AuctionByPortfolioAndLocationPage = () => {
                 <div className="flex items-center gap-2">
                   <Gavel className="mr-2 h-10 w-10" />
 
-                  <h1 className="text-4xl font-black">
-                    {auctionLocation} Auction
-                  </h1>
+                  <h1 className="text-4xl font-black">{auctionLocation} Auction</h1>
                 </div>
                 <Badge variant="secondary" className="text-2xl">
                   Portfolio {portfolioId}

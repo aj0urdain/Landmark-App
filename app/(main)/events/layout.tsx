@@ -1,5 +1,26 @@
-import EventsMenu from "@/components/molecules/EventMenu/EventMenu";
+"use client";
+
 import React from "react";
+import { Home, Calendar, Gavel } from "lucide-react";
+import SubNavigationMenu from "@/components/molecules/SubNavigationMenu/SubNavigationMenu";
+
+const eventLinks = [
+  {
+    name: "Home",
+    icon: Home,
+    href: "/events",
+  },
+  {
+    name: "Calendar",
+    icon: Calendar,
+    href: "/events/calendar",
+  },
+  {
+    name: "Auctions",
+    icon: Gavel,
+    href: "/events/auctions",
+  },
+];
 
 export default function EventsLayout({
   children,
@@ -8,7 +29,7 @@ export default function EventsLayout({
 }) {
   return (
     <div className="w-full">
-      <EventsMenu />
+      <SubNavigationMenu title="Events" links={eventLinks} rootPath="/events" />
       <div className="p-4">{children}</div>
     </div>
   );
