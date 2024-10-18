@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Filter } from "lucide-react";
+
 import {
   MultiSelectCombobox,
   Option,
@@ -29,16 +29,11 @@ export function EventTypeFilter({
   const handleFilterChange = (newSelectedTypes: string[]) => {
     setSelectedTypes(newSelectedTypes);
     onFilterChange(newSelectedTypes);
+      console.log(`tes g ds `);
   };
 
   return (
     <div className="flex w-full animate-slide-down-fade-in flex-wrap items-center justify-end gap-4">
-      <div className="flex items-center gap-2">
-        <Filter className="size-3 text-muted-foreground" />
-        <span className="text-xs font-medium uppercase text-muted-foreground">
-          Filter Events
-        </span>
-      </div>
       <MultiSelectCombobox
         options={eventTypeOptions as Option[]}
         selectedValues={selectedTypes}

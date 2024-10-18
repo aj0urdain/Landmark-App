@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react';
 import {
   parseISO,
   endOfWeek,
@@ -6,9 +6,9 @@ import {
   isSameDay,
   subMonths,
   compareAsc,
-} from "date-fns";
-import { Event } from "../CompanyCalendar/CompanyCalendar";
-import { EventCard } from "@/components/molecules/EventCard/EventCard";
+} from 'date-fns';
+import { Event } from '../CompanyCalendar/CompanyCalendar';
+import { EventCard } from '@/components/molecules/EventCard/EventCard';
 
 interface EventListProps {
   events: Event[];
@@ -35,9 +35,7 @@ export function EventList({ events }: EventListProps) {
 
     sortedEvents.forEach((event) => {
       const eventStartDate = parseISO(event.start_date);
-      const eventEndDate = event.end_date
-        ? parseISO(event.end_date)
-        : eventStartDate;
+      const eventEndDate = event.end_date ? parseISO(event.end_date) : eventStartDate;
 
       if (
         (eventStartDate <= today && eventEndDate >= today) ||
@@ -68,10 +66,10 @@ export function EventList({ events }: EventListProps) {
     <div key={title} className="mb-8">
       <h2 className="mb-4 text-xl font-bold">{title}</h2>
       {events.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3  ">
           {events.map((event) => (
             <EventCard
-              key={`${event.type}-${event.portfolio_id}-${event.start_date}`}
+              key={`${event.type}-${event.start_date}`}
               event={event}
               variant="full"
             />
@@ -85,11 +83,11 @@ export function EventList({ events }: EventListProps) {
 
   return (
     <div className="space-y-8">
-      {renderColumn("Today", categorizedEvents.today)}
-      {renderColumn("This Week", categorizedEvents.thisWeek)}
-      {renderColumn("This Month", categorizedEvents.thisMonth)}
-      {renderColumn("Future", categorizedEvents.future)}
-      {renderColumn("Previously", categorizedEvents.previously)}
+      {renderColumn('Today', categorizedEvents.today)}
+      {renderColumn('This Week', categorizedEvents.thisWeek)}
+      {renderColumn('This Month', categorizedEvents.thisMonth)}
+      {renderColumn('Future', categorizedEvents.future)}
+      {renderColumn('Previously', categorizedEvents.previously)}
     </div>
   );
 }

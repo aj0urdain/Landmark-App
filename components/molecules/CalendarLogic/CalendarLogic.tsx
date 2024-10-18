@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
-import { parseISO, startOfDay, format, eachDayOfInterval } from "date-fns";
-import { eventTypeInfo, getEventColor, hexToRGBA } from "@/utils/eventTypeInfo";
-import { CalendarEvent } from "../EventCalendar/EventCalendar";
+import React, { useMemo } from 'react';
+import { parseISO, startOfDay, format, eachDayOfInterval } from 'date-fns';
+import { eventTypeInfo, getEventColor, hexToRGBA } from '@/utils/eventTypeInfo';
+import { CalendarEvent } from '../EventCalendar/EventCalendar';
 
 export type Event = {
   type: keyof typeof eventTypeInfo;
@@ -9,7 +9,7 @@ export type Event = {
   start_date: string;
   end_date: string | null;
   portfolio_id: number;
-  details: any;
+  details: unknown;
 };
 
 interface CalendarLogicProps {
@@ -26,22 +26,18 @@ export function CalendarLogic({ events, children }: CalendarLogicProps) {
 
     events.forEach((event) => {
       const startDate = startOfDay(parseISO(event.start_date));
-      const endDate = event.end_date
-        ? startOfDay(parseISO(event.end_date))
-        : startDate;
+      const endDate = event.end_date ? startOfDay(parseISO(event.end_date)) : startDate;
 
-      if (event.type === "advertising_period") {
-        eachDayOfInterval({ start: startDate, end: endDate }).forEach(
-          (date) => {
-            const dateKey = format(date, "yyyy-MM-dd");
-            if (!eventMap[dateKey]) {
-              eventMap[dateKey] = [];
-            }
-            eventMap[dateKey].push(event);
-          },
-        );
+      if (event.type === 'advertising_period') {
+        eachDayOfInterval({ start: startDate, end: endDate }).forEach((date) => {
+          const dateKey = format(date, 'yyyy-MM-dd');
+          if (!eventMap[dateKey]) {
+            eventMap[dateKey] = [];
+          }
+          eventMap[dateKey].push(event);
+        });
       } else {
-        const dateKey = format(startDate, "yyyy-MM-dd");
+        const dateKey = format(startDate, 'yyyy-MM-dd');
         if (!eventMap[dateKey]) {
           eventMap[dateKey] = [];
         }
@@ -71,50 +67,68 @@ export function CalendarLogic({ events, children }: CalendarLogicProps) {
 
       styles[event.type] = {
         backgroundColor: hexToRGBA(bgColor, 0.3),
-        borderRadius: "0px",
-        color: "hsl(var(--foreground))",
+        borderRadius: '0px',
+        color: 'hsl(var(--foreground))',
       };
 
-      if (event.type === "signed_schedule" && borderColor) {
+      if (event.type === 'birthday') {
         styles[event.type] = {
           ...styles[event.type],
-          backgroundColor: "transparent",
-          border: `2px dotted ${hexToRGBA(borderColor || "#000", 0.3)}`,
-          borderRadius: "2px",
+          backgroundColor: 'transparent',
+          color: hexToRGBA(bgColor, 1),
+          fontWeight: 'bold',
+        };
+      }
+
+      if (event.type === 'work_anniversary') {
+        styles[event.type] = {
+          ...styles[event.type],
+          backgroundColor: 'transparent',
+          color: hexToRGBA(bgColor, 1),
+          fontWeight: 'bold',
+        };
+      }
+
+      if (event.type === 'signed_schedule' && borderColor) {
+        styles[event.type] = {
+          ...styles[event.type],
+          backgroundColor: 'transparent',
+          border: `2px dotted ${hexToRGBA(borderColor || '#000', 0.3)}`,
+          borderRadius: '2px',
           borderColor: borderColor,
         };
       }
 
-      if (event.type === "magazine_deadline") {
+      if (event.type === 'magazine_deadline') {
         styles[event.type] = {
           ...styles[event.type],
           backgroundColor: hexToRGBA(bgColor, 0.15),
-          border: `2px dotted ${hexToRGBA(borderColor || "#000", 0.3)}`,
-          borderRadius: "2px",
+          border: `2px dotted ${hexToRGBA(borderColor || '#000', 0.3)}`,
+          borderRadius: '2px',
           borderColor: borderColor,
         };
       }
 
-      if (event.type === "magazine_print") {
+      if (event.type === 'magazine_print') {
         styles[event.type] = {
           ...styles[event.type],
           backgroundColor: hexToRGBA(bgColor, 0.2),
         };
       }
 
-      if (event.type === "advertising_period") {
+      if (event.type === 'advertising_period') {
         styles[event.type] = {
           ...styles[event.type],
           backgroundColor: hexToRGBA(bgColor, 0.15),
         };
       }
 
-      if (event.type === "auction" && event.details?.auction_location) {
+      if (event.type === 'auction' && event.details?.auction_location) {
         const location = event.details.auction_location as string;
         styles[`auction_${location}`] = {
           backgroundColor: hexToRGBA(bgColor, 0.3),
-          borderRadius: "4px",
-          color: "hsl(var(--foreground))",
+          borderRadius: '4px',
+          color: 'hsl(var(--foreground))',
         };
         if (!modifiers[`auction_${location}`]) {
           modifiers[`auction_${location}`] = [];
@@ -124,10 +138,10 @@ export function CalendarLogic({ events, children }: CalendarLogicProps) {
     });
 
     styles.selected = {
-      fontWeight: "bold",
-      border: "2px solid white",
-      backgroundColor: "white",
-      animation: "pulse 2s infinite",
+      fontWeight: 'bold',
+      border: '2px solid white',
+      backgroundColor: 'white',
+      animation: 'pulse 2s infinite',
       zIndex: 100,
     };
 

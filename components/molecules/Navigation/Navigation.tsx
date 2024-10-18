@@ -131,7 +131,7 @@ export const Navigation = React.memo(function Navigation({
   isCollapsed,
 }: NavigationProps) {
   return (
-    <nav className="flex flex-col gap-2 pt-4">
+    <nav className="flex w-full flex-col gap-2 pt-4">
       {links.map((link, index) => {
         if (link.type === "separator") {
           return <Separator key={`separator-${index}`} className="my-4" />;

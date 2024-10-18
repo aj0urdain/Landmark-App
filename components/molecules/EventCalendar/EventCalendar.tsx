@@ -20,6 +20,10 @@ interface EventCalendarProps {
   defaultMonth?: Date;
   modifiers: Record<string, Date[]>;
   modifiersStyles: Record<string, React.CSSProperties>;
+  classNames?: Record<string, string>;
+  month?: Date;
+  onMonthChange?: (date: Date | undefined) => void;
+  showWeekNumbers?: boolean;
 }
 
 export function EventCalendar({
@@ -31,12 +35,18 @@ export function EventCalendar({
   defaultMonth,
   modifiers,
   modifiersStyles,
+  classNames = {},
+  month,
+  onMonthChange,
+  showWeekNumbers,
 }: EventCalendarProps) {
   return (
     <Calendar
       mode="single"
       defaultMonth={defaultMonth}
       selected={selectedDate}
+      month={month}
+      onMonthChange={onMonthChange}
       onSelect={onSelectDate}
       className={className}
       modifiers={modifiers}
@@ -44,6 +54,8 @@ export function EventCalendar({
       numberOfMonths={numberOfMonths}
       showOutsideDays
       enableNavigation={enableNavigation}
+      classNames={classNames}
+      showWeekNumber={showWeekNumbers}
     />
   );
 }

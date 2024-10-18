@@ -19,6 +19,7 @@ import { Card } from "@/components/ui/card";
 import { Dot } from "@/components/atoms/Dot/Dot";
 import ReactTimeAgo from "react-time-ago";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface NotificationSidebarProps {
   isCollapsed: boolean;
@@ -631,7 +632,7 @@ export function Inbox({
           return (
             <div
               key={section}
-              className="flex flex-col items-center justify-center rounded-full border p-2"
+              className="flex w-fit flex-col items-center justify-center gap-1 rounded-full border border-muted bg-muted/25 p-2"
             >
               {section === "me" && <User className="h-4 w-4" />}
               {section === "groups" && <Users className="h-4 w-4" />}
@@ -665,8 +666,8 @@ export function Inbox({
         {(["me", "groups", "company"] as const).map((section) => {
           if (groupedNotifications[section].length === 0) return null;
           return (
-            <div key={section} className="mb-4">
-              <div className="mb-2 flex items-center justify-between">
+            <div key={section}>
+              <div className="flex items-center justify-between">
                 <h3 className="flex items-center gap-1 text-xs font-semibold capitalize text-muted-foreground">
                   {section === "me" && <User className="h-3 w-3" />}
                   {section === "groups" && <Users className="h-3 w-3" />}
@@ -747,14 +748,14 @@ export function Inbox({
 
   return (
     <div
-      className={`flex h-full w-full flex-col transition-all duration-300 ease-in-out ${
+      className={`flex h-full max-h-screen w-full flex-col transition-all duration-300 ease-in-out ${
         isCollapsed ? "max-w-16" : "max-w-64"
       }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="flex h-full flex-col border-l">
-        <div className="flex flex-col space-y-2 p-4">
+      <div className="flex h-full flex-col space-y-6 border-l p-4">
+        <div className="flex-shrink-0">
           {isCollapsed ? (
             <div className="flex justify-center">
               <InboxIcon className="mb-5 mt-1 h-5 w-6 text-muted-foreground" />
@@ -790,33 +791,49 @@ export function Inbox({
               )}
             </Button>
           )}
-          {isCollapsed ? (
-            <div className="mt-2">{renderCollapsedNotifications(false)}</div>
-          ) : (
-            <Tabs defaultValue="inbox" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="inbox">
-                  <InboxIcon className="mr-2 h-3 w-3" />
+        </div>
+        {isCollapsed ? (
+          <div className="flex flex-grow justify-center">
+            {renderCollapsedNotifications(false)}
+          </div>
+        ) : (
+          <div className="flex flex-grow flex-col overflow-hidden">
+            <Tabs
+              defaultValue="inbox"
+              className="flex h-full flex-col items-center justify-center"
+            >
+              <TabsList className="mb-2 grid w-full flex-shrink-0 grid-cols-2 bg-transparent">
+                <TabsTrigger
+                  value="inbox"
+                  className="group py-2 data-[state=active]:border-b data-[state=active]:border-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
+                >
+                  <InboxIcon className="mr-1.5 h-3 w-3 group-data-[state=active]:animate-bounce" />
                   <p className="text-xs">Inbox</p>
                 </TabsTrigger>
-                <TabsTrigger value="archive">
-                  <Archive className="mr-2 h-3 w-3" />
+                <TabsTrigger
+                  value="archive"
+                  className="group py-2 data-[state=active]:border-b data-[state=active]:border-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
+                >
+                  <Archive className="mr-1.5 h-3 w-3 group-data-[state=active]:animate-bounce" />
                   <p className="text-xs">Archive</p>
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="inbox" className="mt-2">
-                <div className="max-h-[calc(100vh)] overflow-y-auto">
+              <TabsContent value="inbox" className="flex-grow overflow-hidden">
+                <ScrollArea className="h-full">
                   {showContent && renderNotifications(false)}
-                </div>
+                </ScrollArea>
               </TabsContent>
-              <TabsContent value="archive" className="mt-2">
-                <div className="max-h-[calc(100vh)] overflow-y-auto">
+              <TabsContent
+                value="archive"
+                className="flex-grow overflow-hidden"
+              >
+                <ScrollArea className="h-full">
                   {showContent && renderNotifications(true)}
-                </div>
+                </ScrollArea>
               </TabsContent>
             </Tabs>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

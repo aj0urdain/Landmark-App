@@ -60,11 +60,13 @@ export function AuctionCard({ event, variant }: AuctionCardProps) {
       <div className="relative z-10 flex h-full w-full flex-col justify-between p-3">
         {(variant === "full" || variant === "featured") && (
           <div className="text-xs text-muted-foreground transition-all duration-300 group-hover:font-semibold">
-            <p>{format(event.start_date, "MMMM d, yyyy")}</p>
+            <p className="shadow-m">
+              {format(event.start_date, "MMMM d, yyyy")}
+            </p>
           </div>
         )}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-start gap-2">
+        <div className="flex w-full flex-col gap-2">
+          <div className="flex gap-2">
             <Icon
               className={`h-4 w-4 ${
                 variant === "preview"
@@ -73,12 +75,13 @@ export function AuctionCard({ event, variant }: AuctionCardProps) {
               } transition-all duration-500 group-hover:animate-gavel-hit group-hover:opacity-100`}
               style={{ color: bgColor }}
             />
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1">
               <p
                 className={`${
                   variant === "preview"
                     ? "text-sm"
-                    : "text-xl group-hover:text-2xl"
+                    : // : "text-xl group-hover:text-2xl"
+                      "text-xl"
                 } font-bold transition-all duration-500 group-hover:text-foreground`}
                 style={
                   {

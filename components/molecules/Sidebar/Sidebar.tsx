@@ -5,15 +5,19 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Logo } from "@/components/atoms/Logo/Logo";
 import { LogoWordmark } from "@/components/atoms/LogoWordmark/LogoWordmark";
 import { Navigation } from "@/components/molecules/Navigation/Navigation";
-// import { UpgradeCard } from '@/components/molecules/UpgradeCard/UpgradeCard';
 
 interface SidebarProps {
   isCollapsed: boolean;
+  sheetMode?: boolean;
 }
 
-export function Sidebar({ isCollapsed }: SidebarProps) {
+export function Sidebar({ isCollapsed, sheetMode }: SidebarProps) {
   return (
-    <div className="flex h-full flex-col border-r transition-all duration-300">
+    <div
+      className={`flex h-full w-full flex-col transition-all duration-300 ${
+        sheetMode ? "border-none" : "border-r"
+      }`}
+    >
       <div
         className={`flex h-16 items-center p-4 ${isCollapsed ? "justify-center" : "justify-start"}`}
       >
@@ -28,11 +32,6 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
       <ScrollArea className="flex-1">
         <Navigation isCollapsed={isCollapsed} />
       </ScrollArea>
-      {/* {!isCollapsed && (
-        <div className='p-4'>
-          <UpgradeCard />
-        </div>
-      )} */}
     </div>
   );
 }

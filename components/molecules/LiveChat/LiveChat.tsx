@@ -300,7 +300,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
     if (!floatingMessage) return null;
 
     return (
-      <div className="animate-float-up-fade-out absolute bottom-full left-0 mb-2">
+      <div className="absolute bottom-full left-0 mb-2 animate-float-up-fade-out">
         <div className="mx-auto w-full rounded-lg border border-muted-foreground bg-transparent p-2 text-xs text-primary">
           {floatingMessage}
         </div>
