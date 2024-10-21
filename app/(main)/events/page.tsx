@@ -62,14 +62,6 @@ interface PortfolioWithAuctions {
   advertising_period_start: string;
 }
 
-interface StaffEvent {
-  work_anniversary: string;
-  birthday: string;
-  nextOccurrence: Date;
-  eventType: 'work_anniversary' | 'birthday';
-  // Add other necessary properties
-}
-
 const EventsPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -116,24 +108,20 @@ const EventsPage = () => {
     });
   };
 
-  const getUpcomingEvents = (
-    data: Event[],
-    eventType: 'work_anniversary' | 'birthday',
-    limit = 5,
-  ): StaffEvent[] => {
+  const getUpcomingEvents = (data: Event[], eventType: string, limit = 5) => {
     const today = new Date();
     const currentYear = today.getFullYear();
 
     return data
-      .map((user: unknown) => {
-        const date = new Date(user[eventType] as unknown as string);
+      .map((user: any) => {
+        const date = new Date(user[eventType]);
         const nextOccurrence = new Date(currentYear, date.getMonth(), date.getDate());
         if (nextOccurrence < today) {
           nextOccurrence.setFullYear(currentYear + 1);
         }
         return { ...user, nextOccurrence, eventType };
       })
-      .sort((a: unknown, b: unknown) => a.nextOccurrence - b.nextOccurrence)
+      .sort((a: any, b: any) => a.nextOccurrence - b.nextOccurrence)
       .slice(0, limit);
   };
 

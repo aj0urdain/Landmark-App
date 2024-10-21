@@ -35,7 +35,7 @@ const CalendarPage = () => {
   const currentMonthRef = useRef<HTMLDivElement>(null);
 
   const handleYearChange = (increment: number) => {
-    const newDate = new Date(selectedDate || new Date());
+    const newDate = new Date(selectedDate ?? new Date());
     newDate.setFullYear(newDate.getFullYear() + increment);
     setSelectedDate(newDate);
     if (currentMonthRef.current) {
@@ -47,7 +47,7 @@ const CalendarPage = () => {
   };
 
   const handleDayChange = (increment: number) => {
-    const newDate = new Date(selectedDate || new Date());
+    const newDate = new Date(selectedDate ?? new Date());
     newDate.setDate(newDate.getDate() + increment);
     setSelectedDate(newDate);
   };
@@ -81,8 +81,12 @@ const CalendarPage = () => {
         block: 'start',
       });
       setHighlightState('active');
-      setTimeout(() => setHighlightState('fading'), 2000);
-      setTimeout(() => setHighlightState('inactive'), 2500);
+      setTimeout(() => {
+        setHighlightState('fading');
+      }, 2000);
+      setTimeout(() => {
+        setHighlightState('inactive');
+      }, 2500);
     }
   }, [isLoadingEvents]);
 
@@ -172,7 +176,9 @@ const CalendarPage = () => {
                       size="icon"
                       variant="ghost"
                       className="size-5 p-0"
-                      onClick={() => handleYearChange(-1)}
+                      onClick={() => {
+                        handleYearChange(-1);
+                      }}
                     >
                       <ChevronLeft className="size-4" />
                     </Button>
@@ -180,7 +186,9 @@ const CalendarPage = () => {
                       size="icon"
                       variant="ghost"
                       className="size-5 p-0"
-                      onClick={() => handleYearChange(1)}
+                      onClick={() => {
+                        handleYearChange(1);
+                      }}
                     >
                       <ChevronRight className="size-4" />
                     </Button>
@@ -196,7 +204,9 @@ const CalendarPage = () => {
                       size="icon"
                       variant="ghost"
                       className="size-5 p-0"
-                      onClick={() => handleDayChange(-1)}
+                      onClick={() => {
+                        handleDayChange(-1);
+                      }}
                     >
                       <ChevronLeft className="size-4" />
                     </Button>
@@ -204,7 +214,9 @@ const CalendarPage = () => {
                       size="icon"
                       variant="ghost"
                       className="size-5 p-0"
-                      onClick={() => handleDayChange(1)}
+                      onClick={() => {
+                        handleDayChange(1);
+                      }}
                     >
                       <ChevronRight className="size-4" />
                     </Button>
@@ -225,12 +237,10 @@ const CalendarPage = () => {
                           selectedDateEvents.map((event, index) => (
                             <StaggeredAnimation
                               baseDelay={0}
-                              incrementDelay={0.05}
                               key={event.start_date + selectedDate.toISOString()}
                               index={index}
-                              fadeDirection="left"
                             >
-                              <EventCard key={index} event={event} variant="preview" />
+                              <EventCard event={event} variant="preview" />
                             </StaggeredAnimation>
                           ))
                         ) : (

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getUserProfilePage } from './_actions/getUserProfilePage';
 import { useParams, usePathname } from 'next/navigation';
-import { AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -69,7 +68,9 @@ export function UserPage() {
       const timer = setTimeout(() => {
         setShowBirthdayMessage(true);
       }, 3500);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, [isBirthday]);
 
@@ -95,7 +96,9 @@ export function UserPage() {
     const today = new Date();
     const years = differenceInYears(today, start);
     const months = differenceInMonths(today, start) % 12;
-    return `${years} year${years !== 1 ? 's' : ''}, ${months} month${months !== 1 ? 's' : ''}`;
+    return `${years.toFixed(1)} year${years !== 1 ? 's' : ''}, ${months.toFixed(
+      1,
+    )} month${months !== 1 ? 's' : ''}`;
   };
 
   const formatBirthday = (birthday: string) => {
@@ -164,7 +167,9 @@ export function UserPage() {
               )}
 
               <p
-                className={`${isBirthday && showBirthdayMessage && 'mt-4'} animate-slide-left-fade-in text-7xl font-extrabold opacity-0 [animation-delay:_1s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]`}
+                className={`${
+                  isBirthday && showBirthdayMessage ? 'mt-4' : ''
+                } animate-slide-left-fade-in text-7xl font-extrabold opacity-0 [animation-delay:_1s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]`}
               >
                 <span className="font-medium">{data.first_name}</span>{' '}
                 <span className="font-black">{data.last_name}</span>

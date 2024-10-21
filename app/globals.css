@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://p.typekit.net/p.css?s=1&k=sin3yas&ht=tk&f=9775.9776.9805.9806.9807.9808.9810.9811.9812.9813.9814.9815.9816.9817.52981.52982.52983.52984.52985.52986&a=21977985&app=typekit&e=css");
+@import url('https://p.typekit.net/p.css?s=1&k=sin3yas&ht=tk&f=9775.9776.9805.9806.9807.9808.9810.9811.9812.9813.9814.9815.9816.9817.52981.52982.52983.52984.52985.52986&a=21977985&app=typekit&e=css');
 
 @font-face {
-  font-family: "lexia-advertising";
-  src: url("https://use.typekit.net/af/3c3ad3/000000000000000077359d7c/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3")
-    format("opentype");
+  font-family: 'lexia-advertising';
+  src: url('https://use.typekit.net/af/3c3ad3/000000000000000077359d7c/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 400;
@@ -15,9 +15,9 @@
 }
 
 @font-face {
-  font-family: "lexia-advertising";
-  src: url("https://use.typekit.net/af/bbc27d/000000000000000077359d82/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3")
-    format("opentype");
+  font-family: 'lexia-advertising';
+  src: url('https://use.typekit.net/af/bbc27d/000000000000000077359d82/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 400;
@@ -25,9 +25,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/042bd3/000000000000000077359d7f/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/042bd3/000000000000000077359d7f/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 400;
@@ -35,9 +35,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/1c4cee/000000000000000077359d84/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/1c4cee/000000000000000077359d84/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 400;
@@ -45,9 +45,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/1da891/000000000000000077359d87/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/1da891/000000000000000077359d87/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 700;
@@ -55,9 +55,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/85ad1d/000000000000000077359d8b/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/85ad1d/000000000000000077359d8b/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 700;
@@ -65,9 +65,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/97333c/000000000000000077359d8e/30/a?subset_id=2&fvd=n2&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/97333c/000000000000000077359d8e/30/a?subset_id=2&fvd=n2&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 200;
@@ -75,9 +75,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/1be770/000000000000000077359d90/30/a?subset_id=2&fvd=i2&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/1be770/000000000000000077359d90/30/a?subset_id=2&fvd=i2&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 200;
@@ -85,9 +85,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/aefea0/000000000000000077359d92/30/a?subset_id=2&fvd=n3&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/aefea0/000000000000000077359d92/30/a?subset_id=2&fvd=n3&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 300;
@@ -95,9 +95,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/23da7c/000000000000000077359d94/30/a?subset_id=2&fvd=i3&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/23da7c/000000000000000077359d94/30/a?subset_id=2&fvd=i3&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 300;
@@ -105,9 +105,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/3920d2/000000000000000077359d95/30/a?subset_id=2&fvd=n8&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/3920d2/000000000000000077359d95/30/a?subset_id=2&fvd=n8&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 800;
@@ -115,9 +115,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/ca4208/000000000000000077359d96/30/a?subset_id=2&fvd=i8&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/ca4208/000000000000000077359d96/30/a?subset_id=2&fvd=i8&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 800;
@@ -125,9 +125,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/20b4ac/000000000000000077359d97/30/a?subset_id=2&fvd=n9&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/20b4ac/000000000000000077359d97/30/a?subset_id=2&fvd=n9&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 900;
@@ -135,9 +135,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/c69c93/000000000000000077359d98/30/a?subset_id=2&fvd=i9&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/c69c93/000000000000000077359d98/30/a?subset_id=2&fvd=i9&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 900;
@@ -145,9 +145,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/50dd1b/0000000000000000774eca78/30/a?subset_id=2&fvd=i1&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/50dd1b/0000000000000000774eca78/30/a?subset_id=2&fvd=i1&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 100;
@@ -155,9 +155,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/4aa346/0000000000000000774eca79/30/a?subset_id=2&fvd=n1&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/4aa346/0000000000000000774eca79/30/a?subset_id=2&fvd=n1&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 100;
@@ -165,9 +165,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/ce0837/0000000000000000774eca7a/30/a?subset_id=2&fvd=n5&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/ce0837/0000000000000000774eca7a/30/a?subset_id=2&fvd=n5&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 500;
@@ -175,9 +175,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/cf117f/0000000000000000774eca7b/30/a?subset_id=2&fvd=i5&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/cf117f/0000000000000000774eca7b/30/a?subset_id=2&fvd=i5&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 500;
@@ -185,9 +185,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/0419ca/0000000000000000774eca7c/30/a?subset_id=2&fvd=n6&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/0419ca/0000000000000000774eca7c/30/a?subset_id=2&fvd=n6&v=3')
+    format('opentype');
   font-display: auto;
   font-style: normal;
   font-weight: 600;
@@ -195,9 +195,9 @@
 }
 
 @font-face {
-  font-family: "lexia";
-  src: url("https://use.typekit.net/af/e6f2ae/0000000000000000774eca7d/30/a?subset_id=2&fvd=i6&v=3")
-    format("opentype");
+  font-family: 'lexia';
+  src: url('https://use.typekit.net/af/e6f2ae/0000000000000000774eca7d/30/a?subset_id=2&fvd=i6&v=3')
+    format('opentype');
   font-display: auto;
   font-style: italic;
   font-weight: 600;
@@ -205,10 +205,10 @@
 }
 
 .tk-lexia-advertising {
-  font-family: "lexia-advertising", serif;
+  font-family: 'lexia-advertising', serif;
 }
 .tk-lexia {
-  font-family: "lexia", serif;
+  font-family: 'lexia', serif;
 }
 
 @layer base {
