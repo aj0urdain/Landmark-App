@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 import {
   MultiSelectCombobox,
   Option,
-} from "@/components/molecules/MultiSelectCombobox/MultiSelectCombobox";
-import { getEventTypeOptions } from "@/utils/eventTypeInfo";
+} from '@/components/molecules/MultiSelectCombobox/MultiSelectCombobox';
+import { getEventTypeOptions } from '@/utils/eventTypeInfo';
 
 const eventTypeOptions = getEventTypeOptions().filter(
-  (option) => option.value !== "default",
+  (option) => option.value !== 'default',
 );
 
 interface EventTypeFilterProps {
@@ -19,8 +19,7 @@ export function EventTypeFilter({
   onFilterChange,
   initialSelectedTypes,
 }: EventTypeFilterProps) {
-  const [selectedTypes, setSelectedTypes] =
-    useState<string[]>(initialSelectedTypes);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(initialSelectedTypes);
 
   useEffect(() => {
     onFilterChange(selectedTypes);
@@ -29,7 +28,6 @@ export function EventTypeFilter({
   const handleFilterChange = (newSelectedTypes: string[]) => {
     setSelectedTypes(newSelectedTypes);
     onFilterChange(newSelectedTypes);
-      console.log(`tes g ds `);
   };
 
   return (

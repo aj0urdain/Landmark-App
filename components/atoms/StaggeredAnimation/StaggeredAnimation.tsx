@@ -1,5 +1,5 @@
-import React from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { cn } from '@/lib/utils';
 
 interface StaggeredAnimationProps {
   children: React.ReactNode;
@@ -7,7 +7,7 @@ interface StaggeredAnimationProps {
   baseDelay?: number;
   incrementDelay?: number;
   className?: string;
-  fadeDirection?: "up" | "down" | "left" | "right";
+  fadeDirection?: 'up' | 'down' | 'left' | 'right';
 }
 
 export function StaggeredAnimation({
@@ -16,31 +16,31 @@ export function StaggeredAnimation({
   baseDelay = 0.2,
   incrementDelay = 0.15,
   className,
-  fadeDirection = "down",
+  fadeDirection = 'down',
 }: StaggeredAnimationProps) {
   const delay = baseDelay + (index + 1) * incrementDelay;
 
   const getFadeAnimation = () => {
     switch (fadeDirection) {
-      case "up":
-        return "animate-slide-up-fade-in";
-      case "down":
-        return "animate-slide-down-fade-in";
-      case "left":
-        return "animate-slide-left-fade-in";
-      case "right":
-        return "animate-slide-right-fade-in";
+      case 'up':
+        return 'animate-slide-up-fade-in';
+      case 'down':
+        return 'animate-slide-down-fade-in';
+      case 'left':
+        return 'animate-slide-left-fade-in';
+      case 'right':
+        return 'animate-slide-right-fade-in';
       default:
-        return "animate-slide-down-fade-in";
+        return 'animate-slide-down-fade-in';
     }
   };
 
   return (
     <div
-      className={cn("opacity-0", getFadeAnimation(), className)}
+      className={cn('opacity-0', getFadeAnimation(), className)}
       style={{
         animationDelay: `${delay.toFixed(2)}s`,
-        animationFillMode: "forwards",
+        animationFillMode: 'forwards',
       }}
     >
       {children}

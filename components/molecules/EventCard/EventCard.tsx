@@ -9,8 +9,16 @@ import Link from 'next/link';
 import { AuctionCard } from './AuctionCard/AuctionCard';
 import { Badge } from '@/components/ui/badge';
 
+interface EventDetails {
+  auction_location: string;
+  first_name: string;
+  last_name: string;
+}
+
 interface EventCardProps {
-  event: Event;
+  event: Event & {
+    details?: EventDetails;
+  };
   variant: 'preview' | 'full' | 'featured';
 }
 
@@ -23,42 +31,31 @@ export function EventCard({ event, variant }: EventCardProps) {
     const { icon: Icon, bgColor } = getEventTypeInfo(event.type);
 
     return (
-      <div className="flex items-start h-full justify-between gap-2 p-3">
-        <div className="flex flex-col gap-1 h-full justify-between">
-          <p
-            className={`text-muted-foreground ${variant === 'preview' ? 'text-xs' : 'text-sm'}`}
-          >
-            {formatEventDate()}
-          </p>
-          <div className="flex items-center gap-2">
-            {event.type !== 'birthday' && event.type !== 'work_anniversary' && (
-              <Icon
-                className={`h-4 w-4`}
-                style={{
-                  color: typeof bgColor === 'string' ? bgColor : bgColor.default,
-                }}
-              />
-            )}
-            <p className={`${variant === 'preview' ? 'text-base' : 'text-lg'} font-bold`}>
-              {event.title}
-            </p>
-          </div>
-        </div>
-        {event.type !== 'birthday' && event.type !== 'work_anniversary' ? (
-          <Badge
-            variant="secondary"
-            className="text-muted-foreground text-sm px-2 py-0.5"
-          >
-            {event.portfolio_id}
-          </Badge>
-        ) : (
+      <div className="flex relative p-3 h-full w-full flex-col justify-between gap-2">
+        <p
+          className={`text-muted-foreground ${variant === 'preview' ? 'text-xs' : 'text-sm'}`}
+        >
+          {formatEventDate()}
+        </p>
+        <div className="flex items-center gap-2">
           <Icon
             className={`h-4 w-4`}
             style={{
               color: typeof bgColor === 'string' ? bgColor : bgColor.default,
             }}
           />
-        )}
+          <p className={`${variant === 'preview' ? 'text-base' : 'text-lg'} font-bold`}>
+            {event.title}
+          </p>
+        </div>
+        {event.type !== 'birthday' && event.type !== 'work_anniversary' ? (
+          <Badge
+            variant="secondary"
+            className="text-muted-foreground text-sm px-2 py-0.5 absolute top-3 right-3"
+          >
+            {event.portfolio_id}
+          </Badge>
+        ) : null}
       </div>
     );
   };
@@ -70,30 +67,10 @@ export function EventCard({ event, variant }: EventCardProps) {
     return format(new Date(event.start_date), 'MMM d, yyyy');
   };
 
-  const renderAdditionalInfo = () => {
-    if (variant !== 'full' && variant !== 'featured') return null;
-
-    switch (event.type) {
-      case 'advertising_period':
-        return (
-          <div className="text-sm">
-            <p>
-              Duration:{' '}
-              {event.end_date
-                ? `${Math.ceil((new Date(event.end_date).getTime() - new Date(event.start_date).getTime()) / (1000 * 60 * 60 * 24))} days`
-                : 'N/A'}
-            </p>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
   const cardContent = (
     <Card
-      className={`group box-border flex h-full w-full flex-col gap-2 overflow-hidden border transition-all duration-300
-        ${variant === 'preview' ? 'min-h-[100px]' : ''}
+      className={`group box-border flex h-full w-full flex-col overflow-hidden border transition-all duration-300
+        ${variant === 'preview' ? 'h-[100px]' : ''}
         ${
           variant === 'featured' ? 'bg-muted' : ''
         } hover:border-[color:var(--hover-border-color)]`}
@@ -104,22 +81,20 @@ export function EventCard({ event, variant }: EventCardProps) {
       }
     >
       {renderEventContent()}
-      {renderAdditionalInfo()}
     </Card>
   );
 
   if (event.type === 'auction') {
     return (
       <Link
-        href={`/events/auctions/${event.portfolio_id}/${event.details.auction_location}`}
+        href={`/events/auctions/${event.portfolio_id.toString()}/${event.details.auction_location}`}
       >
         {cardContent}
       </Link>
     );
   }
 
-  if (event.type === 'birthday') {
-    console.log(event);
+  if (['birthday', 'work_anniversary'].includes(event.type)) {
     return (
       <Link href={`/wiki/people/${event.details.first_name}-${event.details.last_name}`}>
         {cardContent}
@@ -142,7 +117,9 @@ export function EventCard({ event, variant }: EventCardProps) {
     ].includes(event.type)
   ) {
     return (
-      <Link href={`/wiki/library/portfolios/${event.portfolio_id}?tab=overview`}>
+      <Link
+        href={`/wiki/library/portfolios/${event.portfolio_id.toString()}?tab=overview`}
+      >
         {cardContent}
       </Link>
     );
