@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { BlockEditor } from '@/components/atoms/TipTap/components/BlockEditor';
 import { createBrowserClient } from '@/utils/supabase/client';
-import { Content } from '@tiptap/react';
+import { Content } from '@tiptap/core';
 
 export default function AnnouncementArticlePage() {
   const params = useParams();
@@ -17,14 +17,11 @@ export default function AnnouncementArticlePage() {
 
   const ydoc = useMemo(() => new YDoc(), []);
 
-  // Fetch article data
   const { data: article, isLoading } = useQuery({
     queryKey: ['article', articleId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .eq('id', articleId)
+        .rpc('get_article_with_details', { article_id: parseInt(articleId) })
         .single();
 
       if (error) throw error;
@@ -77,7 +74,7 @@ export default function AnnouncementArticlePage() {
         ydoc={ydoc}
         canEdit={true}
         saveArticle={saveArticle}
-        initialContent={article?.content as Content}
+        article={article}
       />
     </div>
   );
