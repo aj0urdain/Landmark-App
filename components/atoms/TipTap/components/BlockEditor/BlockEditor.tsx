@@ -1,4 +1,4 @@
-import { Content, EditorContent } from '@tiptap/react';
+import { EditorContent } from '@tiptap/react';
 import React, { useRef, useState } from 'react';
 import { ReactElement } from 'react';
 
@@ -29,17 +29,19 @@ import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dot } from '@/components/atoms/Dot/Dot';
 import { format } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export const BlockEditor = ({
   ydoc,
   canEdit = false,
   saveArticle,
-  initialContent,
+  article,
 }: {
   ydoc: Y.Doc;
   canEdit?: boolean;
   saveArticle: (content: any) => Promise<void>;
-  initialContent: any;
+  article: any;
 }): ReactElement => {
   const menuContainerRef = useRef(null);
 
@@ -47,7 +49,7 @@ export const BlockEditor = ({
   const { editor } = useBlockEditor({
     ydoc,
     canEdit,
-    initialContent: initialContent as Content,
+    initialContent: article.content,
   });
 
   const [reactions, setReactions] = useState({
@@ -55,9 +57,10 @@ export const BlockEditor = ({
     laugh: 12,
     celebrate: 12,
     sad: 12,
+    angry: 12,
   });
 
-  const handleReaction = (type: 'heart' | 'laugh' | 'celebrate' | 'sad') => {
+  const handleReaction = (type: 'heart' | 'laugh' | 'celebrate' | 'sad' | 'angry') => {
     setReactions((prev) => ({
       ...prev,
       [type]: prev[type] + 1,
@@ -77,14 +80,21 @@ export const BlockEditor = ({
             />
           </div>
         )}
-        <div
-          className={`flex-1 h-full gap-12 ${canEdit ? 'ml-24 mr-24 my-12' : 'ml-0 mr-0 my-6'}`}
-        >
+        <div className={`flex-1 h-full gap-12 ${canEdit ? 'my-12' : 'my-6'}`}>
           <div className="flex flex-col gap-8">
             <div className="flex flex-row gap-4 items-center justify-between w-full">
-              <h2 className="text-muted-foreground font-medium">
-                {format(new Date(), 'EEEE, d MMMM yyyy')}
-              </h2>
+              {canEdit ? (
+                <div className="flex flex-col gap-2">
+                  <Label>Published Date</Label>
+                  <h2 className="text-muted-foreground font-medium">
+                    {format(new Date(article.created_at), 'EEEE, d MMMM yyyy')}
+                  </h2>
+                </div>
+              ) : (
+                <h2 className="text-muted-foreground font-medium">
+                  {format(new Date(article.created_at), 'EEEE, d MMMM yyyy')}
+                </h2>
+              )}
 
               <div className="flex flex-row gap-4 items-center">
                 <p className="text-muted-foreground">5 minute read</p>
@@ -93,20 +103,51 @@ export const BlockEditor = ({
               </div>
             </div>
             <div className="flex flex-col gap-4">
-              <div className="flex gap-4 mb-2">
-                <DepartmentBadge department="Burgess Rawson" list />
-                <DepartmentBadge department="Marketing" list />
-                <DepartmentBadge department="Technology" list />
-                <DepartmentBadge department="Senior Leadership" list />
-              </div>
-              <h1 className="text-5xl font-bold h-fit">
-                Burgess Rawson announces the release of Landmark, a new company intranet
-                in 2025
-              </h1>
-              <p className="text-lg text-muted-foreground italic">
-                Landmark is a new company intranet that will be utilised across the entire
-                Burgess Rawson national team.
-              </p>
+              {canEdit ? (
+                <div className="flex flex-col gap-2">
+                  <Label>Departments</Label>
+                  <div className="flex gap-4 mb-2">
+                    {article.departments.map((department: any) => (
+                      <DepartmentBadge department={department.name} list />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-4 mb-2">
+                  {article.departments.map((department: any) => (
+                    <DepartmentBadge department={department.name} list />
+                  ))}
+                </div>
+              )}
+              {canEdit ? (
+                <div className="flex flex-col gap-2">
+                  <Label>Title</Label>
+                  <Textarea
+                    className="text-5xl font-bold h-fit"
+                    value={article.title}
+                    rows={4}
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                    }}
+                  />
+                </div>
+              ) : (
+                <h1 className="text-5xl font-bold h-fit">{article.title}</h1>
+              )}
+              {canEdit ? (
+                <div className="flex flex-col gap-2">
+                  <Label>Description</Label>
+                  <Textarea
+                    className="text-lg text-muted-foreground italic"
+                    value={article.description}
+                    rows={4}
+                  />
+                </div>
+              ) : (
+                <p className="text-lg text-muted-foreground italic">
+                  {article.description}
+                </p>
+              )}
             </div>
             <div className="flex flex-row gap-4 w-full">
               <Card className="relative min-h-[150px] min-w-96 flex flex-row items-center gap-2 justify-between p-4">
@@ -161,6 +202,16 @@ export const BlockEditor = ({
                     <span>😢</span>
                     <p className="text-muted-foreground">{reactions.sad}</p>
                   </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      handleReaction('angry');
+                    }}
+                    className="flex items-center gap-2 text-2xl font-bold py-6"
+                  >
+                    <span>😡</span>
+                    <p className="text-muted-foreground">{reactions.angry}</p>
+                  </Button>
                 </Card>
 
                 <Card className="relative flex flex-row items-center gap-2 justify-between p-4 h-full">
@@ -171,7 +222,7 @@ export const BlockEditor = ({
             </div>
           </div>
           <Separator className="my-12" />
-          <EditorContent editor={editor} />
+          <EditorContent editor={editor} className={canEdit ? 'canEdit' : ''} />
           <Separator className="my-12" />
           <div className="flex flex-col gap-4">
             <h1 className="text-2xl font-bold">Comments</h1>
