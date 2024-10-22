@@ -1,7 +1,7 @@
 import { Icon } from '@/components/atoms/TipTap/components/ui/Icon';
 import { Toolbar } from '@/components/atoms/TipTap/components/ui/Toolbar';
 import DragHandle from '@tiptap-pro/extension-drag-handle-react';
-import { Editor } from '@tiptap/react';
+import { Editor } from '@tiptap/core';
 
 import * as Popover from '@radix-ui/react-popover';
 import { Surface } from '@/components/atoms/TipTap/components/ui/Surface';
@@ -35,6 +35,7 @@ export const ContentItemMenu = ({ editor }: ContentItemMenuProps) => {
       tippyOptions={{
         offset: [-2, 16],
         zIndex: 99,
+        interactive: true,
       }}
     >
       <div className="flex items-center gap-0.5">
