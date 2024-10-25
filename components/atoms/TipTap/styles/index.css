@@ -1,8 +1,10 @@
 .ProseMirror {
   /* @apply caret-black dark:caret-white outline-0 pr-8 pl-20 py-16 z-0 lg:pl-8 lg:pr-8 mx-auto; */
-  @apply caret-black dark:caret-white outline-0 mx-auto px-8;
+  @apply caret-black dark:caret-white outline-0 mx-auto;
 
-  @apply outline-0 z-0;
+  &.canEdit {
+    @apply mx-0 px-8;
+  }
 
   .selection {
     @apply inline;

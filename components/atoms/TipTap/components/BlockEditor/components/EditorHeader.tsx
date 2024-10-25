@@ -1,21 +1,14 @@
 import { EditorInfo } from './EditorInfo';
 
-import { useEditorState } from '@tiptap/react';
+import { Content, Editor, useEditorState } from '@tiptap/react';
 import { Button } from '@/components/ui/button';
 
 export interface EditorHeaderProps {
-  isSidebarOpen?: boolean;
-  toggleSidebar?: () => void;
-  editor: any;
-  saveArticle: (content: any) => Promise<void>;
+  editor: Editor;
+  saveArticle: (content: Content) => Promise<void>;
 }
 
-export const EditorHeader = ({
-  editor,
-  isSidebarOpen,
-  toggleSidebar,
-  saveArticle,
-}: EditorHeaderProps) => {
+export const EditorHeader = ({ editor, saveArticle }: EditorHeaderProps) => {
   const { characters, words } = useEditorState({
     editor,
     selector: (ctx): { characters: number; words: number } => {
@@ -28,12 +21,12 @@ export const EditorHeader = ({
   });
 
   return (
-    <div className="flex flex-row py-4 items-center px-12 w-full justify-between text-foreground bg-muted/20 border-b border-muted-foreground/50">
+    <div className="flex flex-row py-4 items-center px-12 w-full justify-between text-foreground bg-muted/20 border-b border-muted-foreground/50 backdrop-blur-2xl sticky top-20 z-10">
       <Button
         variant="outline"
         size="lg"
-        onClick={() => {
-          void saveArticle(editor.getJSON());
+        onClick={async () => {
+          await saveArticle(editor.getJSON());
         }}
       >
         Save Article

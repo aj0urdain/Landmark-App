@@ -7,14 +7,12 @@ export interface EditorInfoProps {
 
 export const EditorInfo = memo(({ characters, words }: EditorInfoProps) => {
   return (
-    <div className="flex items-center">
-      <div className="flex flex-col justify-center text-right text-muted-foreground">
-        <div className="text-xs font-semibold">
-          {words} {words === 1 ? 'word' : 'words'}
-        </div>
-        <div className="text-xs font-semibold">
-          {characters} {characters === 1 ? 'character' : 'characters'}
-        </div>
+    <div className="flex justify-center text-right text-muted-foreground gap-2">
+      <div className="text-xs font-semibold">
+        {words} {words === 1 ? 'word' : 'words'}
+      </div>
+      <div className="text-xs font-semibold">
+        {characters} {characters === 1 ? 'character' : 'characters'}
       </div>
     </div>
   );
