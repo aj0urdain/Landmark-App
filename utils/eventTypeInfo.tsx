@@ -140,7 +140,6 @@ export function getEventColor(event: Event): {
   let bgColor: string;
 
   if (!info) {
-    // Handle the case where info is undefined
     bgColor = '#000000'; // Default color
   } else if (event.type === 'auction' && typeof info.bgColor === 'object') {
     bgColor =
@@ -163,7 +162,7 @@ export function hexToRGBA(hex: string, alpha: number): string {
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
 
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  return `rgba(${r.toString()}, ${g.toString()}, ${b.toString()}, ${alpha.toString()})`;
 }
 
 export function getEventTypeOptions() {
