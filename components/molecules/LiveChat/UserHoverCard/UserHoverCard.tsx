@@ -1,20 +1,20 @@
-import { useState, useEffect } from "react";
-import { IdCard } from "lucide-react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { IdCard } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { createBrowserClient } from "@/utils/supabase/client";
-import DepartmentBadge from "@/components/molecules/DepartmentBadge/DepartmentBadge";
+} from '@/components/ui/hover-card';
+import { createBrowserClient } from '@/utils/supabase/client';
+import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
 
-import Image from "next/image";
-import { Portal } from "@radix-ui/react-portal";
+import Image from 'next/image';
+import { Portal } from '@radix-ui/react-portal';
 
-interface ChatUserHoverCardProps {
+interface UserHoverCardProps {
   userId: string;
   children: React.ReactNode;
 }
@@ -31,10 +31,7 @@ interface UserProfileComplete {
   roles: string[];
 }
 
-export function ChatUserHoverCard({
-  userId,
-  children,
-}: ChatUserHoverCardProps) {
+export function UserHoverCard({ userId, children }: UserHoverCardProps) {
   const [user, setUser] = useState<UserProfileComplete | null>(null);
   const supabase = createBrowserClient();
   const router = useRouter();
@@ -42,13 +39,13 @@ export function ChatUserHoverCard({
   useEffect(() => {
     const fetchUserProfile = async () => {
       const { data, error } = await supabase
-        .from("user_profile_complete")
-        .select("*")
-        .eq("id", userId)
+        .from('user_profile_complete')
+        .select('*')
+        .eq('id', userId)
         .single();
 
       if (error) {
-        console.error("Error fetching user profile:", error);
+        console.error('Error fetching user profile:', error);
       } else {
         setUser(data as unknown as UserProfileComplete);
       }
@@ -73,9 +70,9 @@ export function ChatUserHoverCard({
       <Portal>
         <HoverCardContent
           className="z-[9999] w-80 animate-slide-up-fade-in overflow-hidden p-0"
-          align="center"
+          align="start"
           side="top"
-          sideOffset={10}
+          sideOffset={15}
         >
           <div className="relative flex flex-col gap-2">
             <div className="flex w-full flex-col gap-2 p-4">
@@ -93,14 +90,14 @@ export function ChatUserHoverCard({
                 <Link
                   href={`/wiki/people/${user.first_name}-${user.last_name}`}
                   onClick={handleNameClick}
-                  className="cursor-pointer text-lg font-bold hover:underline"
+                  className="cursor-pointer text-lg  hover:underline"
                 >
-                  {user.first_name} {user.last_name}
+                  {user.first_name} <span className="font-bold">{user.last_name}</span>
                 </Link>
                 {user?.roles?.map((role: string) => (
                   <div
                     key={role}
-                    className="flex w-2/3 items-start gap-1 text-xs font-semibold text-muted-foreground"
+                    className="flex w-2/3 items-start gap-1 text-xs text-muted-foreground"
                   >
                     <IdCard className="h-4 w-4" />
                     {role}
