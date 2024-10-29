@@ -15,6 +15,8 @@ interface UserProfileCardProps {
   showRoles?: boolean;
   showAvatar?: boolean;
   className?: string;
+  avatarSize?: 'small' | 'medium' | 'large';
+  showHoverCard?: boolean;
 }
 
 export function UserProfileCard({
@@ -25,6 +27,8 @@ export function UserProfileCard({
   showRoles = false,
   showAvatar = false,
   className = '',
+  avatarSize = 'medium',
+  showHoverCard = true,
 }: UserProfileCardProps) {
   const supabase = createBrowserClient();
 
@@ -51,7 +55,7 @@ export function UserProfileCard({
   if (!user) return null;
 
   return (
-    <UserHoverCard userId={id}>
+    <UserHoverCard userId={id} visible={showHoverCard}>
       <Card
         className={`overflow-visible group cursor-pointer ${className} ${
           variant == 'minimal' ? 'px-0 py-0 border-transparent' : ''
@@ -64,7 +68,11 @@ export function UserProfileCard({
             {showAvatar && (
               <Avatar
                 className={`border border-muted bg-gradient-to-b transition-all from-transparent to-muted group-hover:border-muted-foreground/50 group-hover:to-muted-foreground/75 overflow-visible flex items-end justify-center ${
-                  variant === 'minimal' ? 'w-10 h-10' : 'w-14 h-14'
+                  avatarSize === 'small'
+                    ? 'w-8 h-8'
+                    : avatarSize === 'large'
+                      ? 'w-16 h-16'
+                      : 'w-14 h-14'
                 }`}
               >
                 <AvatarImage

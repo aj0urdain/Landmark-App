@@ -17,6 +17,7 @@ import { Portal } from '@radix-ui/react-portal';
 interface UserHoverCardProps {
   userId: string;
   children: React.ReactNode;
+  visible?: boolean;
 }
 
 interface UserProfileComplete {
@@ -31,7 +32,7 @@ interface UserProfileComplete {
   roles: string[];
 }
 
-export function UserHoverCard({ userId, children }: UserHoverCardProps) {
+export function UserHoverCard({ userId, children, visible = true }: UserHoverCardProps) {
   const [user, setUser] = useState<UserProfileComplete | null>(null);
   const supabase = createBrowserClient();
   const router = useRouter();
@@ -73,6 +74,7 @@ export function UserHoverCard({ userId, children }: UserHoverCardProps) {
           align="start"
           side="top"
           sideOffset={15}
+          hidden={!visible}
         >
           <div className="relative flex flex-col gap-2">
             <div className="flex w-full flex-col gap-2 p-4">
