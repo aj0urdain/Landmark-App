@@ -1,4 +1,4 @@
-import { Button } from '@/components/atoms/TipTap/components/ui/Button';
+import { Button } from '@/components/atoms/TipTap/components/ui/button';
 import { Icon } from '@/components/atoms/TipTap/components/ui/Icon';
 import { Surface } from '@/components/atoms/TipTap/components/ui/Surface';
 import { Toggle } from '@/components/atoms/TipTap/components/ui/Toggle';
