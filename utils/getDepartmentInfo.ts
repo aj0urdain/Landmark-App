@@ -10,8 +10,8 @@ import {
   PenTool,
   Database,
   Component,
-} from "lucide-react";
-import { LucideIcon } from "lucide-react";
+} from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 export interface DepartmentInfo {
   name: string;
@@ -22,83 +22,87 @@ export interface DepartmentInfo {
 
 export const departmentInfo: DepartmentInfo[] = [
   {
-    name: "All",
+    name: 'All',
     icon: Component,
-    color: "text-gray-500 border-gray-500",
-    link: "all",
+    color: 'text-gray-500 border-gray-500',
+    link: 'all',
   },
   {
-    name: "Burgess Rawson",
+    name: 'Burgess Rawson',
     icon: Building,
-    color: "text-emerald-500 border-emerald-500",
-    link: "burgess-rawson",
+    color: 'text-emerald-500 border-emerald-500',
+    link: 'burgess-rawson',
   },
   {
-    name: "Technology",
+    name: 'Technology',
     icon: CpuIcon,
-    color: "text-blue-500 border-blue-500",
-    link: "technology",
+    color: 'text-blue-500 border-blue-500',
+    link: 'technology',
   },
   {
-    name: "Senior Leadership",
+    name: 'Senior Leadership',
     icon: Award,
-    color: "text-purple-500 border-purple-500",
-    link: "senior-leadership",
+    color: 'text-purple-500 border-purple-500',
+    link: 'senior-leadership',
   },
   {
-    name: "Agency",
+    name: 'Agency',
     icon: Building,
-    color: "text-green-500 border-green-500",
-    link: "agency",
+    color: 'text-green-500 border-green-500',
+    link: 'agency',
   },
   {
-    name: "Marketing",
+    name: 'Marketing',
     icon: Megaphone,
-    color: "text-yellow-500 border-yellow-500",
-    link: "marketing",
+    color: 'text-yellow-500 border-yellow-500',
+    link: 'marketing',
   },
   {
-    name: "Asset Management",
+    name: 'Asset Management',
     icon: HandCoins,
-    color: "text-indigo-500 border-indigo-500",
-    link: "asset-management",
+    color: 'text-indigo-500 border-indigo-500',
+    link: 'asset-management',
   },
   {
-    name: "Finance",
+    name: 'Finance',
     icon: BadgeDollarSign,
-    color: "text-red-500 border-red-500",
-    link: "finance",
+    color: 'text-red-500 border-red-500',
+    link: 'finance',
   },
   {
-    name: "Operations",
+    name: 'Operations',
     icon: Cog,
-    color: "text-orange-500 border-orange-500",
-    link: "operations",
+    color: 'text-orange-500 border-orange-500',
+    link: 'operations',
   },
   {
-    name: "Human Resources",
+    name: 'Human Resources',
     icon: UserSearch,
-    color: "text-pink-500 border-pink-500",
-    link: "human-resources",
+    color: 'text-pink-500 border-pink-500',
+    link: 'human-resources',
   },
   {
-    name: "Design",
+    name: 'Design',
     icon: PenTool,
-    color: "text-teal-500 border-teal-500",
-    link: "design",
+    color: 'text-teal-500 border-teal-500',
+    link: 'design',
   },
   {
-    name: "Data",
+    name: 'Data',
     icon: Database,
-    color: "text-cyan-500 border-cyan-500",
-    link: "data",
+    color: 'text-cyan-500 border-cyan-500',
+    link: 'data',
   },
 ];
 
 export function getDepartmentInfo(
-  department: string,
+  department: string | number | null | undefined,
 ): DepartmentInfo | undefined {
+  console.log('getDepartmentInfo received:', department, typeof department);
+  if (!department) return undefined;
+
+  const departmentStr = department.toString();
   return departmentInfo.find(
-    (info) => info.name.toLowerCase() === department?.toLowerCase(),
+    (info) => info.name.toLowerCase() === departmentStr.toLowerCase(),
   );
 }
