@@ -1,6 +1,6 @@
 import { Spinner } from '@/components/atoms/TipTap/components/ui/Spinner';
 import { useDropZone, useFileUpload, useUploader } from './hooks';
-import { Button } from '@/components/atoms/TipTap/components/ui/button';
+import { Button } from '@/components/atoms/TipTap/components/ui/Button';
 import { Icon } from '@/components/atoms/TipTap/components/ui/Icon';
 import { cn } from '@/components/atoms/TipTap/lib/utils';
 import { ChangeEvent, useCallback } from 'react';

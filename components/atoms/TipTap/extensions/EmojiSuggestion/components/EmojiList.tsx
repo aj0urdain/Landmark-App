@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 
-import { Button } from '@/components/atoms/TipTap/components/ui/button';
+import { Button } from '@/components/atoms/TipTap/components/ui/Button';
 import { Panel } from '@/components/atoms/TipTap/components/ui/Panel';
 import { EmojiListProps } from '../types';
 import { SuggestionKeyDownProps } from '@tiptap/suggestion';
