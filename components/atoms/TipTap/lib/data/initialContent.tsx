@@ -350,7 +350,7 @@ export const initialContent = {
     {
       type: 'imageBlock',
       attrs: {
-        src: '/placeholder-image.jpg',
+        src: '/images/burgess-rawson-logo.png',
         width: '100%',
         align: 'center',
       },

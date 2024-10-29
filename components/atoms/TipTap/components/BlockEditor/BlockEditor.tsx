@@ -17,20 +17,20 @@ import { TextMenu } from '../menus/TextMenu';
 import { ContentItemMenu } from '../menus/ContentItemMenu';
 
 export const BlockEditor = ({
-  canEdit = false,
+  editing = false,
   editor,
 }: {
-  canEdit?: boolean;
+  editing: boolean;
   editor: Editor;
 }): ReactElement => {
   const menuContainerRef = useRef(null);
 
   return (
     <div className="flex h-full w-full" ref={menuContainerRef}>
-      <div className={`relative flex flex-col flex-1 h-full ${canEdit ? '' : ''}`}>
-        <EditorContent editor={editor} className={canEdit ? 'mx-0 px-8' : ''} />
+      <div className={`relative flex flex-col flex-1 h-full -mx-8`}>
+        <EditorContent editor={editor} />
 
-        {canEdit && (
+        {editing && (
           <>
             <ContentItemMenu editor={editor} />
             <LinkMenu editor={editor} appendTo={menuContainerRef} />

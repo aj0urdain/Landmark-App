@@ -35,43 +35,45 @@ export const TableRowMenu = React.memo(({ editor, appendTo }: MenuProps): JSX.El
   }, [editor]);
 
   return (
-    <BaseBubbleMenu
-      editor={editor}
-      pluginKey="tableRowMenu"
-      updateDelay={0}
-      tippyOptions={{
-        appendTo: () => {
-          return appendTo?.current;
-        },
-        placement: 'left',
-        offset: [0, 15],
-        popperOptions: {
-          modifiers: [{ name: 'flip', enabled: false }],
-        },
-      }}
-      shouldShow={shouldShow}
-    >
-      <Toolbar.Wrapper isVertical>
-        <PopoverMenu.Item
-          iconComponent={<Icon name="ArrowUpToLine" />}
-          close={false}
-          label="Add row before"
-          onClick={onAddRowBefore}
-        />
-        <PopoverMenu.Item
-          iconComponent={<Icon name="ArrowDownToLine" />}
-          close={false}
-          label="Add row after"
-          onClick={onAddRowAfter}
-        />
-        <PopoverMenu.Item
-          icon="Trash"
-          close={false}
-          label="Delete row"
-          onClick={onDeleteRow}
-        />
-      </Toolbar.Wrapper>
-    </BaseBubbleMenu>
+    <div>
+      <BaseBubbleMenu
+        editor={editor}
+        pluginKey="tableRowMenu"
+        updateDelay={0}
+        tippyOptions={{
+          appendTo: () => {
+            return appendTo?.current;
+          },
+          placement: 'left',
+          offset: [0, 15],
+          popperOptions: {
+            modifiers: [{ name: 'flip', enabled: false }],
+          },
+        }}
+        shouldShow={shouldShow}
+      >
+        <Toolbar.Wrapper isVertical>
+          <PopoverMenu.Item
+            iconComponent={<Icon name="ArrowUpToLine" />}
+            close={false}
+            label="Add row before"
+            onClick={onAddRowBefore}
+          />
+          <PopoverMenu.Item
+            iconComponent={<Icon name="ArrowDownToLine" />}
+            close={false}
+            label="Add row after"
+            onClick={onAddRowAfter}
+          />
+          <PopoverMenu.Item
+            icon="Trash"
+            close={false}
+            label="Delete row"
+            onClick={onDeleteRow}
+          />
+        </Toolbar.Wrapper>
+      </BaseBubbleMenu>
+    </div>
   );
 });
 

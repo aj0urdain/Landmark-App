@@ -13,26 +13,31 @@ declare global {
 
 export const useBlockEditor = ({
   ydoc,
-  canEdit,
+  editing,
   initialContent,
+  enabled = true,
 }: {
   ydoc: YDoc;
-  canEdit: boolean;
+  editing: boolean;
   initialContent: Content;
+  enabled: boolean;
 }) => {
   const editor = useEditor(
     {
-      editable: canEdit,
+      editable: enabled && editing,
       immediatelyRender: true,
       shouldRerenderOnTransaction: false,
-      autofocus: canEdit,
-      onCreate: (ctx) => {
-        if (ctx.editor.isEmpty) {
-          ctx.editor.commands.setContent(initialContent);
-          ctx.editor.commands.focus('start', { scrollIntoView: true });
+      autofocus: editing,
+      extensions: ExtensionKit({}),
+      content: initialContent,
+      onCreate: ({ editor }) => {
+        if (editor.isEmpty && initialContent) {
+          editor.commands.setContent(initialContent);
+          if (editing) {
+            editor.commands.focus('start', { scrollIntoView: true });
+          }
         }
       },
-      extensions: ExtensionKit({}),
       editorProps: {
         attributes: {
           autocomplete: 'off',
@@ -42,7 +47,7 @@ export const useBlockEditor = ({
         },
       },
     },
-    [ydoc, canEdit],
+    [ydoc, editing, initialContent],
   );
 
   window.editor = editor;

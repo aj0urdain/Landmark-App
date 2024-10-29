@@ -74,53 +74,55 @@ export const ImageBlockMenu = ({ editor, appendTo }: MenuProps): React.JSX.Eleme
   });
 
   return (
-    <BaseBubbleMenu
-      editor={editor}
-      pluginKey={`imageBlockMenu-${uuid()}`}
-      shouldShow={shouldShow}
-      updateDelay={0}
-      tippyOptions={{
-        offset: [0, 8],
-        popperOptions: {
-          modifiers: [{ name: 'flip', enabled: false }],
-        },
-        getReferenceClientRect,
-        onCreate: (instance: Instance) => {
-          tippyInstance.current = instance;
-        },
-        appendTo: () => {
-          return appendTo?.current;
-        },
-        plugins: [sticky],
-        sticky: 'popper',
-      }}
-    >
-      <Toolbar.Wrapper shouldShowContent={shouldShow()} ref={menuRef}>
-        <Toolbar.Button
-          tooltip="Align image left"
-          active={isImageLeft}
-          onClick={onAlignImageLeft}
-        >
-          <Icon name="AlignHorizontalDistributeStart" />
-        </Toolbar.Button>
-        <Toolbar.Button
-          tooltip="Align image center"
-          active={isImageCenter}
-          onClick={onAlignImageCenter}
-        >
-          <Icon name="AlignHorizontalDistributeCenter" />
-        </Toolbar.Button>
-        <Toolbar.Button
-          tooltip="Align image right"
-          active={isImageRight}
-          onClick={onAlignImageRight}
-        >
-          <Icon name="AlignHorizontalDistributeEnd" />
-        </Toolbar.Button>
-        <Toolbar.Divider />
-        <ImageBlockWidth onChange={onWidthChange} value={width} />
-      </Toolbar.Wrapper>
-    </BaseBubbleMenu>
+    <div>
+      <BaseBubbleMenu
+        editor={editor}
+        pluginKey={`imageBlockMenu-${uuid()}`}
+        shouldShow={shouldShow}
+        updateDelay={0}
+        tippyOptions={{
+          offset: [0, 8],
+          popperOptions: {
+            modifiers: [{ name: 'flip', enabled: false }],
+          },
+          getReferenceClientRect,
+          onCreate: (instance: Instance) => {
+            tippyInstance.current = instance;
+          },
+          appendTo: () => {
+            return appendTo?.current;
+          },
+          plugins: [sticky],
+          sticky: 'popper',
+        }}
+      >
+        <Toolbar.Wrapper shouldShowContent={shouldShow()} ref={menuRef}>
+          <Toolbar.Button
+            tooltip="Align image left"
+            active={isImageLeft}
+            onClick={onAlignImageLeft}
+          >
+            <Icon name="AlignHorizontalDistributeStart" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            tooltip="Align image center"
+            active={isImageCenter}
+            onClick={onAlignImageCenter}
+          >
+            <Icon name="AlignHorizontalDistributeCenter" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            tooltip="Align image right"
+            active={isImageRight}
+            onClick={onAlignImageRight}
+          >
+            <Icon name="AlignHorizontalDistributeEnd" />
+          </Toolbar.Button>
+          <Toolbar.Divider />
+          <ImageBlockWidth onChange={onWidthChange} value={width} />
+        </Toolbar.Wrapper>
+      </BaseBubbleMenu>
+    </div>
   );
 };
 

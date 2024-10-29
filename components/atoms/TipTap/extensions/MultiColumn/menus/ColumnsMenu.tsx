@@ -50,42 +50,48 @@ export const ColumnsMenu = ({ editor, appendTo }: MenuProps) => {
   });
 
   return (
-    <BaseBubbleMenu
-      editor={editor}
-      pluginKey={`columnsMenu-${uuid()}`}
-      shouldShow={shouldShow}
-      updateDelay={0}
-      tippyOptions={{
-        offset: [0, 8],
-        popperOptions: {
-          modifiers: [{ name: 'flip', enabled: false }],
-        },
-        getReferenceClientRect,
-        appendTo: () => appendTo?.current,
-        plugins: [sticky],
-        sticky: 'popper',
-      }}
-    >
-      <Toolbar.Wrapper>
-        <Toolbar.Button
-          tooltip="Sidebar left"
-          active={isColumnLeft}
-          onClick={onColumnLeft}
-        >
-          <Icon name="PanelLeft" />
-        </Toolbar.Button>
-        <Toolbar.Button tooltip="Two columns" active={isColumnTwo} onClick={onColumnTwo}>
-          <Icon name="Columns2" />
-        </Toolbar.Button>
-        <Toolbar.Button
-          tooltip="Sidebar right"
-          active={isColumnRight}
-          onClick={onColumnRight}
-        >
-          <Icon name="PanelRight" />
-        </Toolbar.Button>
-      </Toolbar.Wrapper>
-    </BaseBubbleMenu>
+    <div>
+      <BaseBubbleMenu
+        editor={editor}
+        pluginKey={`columnsMenu-${uuid()}`}
+        shouldShow={shouldShow}
+        updateDelay={0}
+        tippyOptions={{
+          offset: [0, 8],
+          popperOptions: {
+            modifiers: [{ name: 'flip', enabled: false }],
+          },
+          getReferenceClientRect,
+          appendTo: () => appendTo?.current,
+          plugins: [sticky],
+          sticky: 'popper',
+        }}
+      >
+        <Toolbar.Wrapper>
+          <Toolbar.Button
+            tooltip="Sidebar left"
+            active={isColumnLeft}
+            onClick={onColumnLeft}
+          >
+            <Icon name="PanelLeft" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            tooltip="Two columns"
+            active={isColumnTwo}
+            onClick={onColumnTwo}
+          >
+            <Icon name="Columns2" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            tooltip="Sidebar right"
+            active={isColumnRight}
+            onClick={onColumnRight}
+          >
+            <Icon name="PanelRight" />
+          </Toolbar.Button>
+        </Toolbar.Wrapper>
+      </BaseBubbleMenu>
+    </div>
   );
 };
 

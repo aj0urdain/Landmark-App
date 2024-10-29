@@ -44,33 +44,35 @@ export const LinkMenu = ({ editor, appendTo }: MenuProps): JSX.Element => {
   }, [editor]);
 
   return (
-    <BaseBubbleMenu
-      editor={editor}
-      pluginKey="textMenu"
-      shouldShow={shouldShow}
-      updateDelay={0}
-      tippyOptions={{
-        popperOptions: {
-          modifiers: [{ name: 'flip', enabled: false }],
-        },
-        appendTo: () => {
-          return appendTo?.current;
-        },
-        onHidden: () => {
-          setShowEdit(false);
-        },
-      }}
-    >
-      {showEdit ? (
-        <LinkEditorPanel
-          initialUrl={link}
-          initialOpenInNewTab={target === '_blank'}
-          onSetLink={onSetLink}
-        />
-      ) : (
-        <LinkPreviewPanel url={link} onClear={onUnsetLink} onEdit={handleEdit} />
-      )}
-    </BaseBubbleMenu>
+    <div>
+      <BaseBubbleMenu
+        editor={editor}
+        pluginKey="textMenu"
+        shouldShow={shouldShow}
+        updateDelay={0}
+        tippyOptions={{
+          popperOptions: {
+            modifiers: [{ name: 'flip', enabled: false }],
+          },
+          appendTo: () => {
+            return appendTo?.current;
+          },
+          onHidden: () => {
+            setShowEdit(false);
+          },
+        }}
+      >
+        {showEdit ? (
+          <LinkEditorPanel
+            initialUrl={link}
+            initialOpenInNewTab={target === '_blank'}
+            onSetLink={onSetLink}
+          />
+        ) : (
+          <LinkPreviewPanel url={link} onClear={onUnsetLink} onEdit={handleEdit} />
+        )}
+      </BaseBubbleMenu>
+    </div>
   );
 };
 

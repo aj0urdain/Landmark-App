@@ -36,42 +36,44 @@ export const TableColumnMenu = React.memo(
     }, [editor]);
 
     return (
-      <BaseBubbleMenu
-        editor={editor}
-        pluginKey="tableColumnMenu"
-        updateDelay={0}
-        tippyOptions={{
-          appendTo: () => {
-            return appendTo?.current;
-          },
-          offset: [0, 15],
-          popperOptions: {
-            modifiers: [{ name: 'flip', enabled: false }],
-          },
-        }}
-        shouldShow={shouldShow}
-      >
-        <Toolbar.Wrapper isVertical>
-          <PopoverMenu.Item
-            iconComponent={<Icon name="ArrowLeftToLine" />}
-            close={false}
-            label="Add column before"
-            onClick={onAddColumnBefore}
-          />
-          <PopoverMenu.Item
-            iconComponent={<Icon name="ArrowRightToLine" />}
-            close={false}
-            label="Add column after"
-            onClick={onAddColumnAfter}
-          />
-          <PopoverMenu.Item
-            icon="Trash"
-            close={false}
-            label="Delete column"
-            onClick={onDeleteColumn}
-          />
-        </Toolbar.Wrapper>
-      </BaseBubbleMenu>
+      <div>
+        <BaseBubbleMenu
+          editor={editor}
+          pluginKey="tableColumnMenu"
+          updateDelay={0}
+          tippyOptions={{
+            appendTo: () => {
+              return appendTo?.current;
+            },
+            offset: [0, 15],
+            popperOptions: {
+              modifiers: [{ name: 'flip', enabled: false }],
+            },
+          }}
+          shouldShow={shouldShow}
+        >
+          <Toolbar.Wrapper isVertical>
+            <PopoverMenu.Item
+              iconComponent={<Icon name="ArrowLeftToLine" />}
+              close={false}
+              label="Add column before"
+              onClick={onAddColumnBefore}
+            />
+            <PopoverMenu.Item
+              iconComponent={<Icon name="ArrowRightToLine" />}
+              close={false}
+              label="Add column after"
+              onClick={onAddColumnAfter}
+            />
+            <PopoverMenu.Item
+              icon="Trash"
+              close={false}
+              label="Delete column"
+              onClick={onDeleteColumn}
+            />
+          </Toolbar.Wrapper>
+        </BaseBubbleMenu>
+      </div>
     );
   },
 );
