@@ -96,8 +96,8 @@ export function UserPage() {
     const today = new Date();
     const years = differenceInYears(today, start);
     const months = differenceInMonths(today, start) % 12;
-    return `${years.toFixed(1)} year${years !== 1 ? 's' : ''}, ${months.toFixed(
-      1,
+    return `${years.toFixed(0)} year${years !== 1 ? 's' : ''}, ${months.toFixed(
+      0,
     )} month${months !== 1 ? 's' : ''}`;
   };
 
