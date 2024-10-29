@@ -1,7 +1,7 @@
 import React from 'react';
 import { Article } from '@/types/articleTypes';
 import { Share } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 const ArticleShareButton = ({
   article,

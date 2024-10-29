@@ -1,6 +1,6 @@
 import React from 'react';
 import { Article } from '@/types/articleTypes';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
 
 const ArticleViews = ({ article, editing }: { article: Article; editing: boolean }) => {

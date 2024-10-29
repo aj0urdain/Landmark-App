@@ -1,6 +1,6 @@
 import React from 'react';
 import { Article } from '@/types/articleTypes';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
 
 const ArticleCommentsButton = ({
