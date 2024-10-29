@@ -5,45 +5,21 @@ import { Button } from '@/components/ui/button';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MessageCircle, Send } from 'lucide-react';
-
-interface User {
-  id: string;
-  first_name: string;
-  last_name: string;
-  profile_picture: string | null;
-}
-
-interface Reaction {
-  user_id: string;
-  react_time: string;
-  user: User;
-}
-
-interface Comment {
-  id: string;
-  comment: string;
-  created_at: string;
-  created_by: User;
-  parent_id: string | null;
-  reactions: Reaction[] | null;
-}
-
-interface CommentSectionProps {
-  entity_id: string;
-  entity_type: string;
-  onSubmitComment: (content: string, replyToId: string | null) => void;
-  onReact: (commentId: string, reactionType: string) => void;
-  setCommentNumber: (number: number) => void;
-  commentNumber: number;
-}
+import { Comment, CommentSectionProps } from '@/types/commentTypes';
 
 const organizeComments = (comments: Comment[]): Comment[] => {
   const commentMap: { [key: string]: Comment } = {};
   const rootComments: Comment[] = [];
 
-  // First pass: create a map of all comments and identify root comments
+  // First pass: create a map of all comments
   comments.forEach((comment) => {
-    commentMap[comment.id] = { ...comment, replies: [] };
+    commentMap[comment.id] = {
+      ...comment,
+      replies: [],
+      parentComment: comment.parent_id
+        ? (comments.find((c) => c.id === comment.parent_id) ?? undefined)
+        : undefined,
+    };
     if (!comment.parent_id) {
       rootComments.push(commentMap[comment.id]);
     }
@@ -95,11 +71,13 @@ const scrollToComment = (commentId: string) => {
   const commentElement = document.getElementById(`comment-${commentId}`);
   if (commentElement) {
     commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    console.log('Comment element not found');
   }
 };
 
 export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionProps>(
-  ({ entity_id, entity_type, onReact, setCommentNumber, commentNumber }, ref) => {
+  ({ entity_id, entity_type, setCommentNumber, commentNumber }, ref) => {
     const supabase = createBrowserClient();
     const [newComment, setNewComment] = useState('');
 
@@ -131,6 +109,52 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
 
     const queryClient = useQueryClient();
 
+    const handleReaction = (commentId: string, reactionType: string) => {
+      void (async () => {
+        try {
+          console.log(
+            `Attempting to toggle reaction: ${reactionType} for comment: ${commentId}`,
+          );
+
+          const { data, error } = await supabase.rpc('toggle_comment_reaction', {
+            p_comment_id: commentId,
+            p_reaction_type: reactionType,
+          });
+
+          if (error) {
+            console.error('Error updating reaction:', error);
+            throw error;
+          }
+
+          console.log('Reaction toggle result:', data);
+
+          // Invalidate the query to fetch fresh data
+          await queryClient.invalidateQueries({
+            queryKey: ['comments', entity_id, entity_type],
+          });
+
+          console.log('Query invalidated, fetching fresh data...');
+
+          // Fetch the updated comments immediately to verify the change
+          const { data: updatedComments, error: fetchError } = await supabase.rpc(
+            'get_comments_with_reactions',
+            {
+              p_entity_id: entity_id,
+              p_entity_type: entity_type,
+            },
+          );
+
+          if (fetchError) {
+            console.error('Error fetching updated comments:', fetchError);
+          } else {
+            console.log('Updated comments:', updatedComments);
+          }
+        } catch (error) {
+          console.error('Error in handleReaction:', error);
+        }
+      })();
+    };
+
     const submitCommentMutation = useMutation({
       mutationFn: async (newCommentData: {
         content: string;
@@ -147,7 +171,10 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
           .select('*')
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error submitting comment:', error);
+        }
+
         return data;
       },
       onSuccess: async () => {
@@ -177,7 +204,7 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
     if (error) console.error('Error loading comments:', error);
 
     return (
-      <div className="flex flex-col gap-8 w-full" ref={ref}>
+      <div className="flex flex-col gap-8 w-full scroll-mt-48" ref={ref}>
         <div className="flex items-center justify-start gap-2">
           <MessageCircle className="w-6 h-6" />
           <h1 className="text-2xl font-bold">
@@ -190,10 +217,14 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
             placeholder="Write a comment..."
             value={newComment}
             className="w-full"
-            onChange={(e) => handleNewCommentChange(e.target.value)}
+            onChange={(e) => {
+              handleNewCommentChange(e.target.value);
+            }}
           />
           <Button
-            onClick={() => handleSubmitComment(newComment)}
+            onClick={() => {
+              void handleSubmitComment(newComment);
+            }}
             variant="outline"
             className="mt-2 w-fit"
           >
@@ -202,15 +233,22 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
           </Button>
         </div>
         {comments && comments.length > 0 ? (
-          comments.map((comment) => (
-            <CommentThread
-              key={comment.id}
-              comment={comment}
-              onReact={onReact}
-              onReply={(content, parentId) => handleSubmitComment(content, parentId)}
-              scrollToComment={scrollToComment}
-            />
-          ))
+          comments.map((comment) => {
+            console.log('comment below for commentid ', comment.id);
+            console.log(comment);
+            return (
+              <CommentThread
+                key={comment.id}
+                comment={comment}
+                onReact={handleReaction}
+                onReply={(content, parentId) => {
+                  void handleSubmitComment(content, parentId);
+                }}
+                scrollToComment={scrollToComment}
+                parentComment={comment.parentComment}
+              />
+            );
+          })
         ) : (
           <p className="text-gray-500 italic">
             No comments yet. Be the first to comment!

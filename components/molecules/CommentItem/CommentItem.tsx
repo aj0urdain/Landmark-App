@@ -7,6 +7,7 @@ import ReactTimeAgo from 'react-time-ago';
 import { Dot } from '@/components/atoms/Dot/Dot';
 import { ReactionSummary } from '@/components/molecules/ReactionSummary/ReactionSummary';
 import { ReplyForm } from '@/components/molecules/ReplyForm/ReplyForm';
+import { Reaction } from '@/types/commentTypes';
 
 interface CommentItemProps {
   id: string;
@@ -72,7 +73,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
           className={`border border-muted bg-gradient-to-b transition-all from-transparent to-muted group-hover:border-muted-foreground/50 group-hover:to-muted-foreground/75 overflow-visible flex items-end justify-center mt-1 ${isReply ? 'w-8 h-8' : 'w-14 h-14'}`}
         >
           <AvatarImage
-            src={created_by.profile_picture}
+            src={created_by.profile_picture ?? ''}
             alt={`${created_by.first_name} ${created_by.last_name}`}
             className="object-cover rounded-b-full w-auto h-[120%]"
           />
@@ -96,10 +97,10 @@ export const CommentItem: React.FC<CommentItemProps> = ({
               </div>
             </div>
           </div>
-          <p className={`mt-1 text-sm flex items-center gap-2`}>
+          <p className={`mt-1 text-sm flex items-center gap-1 font-medium`}>
             {isReply && (
               <span
-                className="text-muted-foreground hover:underline cursor-pointer"
+                className="text-muted-foreground hover:underline font-normal cursor-pointer"
                 onClick={() => scrollToComment?.(id)}
               >
                 @{replyUserName}
@@ -110,9 +111,11 @@ export const CommentItem: React.FC<CommentItemProps> = ({
           <div className="flex mt-2 items-start">
             <ReactionSummary
               reactions={reactions}
-              onReact={(reactionType) => onReact(id, reactionType)}
+              onReact={(reactionType) => {
+                onReact(id, reactionType);
+              }}
               onReply={handleReply}
-              currentUserId={currentUser?.id} // Pass the current user's ID from the query
+              currentUserId={currentUser?.id ?? ''}
             />
           </div>
           {isReplyFormOpen && (
@@ -122,7 +125,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 onChange={onReplyContentChange}
                 onSubmit={handleSubmitReply}
                 onCancel={handleCancelReply}
-                replyUserName={replyUserName}
+                replyUserName={`${created_by.first_name} ${created_by.last_name}`}
               />
             </div>
           )}
