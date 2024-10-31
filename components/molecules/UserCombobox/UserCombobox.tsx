@@ -9,6 +9,7 @@ interface UserComboboxProps {
   placeholder: string;
   excludeUserIds?: string[];
   className?: string;
+  modal?: boolean;
 }
 
 export function UserCombobox({
@@ -17,6 +18,7 @@ export function UserCombobox({
   placeholder,
   excludeUserIds = [],
   className,
+  modal = false,
 }: UserComboboxProps) {
   const supabase = createBrowserClient();
 
@@ -69,6 +71,7 @@ export function UserCombobox({
       placeholder={placeholder}
       className={className}
       avatar
+      modal={modal}
     />
   );
 }
