@@ -1,8 +1,6 @@
 import { Content, useEditor } from '@tiptap/react';
 import type { Editor } from '@tiptap/core';
 
-import type { Doc as YDoc } from 'yjs';
-
 import { ExtensionKit } from '@/components/atoms/TipTap/extensions/extension-kit';
 
 declare global {
@@ -12,14 +10,12 @@ declare global {
 }
 
 export const useBlockEditor = ({
-  ydoc,
   editing,
-  initialContent,
+  initialContent = { type: 'doc', content: [{ type: 'paragraph' }] },
   enabled = true,
 }: {
-  ydoc: YDoc;
   editing: boolean;
-  initialContent: Content;
+  initialContent?: Content;
   enabled: boolean;
 }) => {
   const editor = useEditor(
@@ -47,7 +43,7 @@ export const useBlockEditor = ({
         },
       },
     },
-    [ydoc, editing, initialContent],
+    [editing, initialContent],
   );
 
   window.editor = editor;

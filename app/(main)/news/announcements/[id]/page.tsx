@@ -14,100 +14,208 @@ import ArticleActions from '@/components/molecules/ArticleActions/ArticleActions
 import ArticleAuthors from '@/components/molecules/ArticleAuthors/ArticleAuthors';
 import { CommentSection } from '@/components/organisms/CommentSection/CommentSection';
 import { Separator } from '@/components/ui/separator';
-import { Article } from '@/types/articleTypes';
 import { getArticle } from '@/utils/use-cases/articles/getArticle';
-import { useQuery } from '@tanstack/react-query';
-import { Content } from '@tiptap/react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { useParams } from 'next/navigation';
-import React, { useMemo, useRef, useState } from 'react';
-import { Doc as YDoc } from 'yjs';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+
+import { useToast } from '@/hooks/use-toast';
+import { debounce } from 'lodash';
+import { updateArticleContent } from '@/utils/use-cases/articles/updateArticleContent';
+import { LoaderCircle } from 'lucide-react';
 
 const AnnouncementArticlePage = () => {
   const params = useParams();
   const articleId = params.id as string;
-  const ydoc = useMemo(() => new YDoc(), []);
+
   const [editing, setEditing] = useState(false);
   const [commentNumber, setCommentNumber] = useState(0);
 
-  const [editForm, setEditForm] = useState<unknown>({});
-
   const commentSectionRef = useRef<HTMLDivElement>(null);
+
+  const articleTitleRef = useRef<HTMLDivElement>(null);
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ['article', articleId],
     queryFn: async () => {
-      return await getArticle(parseInt(articleId));
+      const { article, isAuthor, error } = await getArticle(parseInt(articleId));
+
+      if (error) {
+        console.error(error);
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+
+      return { article, isAuthor };
     },
   });
 
   const { editor } = useBlockEditor({
-    ydoc,
     editing,
-    initialContent: (data?.article?.content as Content) ?? {},
-    enabled: !isLoading && !!data?.article?.content,
+    initialContent: null,
+    enabled: true,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  // Use useEffect to update the content once data is loaded
+  useEffect(() => {
+    if (data?.article?.content) {
+      editor.commands.setContent(data.article.content);
+    }
+  }, [data?.article?.content, editor]);
 
-  const { article, isAuthor } = data ?? {};
+  const { mutateAsync: updateContent } = useMutation({
+    mutationFn: (content: Record<string, unknown>) =>
+      updateArticleContent(
+        parseInt(articleId),
+        JSON.parse(JSON.stringify(content)) as Record<string, unknown>,
+      ),
+    onError: () => {
+      toast({
+        title: 'Error saving changes',
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: async () => {
+      toast({
+        title: 'Changes saved',
+        description: 'Your article has been updated successfully.',
+      });
+      // Invalidate without resetting editor state
+      await queryClient.invalidateQueries({
+        queryKey: ['article', articleId],
+        refetchType: 'none', // Prevent automatic refetch
+      });
+    },
+  });
+
+  const debouncedSave = useMemo(
+    () =>
+      debounce((content: Record<string, unknown>) => {
+        const plainContent = JSON.parse(JSON.stringify(content)) as Record<
+          string,
+          unknown
+        >;
+        void updateContent(plainContent);
+      }, 2000),
+    [updateContent],
+  );
+
+  useEffect(() => {
+    if (editing) {
+      const handleUpdate = () => {
+        const content = editor.getJSON();
+        debouncedSave(content);
+      };
+
+      editor.on('update', handleUpdate);
+      return () => {
+        editor.off('update', handleUpdate);
+        debouncedSave.cancel();
+      };
+    }
+  }, [editor, editing, debouncedSave]);
+
+  // Add this effect after the content loads
+  useEffect(() => {
+    if (!isLoading && articleTitleRef.current) {
+      setTimeout(() => {
+        articleTitleRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100); // Small delay to ensure content is rendered
+    }
+  }, [isLoading]);
+
+  if (isLoading)
+    return (
+      <div className="flex items-start justify-center min-h-screen py-2 max-w-4xl w-full mx-auto animate-pulse">
+        <LoaderCircle className="animate-spin" />
+      </div>
+    );
+
+  // If there's no data or no article, show an error or return early
+  if (!data?.article) {
+    return <div>Article not found</div>;
+  }
+
+  const { article, isAuthor } = data;
 
   return (
-    <div className="flex flex-col items-start justify-start min-h-screen py-2">
+    <div className="flex flex-col items-start justify-start min-h-screen py-2 max-w-4xl w-full mx-auto">
       {isAuthor && (
         <EditorHeader
           editor={editor}
-          // saveArticle={saveArticle}
-          // hasChanges={hasChanges}
           editing={editing}
-          toggleEditMode={() => {
-            setEditing((prev) => !prev);
-          }}
+          setEditing={setEditing}
+          article={article}
         />
       )}
 
       <div className="flex flex-col gap-16">
-        <ArticleCoverImage article={article ?? ({} as Article)} editing={editing} />
-        <div className="flex flex-col gap-12">
-          <ArticleDate article={article ?? ({} as Article)} editing={editing} />
+        <div className="animate-slide-down-fade-in opacity-0 [animation-delay:_0.25s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+          <ArticleCoverImage article={article} editing={editing} />
+        </div>
+        <div className="flex flex-col gap-12 -mt-14 z-10">
+          <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_0.75s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+            <ArticleDate article={article} editing={editing} />
+          </div>
           <div className="flex flex-col gap-12">
-            <div className="flex flex-col gap-6">
-              <ArticleDepartments
-                article={article ?? ({} as Article)}
-                editing={editing}
-              />
-              <div className="flex flex-col gap-4">
-                <ArticleTitle article={article ?? ({} as Article)} editing={editing} />
-                <ArticleDescription
-                  article={article ?? ({} as Article)}
+            <div className="flex flex-col gap-12">
+              <div className="flex flex-col gap-6">
+                <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_1s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+                  <ArticleDepartments article={article} editing={editing} />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div
+                    ref={articleTitleRef}
+                    className="animate-slide-left-fade-in opacity-0 [animation-delay:_1.25s] [animation-duration:_2s] [animation-fill-mode:_forwards]"
+                  >
+                    <ArticleTitle article={article} editing={editing} />
+                  </div>
+                  <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_1.5s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+                    <ArticleDescription article={article} editing={editing} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_1.75s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+                <ArticleAuthors article={article} editing={editing} />
+              </div>
+              <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_2s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+                <ArticleActions
+                  article={article}
                   editing={editing}
+                  commentNumber={commentNumber}
+                  commentSectionRef={commentSectionRef}
                 />
               </div>
             </div>
-
-            <ArticleAuthors article={article ?? ({} as Article)} editing={editing} />
-
-            <ArticleActions
-              article={article ?? ({} as Article)}
-              editing={editing}
-              commentNumber={commentNumber}
-              commentSectionRef={commentSectionRef}
-            />
           </div>
         </div>
-      </div>
-      <Separator className="my-12" />
-      {article?.content && <BlockEditor editing={editing} editor={editor} />}
-      <Separator className="mb-12" />
-      <ArticleReactions article={article ?? ({} as Article)} editing={editing} />
-      <Separator className="my-12" />
+        <Separator className="w-full -my-6" />
+        <div className="animate-slide-down-fade-in opacity-0 [animation-delay:_2.75s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+          {article.content && <BlockEditor editing={editing} editor={editor} />}
+        </div>
+        <Separator className="w-full -my-6" />
+        <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_3.25s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+          <ArticleReactions article={article} editing={editing} />
+        </div>
 
-      <CommentSection
-        ref={commentSectionRef}
-        entity_id={articleId}
-        entity_type="article"
-        setCommentNumber={setCommentNumber}
-        commentNumber={commentNumber}
-      />
+        <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_3.5s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+          <CommentSection
+            ref={commentSectionRef}
+            entity_id={articleId}
+            entity_type="article"
+            setCommentNumber={setCommentNumber}
+            commentNumber={commentNumber}
+          />
+        </div>
+      </div>
     </div>
   );
 };
