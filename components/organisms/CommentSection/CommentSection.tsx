@@ -6,6 +6,7 @@ import { createBrowserClient } from '@/utils/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MessageCircle, Send } from 'lucide-react';
 import { Comment, CommentSectionProps } from '@/types/commentTypes';
+import { Input } from '@/components/ui/input';
 
 const organizeComments = (comments: Comment[]): Comment[] => {
   const commentMap: { [key: string]: Comment } = {};
@@ -93,9 +94,6 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
           p_entity_type: entity_type,
         });
 
-        console.log('comment data');
-        console.log(data);
-
         if (data === null) {
           setCommentNumber(0);
           return [];
@@ -126,14 +124,10 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
             throw error;
           }
 
-          console.log('Reaction toggle result:', data);
-
           // Invalidate the query to fetch fresh data
           await queryClient.invalidateQueries({
             queryKey: ['comments', entity_id, entity_type],
           });
-
-          console.log('Query invalidated, fetching fresh data...');
 
           // Fetch the updated comments immediately to verify the change
           const { data: updatedComments, error: fetchError } = await supabase.rpc(
@@ -146,8 +140,6 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
 
           if (fetchError) {
             console.error('Error fetching updated comments:', fetchError);
-          } else {
-            console.log('Updated comments:', updatedComments);
           }
         } catch (error) {
           console.error('Error in handleReaction:', error);
@@ -205,20 +197,25 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
 
     return (
       <div className="flex flex-col gap-8 w-full scroll-mt-48" ref={ref}>
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-center justify-start gap-2 text-muted-foreground">
           <MessageCircle className="w-6 h-6" />
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-xl font-bold">
             {commentNumber} Comment
             <span>{commentNumber != 1 && 's'}</span>
           </h1>
         </div>
         <div className="mb-4 flex flex-col items-end">
-          <Textarea
+          <Input
             placeholder="Write a comment..."
             value={newComment}
             className="w-full"
             onChange={(e) => {
               handleNewCommentChange(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                void handleSubmitComment(newComment);
+              }
             }}
           />
           <Button
@@ -234,8 +231,6 @@ export const CommentSection = React.forwardRef<HTMLDivElement, CommentSectionPro
         </div>
         {comments && comments.length > 0 ? (
           comments.map((comment) => {
-            console.log('comment below for commentid ', comment.id);
-            console.log(comment);
             return (
               <CommentThread
                 key={comment.id}
