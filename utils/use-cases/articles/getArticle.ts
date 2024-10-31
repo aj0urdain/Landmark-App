@@ -11,7 +11,12 @@ export const getArticle = async (articleId: number) => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const article = await getArticleWithDetails(articleId);
+  const { article, error } = await getArticleWithDetails(articleId);
+
+  if (error) {
+    console.error('Error fetching article:', error);
+    return { article: null, isAuthor: false };
+  }
 
   if (user && article) {
     isAuthor = [
@@ -21,5 +26,5 @@ export const getArticle = async (articleId: number) => {
     ].includes(user.id);
   }
 
-  return { article, isAuthor };
+  return { article, isAuthor, error };
 };

@@ -98,7 +98,6 @@ export const departmentInfo: DepartmentInfo[] = [
 export function getDepartmentInfo(
   department: string | number | null | undefined,
 ): DepartmentInfo | undefined {
-  console.log('getDepartmentInfo received:', department, typeof department);
   if (!department) return undefined;
 
   const departmentStr = department.toString();

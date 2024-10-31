@@ -10,12 +10,34 @@ export const getArticleWithDetails = async (articleId: number) => {
     article_id: articleId,
   })) as { data: Article | null; error: unknown };
 
-  console.log(article);
-
   if (error) {
     console.error('Error fetching article:', error);
-    return null;
+    return { article: null, error };
   }
 
-  return article;
+  return { article, error };
+};
+
+export const patchArticleContent = async (
+  articleId: number,
+  content: Record<string, unknown>,
+) => {
+  const supabase = await createServerClient();
+
+  const { data, error } = await supabase
+    .from('articles')
+    .update({ content })
+    .eq('id', articleId);
+
+  return { data, error };
+};
+
+export const createArticle = async (articleType: string) => {
+  const supabase = await createServerClient();
+
+  const { data, error } = await supabase.from('articles').insert({
+    type: articleType,
+  });
+
+  return { data, error };
 };
