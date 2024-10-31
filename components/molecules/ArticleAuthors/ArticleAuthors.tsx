@@ -4,7 +4,7 @@ import { UserProfileCard } from '../UserProfileCard/UserProfileCard';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
-import { Pencil, PlusCircle, User } from 'lucide-react';
+import { Pencil, PlusCircle, Trash, User, UserPen } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/tooltip';
 
 const ArticleAuthors = ({ article, editing }: { article: Article; editing: boolean }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSecondaryDialogOpen, setIsSecondaryDialogOpen] = useState(false);
+  const [isTertiaryDialogOpen, setIsTertiaryDialogOpen] = useState(false);
   const [authors, setAuthors] = useState({
     primary: article.author.id,
     secondary: article.author_secondary?.id ?? null,
@@ -33,26 +34,49 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
   const supabase = createBrowserClient();
   const queryClient = useQueryClient();
 
-  const handleAuthorsUpdate = async () => {
+  const handleSecondaryAuthorUpdate = async () => {
     const { error } = await supabase
       .from('articles')
       .update({
-        author_id: authors.primary,
-        author_id_secondary: authors.secondary,
-        author_id_tertiary: authors.tertiary,
+        author_id_secondary: authors.secondary ?? null,
       })
       .eq('id', article.id)
       .select();
 
     if (!error) {
-      setIsDialogOpen(false);
+      setIsSecondaryDialogOpen(false);
     } else {
-      console.error('Error updating authors:', error);
+      console.error('Error updating secondary author:', error);
     }
   };
 
-  const authorsMutation = useMutation({
-    mutationFn: handleAuthorsUpdate,
+  const handleTertiaryAuthorUpdate = async () => {
+    const { error } = await supabase
+      .from('articles')
+      .update({
+        author_id_tertiary: authors.tertiary ?? null,
+      })
+      .eq('id', article.id)
+      .select();
+
+    if (!error) {
+      setIsTertiaryDialogOpen(false);
+    } else {
+      console.error('Error updating tertiary author:', error);
+    }
+  };
+
+  const secondaryAuthorMutation = useMutation({
+    mutationFn: handleSecondaryAuthorUpdate,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['article', article.id.toString()],
+      });
+    },
+  });
+
+  const tertiaryAuthorMutation = useMutation({
+    mutationFn: handleTertiaryAuthorUpdate,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['article', article.id.toString()],
@@ -81,7 +105,10 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                 <Tooltip>
                   <TooltipTrigger>
                     <div className="flex flex-col items-start gap-2">
-                      <Label>Main</Label>
+                      <Label className="flex flex-row gap-1 items-center text-muted-foreground/50">
+                        <UserPen className="w-4 h-4" />
+                        Main
+                      </Label>
                       <Button
                         variant="outline"
                         className="flex items-center gap-2 border-none cursor-not-allowed"
@@ -102,11 +129,14 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                 </Tooltip>
               </TooltipProvider>
               <div className="flex flex-col gap-2">
-                <Label>Secondary</Label>
+                <Label className="flex flex-row gap-1 items-center text-muted-foreground/50">
+                  <UserPen className="w-4 h-4" />
+                  Secondary
+                </Label>
                 {article.author_secondary ? (
                   <Button
                     variant="outline"
-                    onClick={() => setIsDialogOpen(true)}
+                    onClick={() => setIsSecondaryDialogOpen(true)}
                     className="flex items-center gap-2"
                   >
                     <p className="text-muted-foreground">
@@ -119,7 +149,7 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                 ) : (
                   <Button
                     variant="outline"
-                    onClick={() => setIsDialogOpen(true)}
+                    onClick={() => setIsSecondaryDialogOpen(true)}
                     className="flex items-center gap-2"
                   >
                     <PlusCircle className="w-4 h-4" />
@@ -127,33 +157,38 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                   </Button>
                 )}
               </div>
-              <div className="flex flex-col gap-2">
-                <Label>Tertiary</Label>
-                {article.author_tertiary ? (
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <UserProfileCard
-                      id={article.author_tertiary.id}
-                      showAvatar
-                      variant="minimal"
-                      showName
-                      showRoles
-                    />
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                    Add Tertiary Author
-                  </Button>
-                )}
-              </div>
+              {article.author_secondary && (
+                <div className="flex flex-col gap-2">
+                  <Label className="flex flex-row gap-1 items-center text-muted-foreground/50">
+                    <UserPen className="w-4 h-4" />
+                    Tertiary
+                  </Label>
+                  {article.author_tertiary ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsTertiaryDialogOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <UserProfileCard
+                        id={article.author_tertiary.id}
+                        showAvatar
+                        variant="minimal"
+                        showName
+                        showRoles
+                      />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsTertiaryDialogOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      Add Tertiary Author
+                    </Button>
+                  )}
+                </div>
+              )}
             </>
           ) : (
             <>
@@ -190,47 +225,102 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
         </div>
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog open={isSecondaryDialogOpen} onOpenChange={setIsSecondaryDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Authors</DialogTitle>
+            <DialogTitle>Edit Secondary Author</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-8 py-4">
-            <div className="grid gap-6">
-              <div className="flex flex-col gap-2">
-                <Label className="text-muted-foreground text-sm">Secondary Author</Label>
-                <UserCombobox
-                  placeholder="Select Secondary Author"
-                  selectedUserId={authors.secondary}
-                  onChange={(userId) =>
-                    setAuthors((prev) => ({ ...prev, secondary: userId }))
-                  }
-                  excludeUserIds={
-                    [authors.primary, authors.tertiary].filter(Boolean) as string[]
-                  }
-                />
-              </div>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <Label className="text-muted-foreground text-sm">Secondary Author</Label>
+              <UserCombobox
+                modal
+                placeholder="Select Secondary Author"
+                selectedUserId={authors.secondary}
+                onChange={(userId) =>
+                  setAuthors((prev) => ({
+                    ...prev,
+                    secondary: userId === '' ? null : userId,
+                  }))
+                }
+                excludeUserIds={
+                  [authors.primary, authors.tertiary].filter(Boolean) as string[]
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex flex-row justify-between w-full">
+            {article.author_secondary && (
+              <Button
+                variant="destructive"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  setAuthors((prev) => ({ ...prev, secondary: null }));
+                  secondaryAuthorMutation.mutate();
+                  setIsSecondaryDialogOpen(false);
+                }}
+              >
+                <Trash className="w-4 h-4" />
+              </Button>
+            )}
+            <div className="flex flex-row gap-2 w-full justify-end">
+              <Button variant="outline" onClick={() => setIsSecondaryDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => secondaryAuthorMutation.mutate()}>
+                Save changes
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-              <div className="flex flex-col gap-2">
-                <Label className="text-muted-foreground text-sm">Tertiary Author</Label>
-                <UserCombobox
-                  placeholder="Select Tertiary Author"
-                  selectedUserId={authors.tertiary}
-                  onChange={(userId) =>
-                    setAuthors((prev) => ({ ...prev, tertiary: userId }))
-                  }
-                  excludeUserIds={
-                    [authors.primary, authors.secondary].filter(Boolean) as string[]
-                  }
-                />
-              </div>
+      <Dialog open={isTertiaryDialogOpen} onOpenChange={setIsTertiaryDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Tertiary Author</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <Label className="text-muted-foreground text-sm">Tertiary Author</Label>
+              <UserCombobox
+                modal
+                placeholder="Select Tertiary Author"
+                selectedUserId={authors.tertiary}
+                onChange={(userId) => {
+                  setAuthors((prev) => ({
+                    ...prev,
+                    tertiary: userId === '' ? null : userId,
+                  }));
+                }}
+                excludeUserIds={
+                  [authors.primary, authors.secondary].filter(Boolean) as string[]
+                }
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
+            <Button variant="outline" className="flex items-center gap-2">
+              <Trash className="w-4 h-4" />
+              Remove Tertiary Author
             </Button>
-            <Button onClick={() => authorsMutation.mutate()}>Save changes</Button>
+            <div className="flex flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsTertiaryDialogOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  tertiaryAuthorMutation.mutate();
+                }}
+              >
+                Save changes
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

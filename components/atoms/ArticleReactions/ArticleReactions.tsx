@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Article } from '@/types/articleTypes';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -19,6 +19,7 @@ const ArticleReactions = ({
   const queryClient = useQueryClient();
   const { data: currentUser } = useQuery(userProfileOptions);
   const currentUserId = currentUser?.id;
+  const [isOpen, setIsOpen] = useState(false);
 
   // Determine the user's selected reaction
   const userReaction = article.reactions?.find(
@@ -80,7 +81,7 @@ const ArticleReactions = ({
 
   const handleReaction = async (reactionType: string) => {
     const supabase = createBrowserClient();
-    const { data, error } = await supabase.rpc('toggle_article_reaction', {
+    const { error } = await supabase.rpc('toggle_article_reaction', {
       p_article_id: article.id,
       p_reaction_type: reactionType,
     });
@@ -93,11 +94,13 @@ const ArticleReactions = ({
     await queryClient.invalidateQueries({
       queryKey: ['article', article.id.toString()],
     });
+
+    setIsOpen(false);
   };
 
   return (
-    <div className="flex items-center flex-row justify-start gap-2">
-      <Popover>
+    <div className="flex items-center flex-row justify-start gap-4">
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="gap-2 flex items-center">
             <SmilePlus className="h-4 w-4" />
@@ -127,7 +130,7 @@ const ArticleReactions = ({
         <Button
           variant="ghost"
           size="default"
-          className="flex items-center gap-1.5 hover:bg-transparent group/reaction-summary p-0 transition-all"
+          className="flex items-center gap-1.5 text-lg hover:bg-transparent group/reaction-summary p-0 transition-all"
         >
           <div className="flex items-center gap-1">
             {activeReactions.map(([type, { emoji }]) => (

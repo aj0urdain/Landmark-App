@@ -71,7 +71,7 @@ const ArticleDescription = ({ article, editing }: ArticleDescriptionProps) => {
           </Label>
         )}
         <div className="flex flex-row gap-4 items-center">
-          <p className="text-xl text-muted-foreground group-hover:cursor-pointer group-hover:text-warning-foreground">
+          <p className="text-xl text-muted-foreground font-medium group-hover:cursor-pointer group-hover:text-warning-foreground">
             {article.description}
           </p>
         </div>

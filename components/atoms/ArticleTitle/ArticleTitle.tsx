@@ -72,7 +72,7 @@ const ArticleTitle = ({ article, editing }: ArticleTitleProps) => {
           </Label>
         )}
         <div className="flex flex-row gap-4 items-center">
-          <h1 className="text-5xl font-bold">{article.title}</h1>
+          <h1 className="text-5xl font-black tracking-tight">{article.title}</h1>
         </div>
       </div>
 
