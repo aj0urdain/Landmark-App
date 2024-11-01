@@ -1,6 +1,6 @@
 'use server';
 
-import { getArticleWithDetails } from '@/utils/supabase/articles/articles';
+import { getRawArticle } from '@/utils/supabase/articles/articles';
 import { createServerClient } from '@/utils/supabase/server';
 
 export const getArticle = async (articleId: number) => {
@@ -11,18 +11,18 @@ export const getArticle = async (articleId: number) => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { article, error } = await getArticleWithDetails(articleId);
+  const { article, error } = await getRawArticle(articleId);
 
   if (error) {
     console.error('Error fetching article:', error);
-    return { article: null, isAuthor: false };
+    return { article: null, isAuthor: false, error };
   }
 
   if (user && article) {
     isAuthor = [
-      article.author.id,
-      article.author_secondary?.id,
-      article.author_tertiary?.id,
+      article.author_id,
+      article.author_id_secondary,
+      article.author_id_tertiary,
     ].includes(user.id);
   }
 

@@ -18,6 +18,17 @@ export const getArticleWithDetails = async (articleId: number) => {
   return { article, error };
 };
 
+export const getRawArticle = async (articleId: number) => {
+  const supabase = await createServerClient();
+  const { data: article, error } = (await supabase
+    .from('articles')
+    .select('*')
+    .eq('id', articleId)
+    .single()) as { data: Article | null; error: unknown };
+
+  return { article, error };
+};
+
 export const patchArticleContent = async (
   articleId: number,
   content: Record<string, unknown>,

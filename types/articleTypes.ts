@@ -10,7 +10,6 @@ export interface Reaction {
   type: 'like' | 'love' | 'laugh' | 'fire' | 'sad';
   user_id: string;
   react_time: string;
-  user: User;
 }
 
 export interface Comment {
@@ -42,14 +41,18 @@ export interface Article {
   cover_image: string | null;
   created_at: string;
   updated_at: string;
-  author: User;
-  author_secondary: User | null;
-  author_tertiary: User | null;
+  author_id: string;
+  author_id_secondary: string | null;
+  author_id_tertiary: string | null;
   title: string;
   description: string;
-  content: string;
+  content: {
+    type: string;
+    content: Record<string, unknown>[];
+  };
   views: number;
-  viewers: User[] | null;
-  departments: Department[];
-  reactions: Reaction[];
+  viewer_ids: string[];
+  departments: number[];
+  reactions: Record<string, Reaction[]>;
+  public: boolean;
 }
