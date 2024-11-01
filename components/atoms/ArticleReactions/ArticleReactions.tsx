@@ -1,52 +1,58 @@
 import React, { useState } from 'react';
-import { Article } from '@/types/articleTypes';
+import { Article, Reaction } from '@/types/articleTypes';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CirclePlus, MessageCircle, SmilePlus } from 'lucide-react';
+import { SmilePlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useUser } from '@/hooks/useUser';
-import { userProfileOptions } from '@/types/userProfileTypes';
 
-const ArticleReactions = ({
-  article,
-  editing,
-}: {
-  article: Article;
-  editing: boolean;
-}) => {
+import { userProfileOptions } from '@/types/userProfileTypes';
+import { useUserProfile } from '@/hooks/useUserProfile';
+
+const ArticleReactions = ({ article }: { article: Article }) => {
   const queryClient = useQueryClient();
   const { data: currentUser } = useQuery(userProfileOptions);
   const currentUserId = currentUser?.id;
   const [isOpen, setIsOpen] = useState(false);
 
   // Determine the user's selected reaction
-  const userReaction = article.reactions?.find(
-    (reaction) => reaction.user_id === currentUserId,
+  const userReaction = article.reactions.find(
+    (reaction: Reaction) => reaction.user_id === currentUserId,
   );
-  const selectedReaction = userReaction ? userReaction.type : null;
+
+  const selectedReaction = userReaction?.type ?? null;
 
   const allReactions = {
     like: {
       emoji: '👍',
-      reactions: article.reactions?.filter((reaction) => reaction.type === 'like') ?? [],
+      reactions: Array.isArray(article.reactions)
+        ? article.reactions.filter((reaction: Reaction) => reaction.type === 'like')
+        : [],
     },
     love: {
       emoji: '❤️',
-      reactions: article.reactions?.filter((reaction) => reaction.type === 'love') ?? [],
+      reactions: Array.isArray(article.reactions)
+        ? article.reactions.filter((reaction: Reaction) => reaction.type === 'love')
+        : [],
     },
     laugh: {
       emoji: '😂',
-      reactions: article.reactions?.filter((reaction) => reaction.type === 'laugh') ?? [],
+      reactions: Array.isArray(article.reactions)
+        ? article.reactions.filter((reaction: Reaction) => reaction.type === 'laugh')
+        : [],
     },
     fire: {
       emoji: '🔥',
-      reactions: article.reactions?.filter((reaction) => reaction.type === 'fire') ?? [],
+      reactions: Array.isArray(article.reactions)
+        ? article.reactions.filter((reaction: Reaction) => reaction.type === 'fire')
+        : [],
     },
     sad: {
       emoji: '😢',
-      reactions: article.reactions?.filter((reaction) => reaction.type === 'sad') ?? [],
+      reactions: Array.isArray(article.reactions)
+        ? article.reactions.filter((reaction: Reaction) => reaction.type === 'sad')
+        : [],
     },
   };
 
@@ -58,7 +64,9 @@ const ArticleReactions = ({
         type,
         {
           emoji,
-          reactions: article.reactions?.filter((r) => r.type === type) ?? [],
+          reactions: Array.isArray(article.reactions)
+            ? article.reactions.filter((reaction: Reaction) => reaction.type === type)
+            : [],
         },
       ]),
     ),
@@ -68,15 +76,23 @@ const ArticleReactions = ({
     ([_, { reactions }]) => reactions.length > 0,
   );
 
-  const totalReactions = article.reactions?.length || 0;
+  const totalReactions = Array.isArray(article.reactions) ? article.reactions.length : 0;
 
   // Get latest reactor for the summary text
-  const latestReaction = article.reactions?.sort(
-    (a, b) => new Date(b.react_time).getTime() - new Date(a.react_time).getTime(),
-  )[0];
+  const latestReaction =
+    Array.isArray(article.reactions) && article.reactions.length > 0
+      ? article.reactions.sort(
+          (a: Reaction, b: Reaction) =>
+            new Date(b.react_time).getTime() - new Date(a.react_time).getTime(),
+        )[0]
+      : null;
 
-  const latestReactor = latestReaction?.user
-    ? `${latestReaction.user.first_name} ${latestReaction.user.last_name}`
+  const latestReactorId = latestReaction?.user_id;
+
+  const { data: latestReactorProfile } = useUserProfile(latestReactorId as string);
+
+  const latestReactor = latestReactorProfile
+    ? `${latestReactorProfile.first_name} ${latestReactorProfile.last_name}`
     : '';
 
   const handleReaction = async (reactionType: string) => {
@@ -99,7 +115,7 @@ const ArticleReactions = ({
   };
 
   return (
-    <div className="flex items-center flex-row justify-start gap-4">
+    <div className="flex items-center flex-row justify-start gap-4 group/reaction-popover">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="gap-2 flex items-center">
@@ -107,7 +123,11 @@ const ArticleReactions = ({
             {/* <p>React!</p> */}
           </Button>
         </PopoverTrigger>
-
+        {totalReactions === 0 && (
+          <p className="text-muted text-sm select-none group-hover/reaction-popover:text-muted-foreground transition-colors">
+            React to this article!
+          </p>
+        )}
         <PopoverContent className="w-auto p-1" side="right">
           <div className="flex gap-1">
             {Object.entries(allReactions).map(([key, { emoji }]) => (

@@ -43,7 +43,7 @@ const ArticleCoverImage = ({
         return [];
       }
       console.log('Buckets:', data); // Debug log
-      return data || [];
+      return data;
     },
   });
 
@@ -67,7 +67,7 @@ const ArticleCoverImage = ({
       console.log('Files in bucket:', files); // Debug log
 
       return Promise.all(
-        (files || []).map(async (file) => {
+        files.map(async (file) => {
           const {
             data: { publicUrl },
           } = supabase.storage.from(selectedBucket).getPublicUrl(file.name);
@@ -306,8 +306,8 @@ const ArticleCoverImage = ({
     </Dialog>
   ) : (
     <ImageContainer
-      image={article.cover_image ?? ''}
-      title={article.title}
+      image={article?.cover_image ?? ''}
+      title={article?.title ?? ''}
       editing={editing}
     />
   );
