@@ -12,6 +12,7 @@ import {
   Component,
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { createBrowserClient } from './supabase/client';
 
 export interface DepartmentInfo {
   name: string;
@@ -104,4 +105,24 @@ export function getDepartmentInfo(
   return departmentInfo.find(
     (info) => info.name.toLowerCase() === departmentStr.toLowerCase(),
   );
+}
+
+export async function getDepartmentName(department: number): Promise<string | undefined> {
+  const supabase = createBrowserClient();
+
+  console.log('department');
+  console.log(department);
+
+  const { data, error } = await supabase
+    .from('departments')
+    .select('department_name')
+    .eq('id', department)
+    .single();
+
+  if (error) {
+    console.error('Error fetching department name:', error);
+    return undefined;
+  }
+
+  return data.department_name;
 }

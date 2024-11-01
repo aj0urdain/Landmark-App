@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Ban, Component, PencilIcon, PlusIcon, Check } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { getDepartmentInfo } from '@/utils/getDepartmentInfo';
+import { departmentInfo, getDepartmentInfo } from '@/utils/getDepartmentInfo';
 import { cn } from '@/lib/utils';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
@@ -44,17 +44,36 @@ const ArticleDepartments = ({
         .order('department_name');
 
       if (error) throw error;
-      return data;
+
+      // join departmentnames and id from supabase with departmentInfo metadata
+      const enrichedDepartments = data.map((dept) => ({
+        ...dept,
+        ...(departmentInfo.find((info) => info.name === dept.department_name) ?? {
+          color: 'gray',
+          backgroundColor: 'bg-gray-100',
+        }),
+      }));
+
+      console.log(`enrichedDepartments`);
+      console.log(enrichedDepartments);
+
+      console.log(`data`);
+      console.log(data);
+
+      return enrichedDepartments;
+      // return data;
     },
   });
 
   useEffect(() => {
     if (isDialogOpen) {
-      setSelectedDepartments(article.departments.map((dept) => dept.id));
+      setSelectedDepartments(article.departments.map((dept) => dept));
     }
   }, [isDialogOpen, article.departments]);
 
   const handleDepartmentRemove = async (departmentId: number) => {
+    console.log(`attempting to remove ${departmentId}`);
+
     if (article.departments.length === 1) {
       const burgessRawsonDept = allDepartments?.find(
         (dept) => dept.department_name.toLowerCase() === 'burgess rawson',
@@ -77,8 +96,8 @@ const ArticleDepartments = ({
     }
 
     const updatedDepartments = article.departments
-      .filter((dept) => dept.id !== departmentId)
-      .map((dept) => dept.id);
+      .filter((dept) => dept !== departmentId)
+      .map((dept) => dept);
 
     const { error } = await supabase
       .from('articles')
@@ -132,6 +151,10 @@ const ArticleDepartments = ({
     });
   };
 
+  if (!allDepartments) return null;
+
+  if (!article.departments) return null;
+
   return editing ? (
     <>
       <div className="flex flex-col gap-4 group items-start justify-center">
@@ -150,58 +173,64 @@ const ArticleDepartments = ({
             Add Department
           </Button>
           <Separator orientation="vertical" className="h-4" />
-          {article.departments.map((department) => {
-            const departmentInformation = getDepartmentInfo(department.name);
+          {article.departments.length > 0 &&
+            article.departments.map((department) => {
+              const fullDepartment = allDepartments.find((dept) => dept.id == department);
 
-            if (!departmentInformation) {
-              return null;
-            }
+              const departmentInformation = getDepartmentInfo(
+                fullDepartment?.department_name,
+              );
 
-            const { icon: Icon, color } = departmentInformation;
+              if (!departmentInformation) {
+                return null;
+              }
 
-            return (
-              <TooltipProvider>
-                <Tooltip delayDuration={100}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      key={department.id}
-                      variant="outline"
-                      className={`flex flex-row gap-2 group/department transition-all duration-300 hover:bg-destructive hover:text-primary
+              const { icon: Icon, color } = departmentInformation;
+
+              return (
+                <TooltipProvider>
+                  <Tooltip delayDuration={100}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        key={fullDepartment?.id}
+                        variant="outline"
+                        className={`flex flex-row gap-2 group/department transition-all duration-300 hover:bg-destructive hover:text-primary
                         ${article.departments.length <= 1 ? 'cursor-not-allowed hover:border-destructive hover:bg-muted hover:text-muted-foreground' : ''}
                         `}
-                      onClick={() => {
-                        if (article.departments.length <= 1) return;
-                        removeDepartmentMutation.mutate(department.id);
-                      }}
-                    >
-                      <Ban className="w-4 h-4 hidden group-hover/department:block group-hover/department:animate-slide-down-fade-in" />
-                      <Icon
-                        className={cn(
-                          'w-4 h-4 block group-hover/department:hidden animate-slide-up-fade-in',
-                          color,
-                        )}
-                      />
-                      <span
-                        className={cn(
-                          `${color} group-hover/department:text-primary text-sm`,
-                        )}
-                      >
-                        {department.name}
-                      </span>
-                    </Button>
-                  </TooltipTrigger>
+                        onClick={() => {
+                          if (article.departments.length <= 1) return;
 
-                  <TooltipContent
-                    hidden={article.departments.length > 1}
-                    side="right"
-                    className="text-primary bg-destructive"
-                  >
-                    <p>Every article must have at least one department!</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            );
-          })}
+                          removeDepartmentMutation.mutate(department);
+                        }}
+                      >
+                        <Ban className="w-4 h-4 hidden group-hover/department:block group-hover/department:animate-slide-down-fade-in" />
+                        <Icon
+                          className={cn(
+                            'w-4 h-4 block group-hover/department:hidden animate-slide-up-fade-in',
+                            color,
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            `${color} group-hover/department:text-primary text-sm`,
+                          )}
+                        >
+                          {fullDepartment?.department_name}
+                        </span>
+                      </Button>
+                    </TooltipTrigger>
+
+                    <TooltipContent
+                      hidden={article.departments.length > 1}
+                      side="right"
+                      className="text-primary bg-destructive"
+                    >
+                      <p>Every article must have at least one department!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              );
+            })}
         </div>
       </div>
 
@@ -263,14 +292,20 @@ const ArticleDepartments = ({
     </>
   ) : (
     <div className="flex flex-row gap-8">
-      {article.departments.map((department) => (
-        <DepartmentBadge
-          key={department.id}
-          department={department.name}
-          list
-          size="large"
-        />
-      ))}
+      {article?.departments?.length > 0 &&
+        article.departments.map((department) => {
+          const fullDepartment = allDepartments.find((dept) => dept.id == department);
+
+          if (!fullDepartment) return null;
+          return (
+            <DepartmentBadge
+              key={fullDepartment.id}
+              department={fullDepartment.department_name}
+              list
+              size="large"
+            />
+          );
+        })}
     </div>
   );
 };
