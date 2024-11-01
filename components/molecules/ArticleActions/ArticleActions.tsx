@@ -18,7 +18,7 @@ const ArticleActions = ({
 }) => {
   return (
     <div className="flex flex-row gap-2 text-muted-foreground">
-      <ArticleViews article={article} editing={editing} />
+      <ArticleViews article={article} />
       <ArticleCommentsButton
         article={article}
         editing={editing}

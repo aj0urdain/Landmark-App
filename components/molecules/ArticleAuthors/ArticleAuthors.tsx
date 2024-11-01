@@ -21,18 +21,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const ArticleAuthors = ({ article, editing }: { article: Article; editing: boolean }) => {
   const [isSecondaryDialogOpen, setIsSecondaryDialogOpen] = useState(false);
   const [isTertiaryDialogOpen, setIsTertiaryDialogOpen] = useState(false);
   const [authors, setAuthors] = useState({
-    primary: article.author.id,
-    secondary: article.author_secondary?.id ?? null,
-    tertiary: article.author_tertiary?.id ?? null,
+    primary: article.author_id,
+    secondary: article.author_id_secondary ?? null,
+    tertiary: article.author_id_tertiary ?? null,
   });
 
   const supabase = createBrowserClient();
   const queryClient = useQueryClient();
+
+  const primaryAuthor = useUserProfile(authors.primary);
+  const secondaryAuthor = useUserProfile(authors.secondary);
+  const tertiaryAuthor = useUserProfile(authors.tertiary);
 
   const handleSecondaryAuthorUpdate = async () => {
     const { error } = await supabase
@@ -114,8 +119,10 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                         className="flex items-center gap-2 border-none cursor-not-allowed"
                       >
                         <p className="text-muted-foreground">
-                          {article.author.first_name}{' '}
-                          <span className="font-bold">{article.author.last_name}</span>
+                          {primaryAuthor.data?.first_name}{' '}
+                          <span className="font-bold">
+                            {primaryAuthor.data?.last_name}
+                          </span>
                         </p>
                       </Button>
                     </div>
@@ -133,17 +140,15 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                   <UserPen className="w-4 h-4" />
                   Secondary
                 </Label>
-                {article.author_secondary ? (
+                {secondaryAuthor.data ? (
                   <Button
                     variant="outline"
                     onClick={() => setIsSecondaryDialogOpen(true)}
                     className="flex items-center gap-2"
                   >
                     <p className="text-muted-foreground">
-                      {article.author_secondary.first_name}{' '}
-                      <span className="font-bold">
-                        {article.author_secondary.last_name}
-                      </span>
+                      {secondaryAuthor.data.first_name}{' '}
+                      <span className="font-bold">{secondaryAuthor.data.last_name}</span>
                     </p>
                   </Button>
                 ) : (
@@ -157,20 +162,20 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                   </Button>
                 )}
               </div>
-              {article.author_secondary && (
+              {secondaryAuthor.data && (
                 <div className="flex flex-col gap-2">
                   <Label className="flex flex-row gap-1 items-center text-muted-foreground/50">
                     <UserPen className="w-4 h-4" />
                     Tertiary
                   </Label>
-                  {article.author_tertiary ? (
+                  {tertiaryAuthor.data ? (
                     <Button
                       variant="outline"
                       onClick={() => setIsTertiaryDialogOpen(true)}
                       className="flex items-center gap-2"
                     >
                       <UserProfileCard
-                        id={article.author_tertiary.id}
+                        id={tertiaryAuthor.data.id}
                         showAvatar
                         variant="minimal"
                         showName
@@ -193,16 +198,16 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
           ) : (
             <>
               <UserProfileCard
-                id={article.author.id}
+                id={article.author_id}
                 showAvatar
                 variant="minimal"
                 showName
                 showRoles
                 avatarSize="small"
               />
-              {article.author_secondary && (
+              {article.author_id_secondary && (
                 <UserProfileCard
-                  id={article.author_secondary.id}
+                  id={article.author_id_secondary}
                   showAvatar
                   variant="minimal"
                   showName
@@ -210,9 +215,9 @@ const ArticleAuthors = ({ article, editing }: { article: Article; editing: boole
                   avatarSize="small"
                 />
               )}
-              {article.author_tertiary && (
+              {article.author_id_tertiary && (
                 <UserProfileCard
-                  id={article.author_tertiary.id}
+                  id={article.author_id_tertiary}
                   showAvatar
                   variant="minimal"
                   showName
