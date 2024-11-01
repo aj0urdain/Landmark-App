@@ -193,12 +193,19 @@ const EventsPage = () => {
   const { data: events, isLoading, error } = useCalendarEvents();
   const { data: activePortfolio, isLoading: isLoadingPortfolio } = useActivePortfolio();
 
+  // Add this new ref to track initial load
+  const isInitialLoad = useRef(true);
+
   useEffect(() => {
-    const highlightTab = searchParams.get('highlightTab');
-    if (highlightTab) {
-      handleTabChange(highlightTab);
+    // Only scroll if it's the initial load
+    if (isInitialLoad.current) {
+      const highlightTab = searchParams.get('highlightTab');
+      if (highlightTab) {
+        handleTabChange(highlightTab);
+      }
+      isInitialLoad.current = false;
     }
-  }, [searchParams, handleTabChange]);
+  }, [searchParams]); // Remove handleTabChange from dependencies
 
   // Calculate the start and end of the week for the selected date
   const selectedWeek = useMemo(() => {

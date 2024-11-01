@@ -49,22 +49,18 @@ const AnnouncementArticlePage = () => {
         throw error instanceof Error ? error : new Error(String(error));
       }
 
+      console.log(`article content for article title ${article?.title.toString()}`);
+      console.log(article?.content);
+
       return { article, isAuthor };
     },
   });
 
   const { editor } = useBlockEditor({
     editing,
-    initialContent: null,
+    initialContent: data?.article?.content ?? null,
     enabled: true,
   });
-
-  // Use useEffect to update the content once data is loaded
-  useEffect(() => {
-    if (data?.article?.content) {
-      editor.commands.setContent(data.article.content);
-    }
-  }, [data?.article?.content, editor]);
 
   const { mutateAsync: updateContent } = useMutation({
     mutationFn: (content: Record<string, unknown>) =>
@@ -108,7 +104,9 @@ const AnnouncementArticlePage = () => {
     if (editing) {
       const handleUpdate = () => {
         const content = editor.getJSON();
-        debouncedSave(content);
+        if (content && Object.keys(content).length > 0) {
+          debouncedSave(content);
+        }
       };
 
       editor.on('update', handleUpdate);
@@ -146,7 +144,7 @@ const AnnouncementArticlePage = () => {
   const { article, isAuthor } = data;
 
   return (
-    <div className="flex flex-col items-start justify-start min-h-screen py-2 max-w-4xl w-full mx-auto">
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 max-w-4xl w-full mx-auto">
       {isAuthor && (
         <EditorHeader
           editor={editor}
@@ -157,7 +155,7 @@ const AnnouncementArticlePage = () => {
       )}
 
       <div className="flex flex-col gap-16">
-        <div className="animate-slide-down-fade-in opacity-0 [animation-delay:_0.25s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+        <div className="animate-slide-down-fade-in opacity-0 [animation-delay:_1.5s] [animation-duration:_4s] [animation-fill-mode:_forwards]">
           <ArticleCoverImage article={article} editing={editing} />
         </div>
         <div className="flex flex-col gap-12 -mt-14 z-10">

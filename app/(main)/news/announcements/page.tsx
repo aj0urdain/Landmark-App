@@ -11,6 +11,7 @@ import { createBrowserClient } from '@/utils/supabase/client';
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
 
 const AnnouncementsNewsPage = () => {
   const router = useRouter();
@@ -19,8 +20,8 @@ const AnnouncementsNewsPage = () => {
 
   const createAnnouncementMutation = useMutation({
     mutationFn: () => createArticle('announcement'),
-    onSuccess: (newArticleId: number) => {
-      router.push(`/news/announcements/${newArticleId.toString()}`);
+    onSuccess: (newArticle) => {
+      router.push(`/news/announcements/${newArticle.id.toString()}`);
     },
     onError: (error) => {
       console.error('Error creating announcement:', error);
@@ -75,7 +76,7 @@ const AnnouncementsNewsPage = () => {
               href={`/news/announcements/${announcement.id.toString()}`}
               key={announcement.id}
             >
-              <Card className="w-full relative min-h-80 flex flex-col items-start justify-end p-6 gap-2">
+              <Card className="w-full relative min-h-80 flex flex-col items-start justify-end p-6 gap-2 hover:border-foreground transition-all group duration-300">
                 <div className="">
                   <Image
                     src={announcement.cover_image ?? ''}
@@ -87,7 +88,7 @@ const AnnouncementsNewsPage = () => {
                   <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/75 to-background rounded-xl" />
                 </div>
 
-                <h1 className="text-2xl font-black z-10 line-clamp-2">
+                <h1 className="text-2xl group-hover:text-[1.6rem] transition-all duration-300 font-black z-10 line-clamp-2">
                   {announcement.title}
                 </h1>
 
@@ -99,8 +100,10 @@ const AnnouncementsNewsPage = () => {
           ))}
       </div>
 
+      <Separator className="my-12" />
+
       <div className="mt-6">
-        <h1 className="text-xl font-bold">More Announcements</h1>
+        {/* <h1 className="text-lg font-bold text-muted-foreground">More Announcements</h1> */}
         <div className="grid grid-cols-1 gap-4 mt-6">
           {/* Dummy data for list of additional articles */}
           {new Array(10).fill(0).map((_, index) => (
