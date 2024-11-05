@@ -1,16 +1,16 @@
-import React from "react";
-import { DashboardCardRow } from "@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import React from 'react';
+import { DashboardCardRow } from '@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
-import DashboardContainer from "@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer";
-import LiveChat from "@/components/molecules/LiveChat/LiveChat";
-import { Bell, Cake, Calendar, Link2, Timer } from "lucide-react";
+import DashboardContainer from '@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer';
+import LiveChat from '@/components/molecules/LiveChat/LiveChat';
+import { Bell, Cake, Calendar, Link2, Timer } from 'lucide-react';
 
 const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
     <DashboardContainer department="Burgess Rawson" isLast={isLast}>
       <DashboardCardRow height={420}>
-        <div className="col-span-7 flex h-full flex-col gap-4">
+        <div className="col-span-6 flex h-full flex-col gap-4">
           <Card className="row-span-1 flex h-1/2 flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -20,9 +20,7 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
             </CardHeader>
             <CardContent className="flex flex-col text-sm text-muted">
               <p>Possible table of events?</p>
-              <p>
-                May include filter to change upcoming events via day/week/month
-              </p>
+              <p>May include filter to change upcoming events via day/week/month</p>
             </CardContent>
           </Card>
           <Card className="row-span-1 flex h-1/2 flex-col">
@@ -37,11 +35,11 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
             </CardContent>
           </Card>
         </div>
-        <div className="col-span-5 h-full overflow-visible">
+        <div className="col-span-6 h-full overflow-visible">
           <LiveChat chatName="company" height={420} />
         </div>
       </DashboardCardRow>
-      <DashboardCardRow>
+      {/* <DashboardCardRow>
         <div className="col-span-2 h-full">
           <Card className="flex h-full flex-col">
             <CardHeader>
@@ -52,8 +50,8 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
             </CardHeader>
             <CardContent className="flex items-center justify-center text-sm text-muted">
               <p>
-                choose event to display interactive countdown, otherwise default
-                to next company event
+                choose event to display interactive countdown, otherwise default to next
+                company event
               </p>
             </CardContent>
           </Card>
@@ -86,13 +84,13 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
             </CardHeader>
             <CardContent className="text-sm text-muted">
               <p>
-                Links to commonly used websites and applications, could either
-                be icons with floating tooltips or a table?
+                Links to commonly used websites and applications, could either be icons
+                with floating tooltips or a table?
               </p>
             </CardContent>
           </Card>
         </div>
-      </DashboardCardRow>
+      </DashboardCardRow> */}
     </DashboardContainer>
   );
 };

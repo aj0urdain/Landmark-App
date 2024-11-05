@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useRef } from "react";
-import Autoplay from "embla-carousel-autoplay";
+import React, { useRef } from 'react';
+import Autoplay from 'embla-carousel-autoplay';
 
 import {
   Carousel,
@@ -9,9 +9,10 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import AuctionCountdown from "@/components/molecules/DashboardCards/CompanyCarousel/AuctionCountdown/AuctionCountdown";
-import IndustryNews from "@/components/molecules/DashboardCards/CompanyCarousel/IndustryNews/IndustryNews";
+} from '@/components/ui/carousel';
+import AuctionCountdown from '@/components/molecules/DashboardCards/CompanyCarousel/AuctionCountdown/AuctionCountdown';
+import IndustryNews from '@/components/molecules/DashboardCards/CompanyCarousel/IndustryNews/IndustryNews';
+import PersonalLinks from './PersonalLinks/PersonalLinks';
 
 export default function CompanyCarousel() {
   const plugin = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }));
@@ -25,6 +26,9 @@ export default function CompanyCarousel() {
         onMouseLeave={plugin.current.reset}
       >
         <CarouselContent className="h-full">
+          <CarouselItem className="flex h-full items-center justify-center">
+            <PersonalLinks />
+          </CarouselItem>
           <CarouselItem className="flex h-full items-center justify-center">
             <AuctionCountdown />
           </CarouselItem>
