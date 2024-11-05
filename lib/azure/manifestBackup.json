@@ -1,0 +1,103 @@
+{
+  "id": "b07b5bfc-72dc-4779-b8ef-33b8ac522cb0",
+  "deletedDateTime": null,
+  "appId": "5510aa07-b7a2-4379-b5fa-001cec60d79c",
+  "applicationTemplateId": null,
+  "disabledByMicrosoftStatus": null,
+  "createdDateTime": "2024-11-03T23:11:38Z",
+  "displayName": "Landmark",
+  "description": null,
+  "groupMembershipClaims": null,
+  "identifierUris": [],
+  "isDeviceOnlyAuthSupported": null,
+  "isFallbackPublicClient": null,
+  "nativeAuthenticationApisEnabled": null,
+  "notes": null,
+  "publisherDomain": "burgessrawson.com.au",
+  "serviceManagementReference": null,
+  "signInAudience": "AzureADMultipleOrgs",
+  "tags": [],
+  "tokenEncryptionKeyId": null,
+  "samlMetadataUrl": null,
+  "defaultRedirectUri": null,
+  "certification": null,
+  "optionalClaims": null,
+  "requestSignatureVerification": null,
+  "addIns": [],
+  "api": {
+    "acceptMappedClaims": null,
+    "knownClientApplications": [],
+    "requestedAccessTokenVersion": null,
+    "oauth2PermissionScopes": [],
+    "preAuthorizedApplications": []
+  },
+  "appRoles": [],
+  "info": {
+    "logoUrl": null,
+    "marketingUrl": null,
+    "privacyStatementUrl": null,
+    "supportUrl": null,
+    "termsOfServiceUrl": null
+  },
+  "keyCredentials": [],
+  "parentalControlSettings": {
+    "countriesBlockedForMinors": [],
+    "legalAgeGroupRule": "Allow"
+  },
+  "passwordCredentials": [
+    {
+      "customKeyIdentifier": null,
+      "displayName": "supabase-secret",
+      "endDateTime": "2026-11-03T23:28:06.5Z",
+      "hint": "2eC",
+      "keyId": "43aa8ee3-c9a5-4ed3-b32c-03c207cc0fd8",
+      "secretText": null,
+      "startDateTime": "2024-11-03T23:28:06.5Z"
+    }
+  ],
+  "publicClient": {
+    "redirectUris": []
+  },
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        }
+      ]
+    }
+  ],
+  "verifiedPublisher": {
+    "displayName": null,
+    "verifiedPublisherId": null,
+    "addedDateTime": null
+  },
+  "web": {
+    "homePageUrl": null,
+    "logoutUrl": null,
+    "redirectUris": ["https://dodfdwvvwmnnlntpnrec.supabase.co/auth/v1/callback"],
+    "implicitGrantSettings": {
+      "enableAccessTokenIssuance": false,
+      "enableIdTokenIssuance": false
+    },
+    "redirectUriSettings": [
+      {
+        "uri": "https://dodfdwvvwmnnlntpnrec.supabase.co/auth/v1/callback",
+        "index": null
+      }
+    ]
+  },
+  "servicePrincipalLockConfiguration": {
+    "isEnabled": true,
+    "allProperties": true,
+    "credentialsWithUsageVerify": true,
+    "credentialsWithUsageSign": true,
+    "identifierUris": false,
+    "tokenEncryptionKeyId": true
+  },
+  "spa": {
+    "redirectUris": []
+  }
+}
