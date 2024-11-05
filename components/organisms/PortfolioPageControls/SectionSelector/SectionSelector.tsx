@@ -1,5 +1,5 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Select,
   SelectContent,
@@ -8,9 +8,9 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { sectionIcons } from "@/constants/portfolioPageConstants";
-import { SectionName } from "@/types/portfolioControlsTypes";
+} from '@/components/ui/select';
+import { sectionIcons } from '@/constants/portfolioPageConstants';
+import { SectionName } from '@/types/portfolioControlsTypes';
 import {
   photoDataOptions,
   headlineDataOptions,
@@ -19,8 +19,8 @@ import {
   propertyCopyDataOptions,
   agentsDataOptions,
   saleTypeDataOptions,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
-import { Dot } from "@/components/atoms/Dot/Dot";
+} from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
+import { Dot } from '@/components/atoms/Dot/Dot';
 
 interface SectionSelectorProps {
   onValueChange: (value: string) => void;
@@ -35,98 +35,103 @@ const SectionSelector: React.FC<SectionSelectorProps> = ({ onValueChange }) => {
   const { data: agentsData } = useQuery(agentsDataOptions);
   const { data: saleTypeData } = useQuery(saleTypeDataOptions);
 
+  const { data: currentSection } = useQuery({
+    queryKey: ['selectedSection'],
+    initialData: null as SectionName | null,
+  });
+
   const sectionTasks = {
     Photos: [
       {
-        name: "Set Layout",
+        name: 'Set Layout',
         isNecessary: true,
         isDone: photoData?.photoCount ?? 0 > 0,
       },
       {
-        name: "Choose Photos",
+        name: 'Choose Photos',
         isNecessary: false,
         isDone: photoData?.photos.some((photo) => photo.original !== null),
       },
     ],
     Logos: [
-      { name: "Choose Logo Count", isNecessary: false, isDone: false },
-      { name: "Set Orientation", isNecessary: false, isDone: false },
-      { name: "Upload Logos", isNecessary: false, isDone: false },
+      { name: 'Choose Logo Count', isNecessary: false, isDone: false },
+      { name: 'Set Orientation', isNecessary: false, isDone: false },
+      { name: 'Upload Logos', isNecessary: false, isDone: false },
     ],
     Headline: [
       {
-        name: "Enter Headline",
+        name: 'Enter Headline',
         isNecessary: true,
         isDone: !!headlineData?.headline,
       },
     ],
     Address: [
       {
-        name: "Enter Suburb",
+        name: 'Enter Suburb',
         isNecessary: true,
         isDone: !!addressData?.suburb,
       },
-      { name: "Enter State", isNecessary: true, isDone: !!addressData?.state },
+      { name: 'Enter State', isNecessary: true, isDone: !!addressData?.state },
       {
-        name: "Enter Additional",
+        name: 'Enter Additional',
         isNecessary: false,
         isDone: !!addressData?.additional,
       },
       {
-        name: "Enter Street",
+        name: 'Enter Street',
         isNecessary: true,
         isDone: !!addressData?.street,
       },
     ],
     Finance: [
       {
-        name: "Enter Finance Copy",
+        name: 'Enter Finance Copy',
         isNecessary: true,
         isDone: !!financeData?.financeCopy,
       },
       {
-        name: "Select Finance Type",
+        name: 'Select Finance Type',
         isNecessary: true,
         isDone: !!financeData?.financeType,
       },
       {
-        name: "Enter Finance Amount",
+        name: 'Enter Finance Amount',
         isNecessary: true,
         isDone: !!financeData?.financeAmount,
       },
     ],
-    "Property Copy": [
+    'Property Copy': [
       {
-        name: "Enter Property Copy",
+        name: 'Enter Property Copy',
         isNecessary: true,
         isDone: !!propertyCopyData?.propertyCopy,
       },
     ],
     Agents: [
       {
-        name: "Add Agents",
+        name: 'Add Agents',
         isNecessary: true,
         isDone: agentsData?.agents && agentsData.agents.length > 0,
       },
     ],
-    "Sale Type": [
+    'Sale Type': [
       {
-        name: "Select Sale Type",
+        name: 'Select Sale Type',
         isNecessary: true,
         isDone: !!saleTypeData?.saleType,
       },
-      ...(saleTypeData?.saleType === "auction"
+      ...(saleTypeData?.saleType === 'auction'
         ? [
             {
-              name: "Enter Auction Details",
+              name: 'Enter Auction Details',
               isNecessary: true,
               isDone: !!saleTypeData?.auctionId,
             },
           ]
-        : saleTypeData?.saleType === "expression"
+        : saleTypeData?.saleType === 'expression'
           ? [
               {
-                name: "Enter EOI Details",
+                name: 'Enter EOI Details',
                 isNecessary: true,
                 isDone: !!saleTypeData?.expressionOfInterest?.closingDate,
               },
@@ -136,7 +141,7 @@ const SectionSelector: React.FC<SectionSelectorProps> = ({ onValueChange }) => {
   };
 
   return (
-    <Select onValueChange={onValueChange}>
+    <Select onValueChange={onValueChange} value={currentSection ?? undefined}>
       <SelectTrigger className="h-fit w-full">
         <SelectValue placeholder="Select a section" />
       </SelectTrigger>
@@ -161,10 +166,10 @@ const SectionSelector: React.FC<SectionSelectorProps> = ({ onValueChange }) => {
                       key={index}
                       className={`flex items-center gap-1 text-xs ${
                         task.isDone
-                          ? "text-foreground"
+                          ? 'text-foreground'
                           : task.isNecessary
-                            ? "text-warning"
-                            : "text-muted-foreground"
+                            ? 'text-warning'
+                            : 'text-muted-foreground'
                       }`}
                     >
                       {task.isNecessary && !task.isDone && (
