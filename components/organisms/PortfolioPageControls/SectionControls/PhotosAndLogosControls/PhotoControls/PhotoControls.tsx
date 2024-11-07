@@ -1,8 +1,8 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { PhotoLayoutSelector } from "./PhotoLayoutSelector/PhotoLayoutSelector";
-import PhotoSelectionDialog from "./PhotoSelectionDialog/PhotoSelectionDialog";
-import { photoDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { PhotoLayoutSelector } from './PhotoLayoutSelector/PhotoLayoutSelector';
+import PhotoSelectionDialog from './PhotoSelectionDialog/PhotoSelectionDialog';
+import { photoDataOptions } from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
 
 const PhotoControls: React.FC = () => {
   const { data: photoData } = useQuery(photoDataOptions);
