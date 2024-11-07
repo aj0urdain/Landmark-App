@@ -1,17 +1,13 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Minus, Plus, Settings, RotateCcw, ArrowLeftRight } from "lucide-react";
+import React, { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Minus, Plus, Settings, RotateCcw, ArrowLeftRight } from 'lucide-react';
 // import { useSearchParams } from "next/navigation";
 interface PreviewControlsProps {
   isDisabled: boolean;
@@ -35,14 +31,14 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
   // }, [searchParams]);
 
   const { data: previewSettings } = useQuery({
-    queryKey: ["previewSettings"],
+    queryKey: ['previewSettings'],
   }) as {
     data:
       | {
           zoom: number;
           overlayOpacity: number;
           showOverlay: boolean;
-          pageSide: "left" | "right";
+          pageSide: 'left' | 'right';
         }
       | undefined;
   };
@@ -53,28 +49,36 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
       return Promise.resolve({ ...previewSettings, ...newSettings });
     },
     onSuccess: (newSettings) => {
-      queryClient.setQueryData(["previewSettings"], newSettings);
+      queryClient.setQueryData(['previewSettings'], newSettings);
     },
   });
 
-  const handleZoomIn = () =>
+  const handleZoomIn = () => {
     updateSettings.mutate({
-      zoom: Math.min((previewSettings?.zoom || 0) + 0.1, 2),
+      zoom: Math.min((previewSettings?.zoom ?? 0) + 0.1, 2),
     });
-  const handleZoomOut = () =>
+  };
+
+  const handleZoomOut = () => {
     updateSettings.mutate({
-      zoom: Math.max((previewSettings?.zoom || 0) - 0.1, 0.5),
+      zoom: Math.max((previewSettings?.zoom ?? 0) - 0.1, 0.5),
     });
+  };
+
   const handleResetZoom = () => {
     updateSettings.mutate({ zoom: 1 });
     setRerenderKey((prevKey) => prevKey + 1);
   };
-  const handleToggleOverlay = () =>
+
+  const handleToggleOverlay = () => {
     updateSettings.mutate({ showOverlay: !previewSettings?.showOverlay });
-  const handleTogglePageSide = () =>
+  };
+
+  const handleTogglePageSide = () => {
     updateSettings.mutate({
-      pageSide: previewSettings?.pageSide === "left" ? "right" : "left",
+      pageSide: previewSettings?.pageSide === 'left' ? 'right' : 'left',
     });
+  };
 
   if (!previewSettings || isDisabled) return null;
 
@@ -127,7 +131,7 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
 
       <Button onClick={handleTogglePageSide} variant="outline">
         <ArrowLeftRight size={20} className="mr-2" />
-        {previewSettings.pageSide === "left" ? "Left" : "Right"} Side
+        {previewSettings.pageSide === 'left' ? 'Left' : 'Right'} Side
       </Button>
     </Card>
   );

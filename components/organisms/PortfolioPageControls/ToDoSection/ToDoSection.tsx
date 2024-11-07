@@ -1,8 +1,8 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Label } from "@/components/ui/label";
-import { SectionName } from "@/types/portfolioControlsTypes";
-import { sectionIcons } from "@/constants/portfolioPageConstants";
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Label } from '@/components/ui/label';
+import { SectionName } from '@/types/portfolioControlsTypes';
+import { sectionIcons } from '@/constants/portfolioPageConstants';
 import {
   photoDataOptions,
   headlineDataOptions,
@@ -11,7 +11,7 @@ import {
   propertyCopyDataOptions,
   agentsDataOptions,
   saleTypeDataOptions,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+} from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
 
 const ToDoSection: React.FC = () => {
   const { data: photoData } = useQuery(photoDataOptions);
@@ -23,9 +23,9 @@ const ToDoSection: React.FC = () => {
   const { data: saleTypeData } = useQuery(saleTypeDataOptions);
 
   const incompleteItems = {
-    Photos: [
-      { isNecessary: true, isDone: photoData?.photoCount ?? 0 > 0 },
-    ].filter((task) => task.isNecessary && !task.isDone).length,
+    Photos: [{ isNecessary: true, isDone: photoData?.photoCount ?? 0 > 0 }].filter(
+      (task) => task.isNecessary && !task.isDone,
+    ).length,
     Logos: 0, // Assuming logos are not necessary for now
     Headline: [{ isNecessary: true, isDone: !!headlineData?.headline }].filter(
       (task) => task.isNecessary && !task.isDone,
@@ -40,7 +40,7 @@ const ToDoSection: React.FC = () => {
       { isNecessary: true, isDone: !!financeData?.financeType },
       { isNecessary: true, isDone: !!financeData?.financeAmount },
     ].filter((task) => task.isNecessary && !task.isDone).length,
-    "Property Copy": [
+    'Property Copy': [
       { isNecessary: true, isDone: !!propertyCopyData?.propertyCopy },
     ].filter((task) => task.isNecessary && !task.isDone).length,
     Agents: [
@@ -49,36 +49,38 @@ const ToDoSection: React.FC = () => {
         isDone: agentsData?.agents && agentsData.agents.length > 0,
       },
     ].filter((task) => task.isNecessary && !task.isDone).length,
-    "Sale Type": [
+    'Sale Type': [
       { isNecessary: true, isDone: !!saleTypeData?.saleType },
       {
-        isNecessary: saleTypeData?.saleType === "auction",
+        isNecessary: saleTypeData?.saleType === 'auction',
         isDone: !!saleTypeData?.auctionId,
       },
       {
-        isNecessary: saleTypeData?.saleType === "expression",
+        isNecessary: saleTypeData?.saleType === 'expression',
         isDone: !!saleTypeData?.expressionOfInterest?.closingDate,
       },
     ].filter((task) => task.isNecessary && !task.isDone).length,
   };
 
   return (
-    <div className="mb-2 flex items-center justify-between">
+    <div className="my-2 flex items-center justify-between">
       <Label>
         <p
-          className={`${!Object.values(incompleteItems).some((count) => count > 0) && "text-muted"}`}
+          className={`${
+            !Object.values(incompleteItems).some((count) => count > 0) && 'text-muted'
+          }`}
         >
           To Do Before Submission:
         </p>
       </Label>
 
-      <div className="flex space-x-2">
+      <div className="flex space-x-4">
         {Object.entries(incompleteItems).map(([section, count]) => {
           if (count > 0) {
             const IconComponent = sectionIcons[section as SectionName];
             return (
               <div key={section} className="flex items-center" title={section}>
-                <IconComponent className="mr-1 h-4 w-4" />
+                <IconComponent className="mr-1 h-3 w-3" />
                 <span className="text-xs">{count}</span>
               </div>
             );
