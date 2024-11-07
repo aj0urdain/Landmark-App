@@ -116,6 +116,7 @@
     "react-image-crop": "^11.0.7",
     "react-time-ago": "^7.3.3",
     "recharts": "^2.12.7",
+    "sonner": "^1.7.0",
     "uuid": "^10.0.0",
     "vaul": "^0.9.3"
   },

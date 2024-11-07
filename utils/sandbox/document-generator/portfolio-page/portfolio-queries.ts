@@ -1,13 +1,13 @@
-import { createBrowserClient } from "@/utils/supabase/client";
-import { getProfileFromID } from "@/utils/supabase/supabase-queries";
+import { createBrowserClient } from '@/utils/supabase/client';
+import { getProfileFromID } from '@/utils/supabase/supabase-queries';
 import {
   QueryClient,
   queryOptions,
   useMutation,
   useQuery,
   useQueryClient,
-} from "@tanstack/react-query";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+} from '@tanstack/react-query';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 // import { createClient } from "@/utils/supabase/client";
 
 interface PhotoData {
@@ -20,11 +20,19 @@ interface PhotoData {
 }
 // Photo Data
 export const photoDataOptions = queryOptions({
-  queryKey: ["photoData"],
-  queryFn: async (): Promise<PhotoData> => {
-    // const supabase = createClient();
-    // Fetch photo data from Supabase
-    // For now, we'll return a dummy structure
+  queryKey: ['photoData'],
+  queryFn: (): Promise<PhotoData> => {
+    const queryClient = new QueryClient();
+    const documentData = queryClient.getQueryData<{
+      documentSnapshot: DocumentData;
+    }>(['documentData']);
+
+    // Return existing data if available
+    if (documentData?.documentSnapshot?.photoData) {
+      return documentData.documentSnapshot.photoData;
+    }
+
+    // Fall back to defaults if no existing data
     return {
       photoCount: 3,
       photos: Array(3).fill({
@@ -42,7 +50,7 @@ export const updatePhotoCount = async (
   currentPhotoData: PhotoData,
 ): Promise<PhotoData> => {
   // const supabase = createClient();
-  console.log("Updating photo count to", newCount);
+  console.log('Updating photo count to', newCount);
 
   // Create a new photos array with the new length, preserving existing data
   const newPhotos = Array(Math.max(newCount, currentPhotoData.photos.length))
@@ -93,20 +101,20 @@ export const updatePhoto = async (
 
 interface LogoData {
   logoCount: number;
-  logoOrientation: "horizontal" | "vertical";
+  logoOrientation: 'horizontal' | 'vertical';
   logos: string[];
 }
 
 export const logoDataOptions = queryOptions({
-  queryKey: ["logoData"],
+  queryKey: ['logoData'],
   queryFn: async (): Promise<LogoData> => {
     // const supabase = createClient();
     // Fetch logo data from Supabase
     // For now, we'll return a dummy structure
     return {
       logoCount: 0,
-      logoOrientation: "horizontal",
-      logos: [""],
+      logoOrientation: 'horizontal',
+      logos: [''],
     };
   },
 });
@@ -116,18 +124,18 @@ export const updateLogoCount = async (
   currentLogoData: LogoData,
 ): Promise<LogoData> => {
   // const supabase = createClient();
-  console.log("Updating logo count to", newCount);
+  console.log('Updating logo count to', newCount);
 
   // Create a new logos array with the new length, preserving existing data
   const newLogos = Array(Math.max(newCount, currentLogoData.logos.length))
-    .fill("")
+    .fill('')
     .map((_, index) => {
       if (index < currentLogoData.logos.length) {
         // Preserve existing logo data
         return currentLogoData.logos[index];
       } else {
         // Add new empty logo slots if needed
-        return "";
+        return '';
       }
     });
 
@@ -144,11 +152,11 @@ export const updateLogoCount = async (
 };
 
 export const updateLogoOrientation = async (
-  newOrientation: "horizontal" | "vertical",
+  newOrientation: 'horizontal' | 'vertical',
   currentLogoData: LogoData,
 ): Promise<LogoData> => {
   // const supabase = createClient();
-  console.log("Updating logo orientation to", newOrientation);
+  console.log('Updating logo orientation to', newOrientation);
 
   const newLogoData = {
     ...currentLogoData,
@@ -188,13 +196,23 @@ interface HeadlineData {
 }
 
 export const headlineDataOptions = queryOptions({
-  queryKey: ["headlineData"],
-  queryFn: async (): Promise<HeadlineData> => {
-    // const supabase = createClient();
-    // Fetch headline data from Supabase
-    // For now, we'll return a dummy structure
+  queryKey: ['headlineData'],
+  queryFn: (): Promise<HeadlineData> => {
+    const queryClient = new QueryClient();
+    const documentData = queryClient.getQueryData<{ documentSnapshot: DocumentData }>([
+      'documentData',
+    ]);
+
+    console.log('documentData', documentData);
+
+    // Return existing data if available
+    if (documentData?.documentSnapshot.headlineData) {
+      return documentData.documentSnapshot.headlineData;
+    }
+
+    // Fall back to defaults
     return {
-      headline: "",
+      headline: '',
     };
   },
 });
@@ -204,7 +222,7 @@ export const updateHeadline = async (
   currentHeadlineData: HeadlineData,
 ): Promise<HeadlineData> => {
   // const supabase = createClient();
-  console.log("Updating headline to", newHeadline);
+  console.log('Updating headline to', newHeadline);
 
   const newHeadlineData = {
     ...currentHeadlineData,
@@ -225,16 +243,16 @@ export interface AddressData {
 }
 
 export const addressDataOptions = queryOptions({
-  queryKey: ["addressData"],
+  queryKey: ['addressData'],
   queryFn: async (): Promise<AddressData> => {
     // const supabase = createClient();
     // Fetch address data from Supabase
     // For now, we'll return a dummy structure
     return {
-      suburb: "",
-      additional: "",
-      state: "",
-      street: "",
+      suburb: '',
+      additional: '',
+      state: '',
+      street: '',
     };
   },
 });
@@ -243,7 +261,7 @@ export const updateAddress = async (
   newAddressData: AddressData,
 ): Promise<AddressData> => {
   // const supabase = createClient();
-  console.log("Updating address data", newAddressData);
+  console.log('Updating address data', newAddressData);
 
   // Here you would update the data in Supabase
   // await supabase.from('address').update(newAddressData).eq('id', newAddressData.id);
@@ -260,14 +278,14 @@ export interface FinanceData {
 }
 
 export const financeDataOptions = queryOptions({
-  queryKey: ["financeData"],
+  queryKey: ['financeData'],
   queryFn: async (): Promise<FinanceData> => {
     // Fetch finance data from your backend or return initial data
     return {
-      financeCopy: "",
-      financeType: "",
-      customFinanceType: "",
-      financeAmount: "",
+      financeCopy: '',
+      financeType: '',
+      customFinanceType: '',
+      financeAmount: '',
     };
   },
 });
@@ -275,7 +293,7 @@ export const financeDataOptions = queryOptions({
 export const updateFinanceData = async (
   newFinanceData: FinanceData,
 ): Promise<FinanceData> => {
-  console.log("Updating finance data", newFinanceData);
+  console.log('Updating finance data', newFinanceData);
   // Here you would update the data in your backend
   // For now, we'll just return the new data
   return newFinanceData;
@@ -287,11 +305,11 @@ export interface PropertyCopyData {
 }
 
 export const propertyCopyDataOptions = queryOptions({
-  queryKey: ["propertyCopyData"],
+  queryKey: ['propertyCopyData'],
   queryFn: async (): Promise<PropertyCopyData> => {
     // Fetch property copy data from your backend or return initial data
     return {
-      propertyCopy: "",
+      propertyCopy: '',
     };
   },
 });
@@ -299,7 +317,7 @@ export const propertyCopyDataOptions = queryOptions({
 export const updatePropertyCopyData = async (
   newPropertyCopyData: PropertyCopyData,
 ): Promise<PropertyCopyData> => {
-  console.log("Updating property copy data", newPropertyCopyData);
+  console.log('Updating property copy data', newPropertyCopyData);
   // Here you would update the data in your backend
   // For now, we'll just return the new data
   return newPropertyCopyData;
@@ -316,8 +334,8 @@ interface AgentsData {
 
 // Agents Data
 export const agentsDataOptions = queryOptions({
-  queryKey: ["agentsData"],
-  queryFn: async (): Promise<AgentsData> => {
+  queryKey: ['agentsData'],
+  queryFn: (): Promise<AgentsData> => {
     // const supabase = createClient();
     // Fetch agents data from Supabase
     // For now, we'll return a dummy structure
@@ -332,14 +350,14 @@ export const updateAgents = async (
   currentAgentsData: AgentsData,
 ): Promise<AgentsData> => {
   // const supabase = createClient();
-  console.log("Updating agents", newAgents);
+  console.log('Updating agents', newAgents);
 
   const newAgentsData = {
     ...currentAgentsData,
     agents: newAgents,
   };
 
-  console.log("newAgentsData", newAgentsData);
+  console.log('newAgentsData', newAgentsData);
 
   // Here you would update the data in Supabase
   // await supabase.from('agents').update(newAgentsData).eq('id', currentAgentsData.id);
@@ -347,10 +365,10 @@ export const updateAgents = async (
   return newAgentsData;
 };
 export interface SaleTypeData {
-  saleType: "auction" | "expression" | "";
+  saleType: 'auction' | 'expression' | '';
   expressionOfInterest?: {
     closingTime?: string;
-    closingAmPm?: "AM" | "PM";
+    closingAmPm?: 'AM' | 'PM';
     closingDate?: Date;
   };
   auctionId?: string;
@@ -360,17 +378,17 @@ export interface Auction {
   id: string;
   auctionDate: Date;
   auctionTime: string;
-  auctionAmPm: "AM" | "PM";
+  auctionAmPm: 'AM' | 'PM';
   // Add any other relevant auction fields
 }
 
 // Sale Type Data
 export const saleTypeDataOptions = queryOptions({
-  queryKey: ["saleTypeData"],
+  queryKey: ['saleTypeData'],
   queryFn: async (): Promise<SaleTypeData> => {
     // Fetch from your backend or return initial data
     return {
-      saleType: "",
+      saleType: '',
     };
   },
 });
@@ -379,7 +397,7 @@ export const updateSaleType = async (
   newSaleTypeData: SaleTypeData,
 ): Promise<SaleTypeData> => {
   // const supabase = createClient();
-  console.log("Updating sale type", newSaleTypeData);
+  console.log('Updating sale type', newSaleTypeData);
 
   return newSaleTypeData;
 };
@@ -416,7 +434,7 @@ export interface SaveDocumentError extends Error {
   toastData?: {
     title: string;
     description: string;
-    variant: "default" | "destructive";
+    variant: 'default' | 'destructive';
     action: string;
   };
 }
@@ -428,94 +446,92 @@ export const savePortfolioDocument = async (
 ): Promise<{ documentId: number; versionNumber: number }> => {
   const supabase = createBrowserClient();
 
-  console.log("documentData", documentData);
+  console.log('documentData', documentData);
 
-  console.log("documentId", documentId);
+  console.log('documentId', documentId);
 
   // Fetch the current document to check ownership and editors
   const { data: currentDocument, error: fetchError } = await supabase
-    .from("documents")
-    .select("document_owner, editors")
-    .eq("id", documentId)
+    .from('documents')
+    .select('document_owner, editors')
+    .eq('id', documentId)
     .single();
 
   if (fetchError) {
-    console.error("Error fetching document:", fetchError);
+    console.error('Error fetching document:', fetchError);
     throw fetchError;
   }
 
-  console.log("Current document:", currentDocument);
+  console.log('Current document:', currentDocument);
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError) {
-    console.error("Error getting user:", userError);
+    console.error('Error getting user:', userError);
     throw userError;
   }
 
   const userId = userData.user?.id;
-  console.log("Current user ID:", userId);
+  console.log('Current user ID:', userId);
 
   const canEdit =
     currentDocument.document_owner === userId ||
     (currentDocument.editors && currentDocument.editors.includes(userId));
 
-  console.log("Can edit:", canEdit);
+  console.log('Can edit:', canEdit);
 
   if (!canEdit) {
-    throw new Error("User does not have permission to edit this document");
+    throw new Error('User does not have permission to edit this document');
   }
 
-  console.log("documentId", documentId);
-  console.log("Updating document data", documentData);
+  console.log('documentId', documentId);
+  console.log('Updating document data', documentData);
 
   const { data: updatedDocument, error: updateError } = await supabase
-    .from("documents")
+    .from('documents')
     .update({ document_data: documentData })
-    .eq("id", documentId)
+    .eq('id', documentId)
     .single();
 
   if (updateError) {
-    console.error("Error updating document", updateError);
+    console.error('Error updating document', updateError);
     throw updateError;
   }
 
-  console.log("updatedDocument", updatedDocument);
+  console.log('updatedDocument', updatedDocument);
 
   const { data: latestVersion, error: versionError } = await supabase
-    .from("document_history")
-    .select("version_number")
-    .eq("document_id", documentId)
-    .order("version_number", { ascending: false })
+    .from('document_history')
+    .select('version_number')
+    .eq('document_id', documentId)
+    .order('version_number', { ascending: false })
     .limit(1)
     .single();
 
   if (versionError) {
-    console.error("Error fetching latest version", versionError);
+    console.error('Error fetching latest version', versionError);
     throw versionError;
   }
 
-  console.log("latestVersion", latestVersion);
+  console.log('latestVersion', latestVersion);
 
   const newVersionNumber = latestVersion?.version_number
     ? latestVersion.version_number + 1
     : 1;
 
-  const { error: insertError } = await supabase
-    .from("document_history")
-    .insert({
-      document_id: documentId,
-      version_number: newVersionNumber,
-      document_snapshot: documentData,
-      status_id: 1,
-      change_summary: "Document update",
-    });
+  const { error: insertError } = await supabase.from('document_history').insert({
+    document_id: documentId,
+    version_number: newVersionNumber,
+    document_snapshot: documentData,
+    status_id: 1,
+    change_summary: 'Document update',
+  });
 
   if (insertError) {
-    console.error("Error inserting new version", insertError);
+    console.error('Error inserting new version', insertError);
     throw insertError;
   }
 
-  console.log("newVersionNumber", newVersionNumber);
+  console.log('newVersionNumber', newVersionNumber);
 
   return { documentId, versionNumber: newVersionNumber };
 };
@@ -532,29 +548,27 @@ export const useSavePortfolioDocument = () => {
       documentId: number;
       documentData: DocumentData;
     }) => {
-      console.log("documentId", documentId);
-      console.log("documentData", documentData);
+      console.log('documentId', documentId);
+      console.log('documentData', documentData);
       return savePortfolioDocument(documentId, documentData);
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["documentData", variables.documentId],
+        queryKey: ['documentData', variables.documentId],
       });
     },
   });
 };
 
 // Query option for fetching property data
-export const portfolioPagePropertyOptions = (
-  selectedPropertyId: string | null,
-) =>
+export const portfolioPagePropertyOptions = (selectedPropertyId: string | null) =>
   queryOptions({
-    queryKey: ["portfolioPageProperty", selectedPropertyId],
+    queryKey: ['portfolioPageProperty', selectedPropertyId],
     queryFn: async () => {
       if (!selectedPropertyId) return null;
       const supabase = createBrowserClient();
       const { data, error } = await supabase
-        .from("properties")
+        .from('properties')
         .select(
           `
           id,
@@ -565,7 +579,7 @@ export const portfolioPagePropertyOptions = (
           lead_agent
         `,
         )
-        .eq("id", selectedPropertyId)
+        .eq('id', selectedPropertyId)
         .single();
 
       if (error) throw error;
@@ -577,21 +591,21 @@ export const portfolioPagePropertyOptions = (
 // Query option for fetching lead agent profile
 export const leadAgentProfileOptions = (leadAgentId: string | undefined) =>
   queryOptions({
-    queryKey: ["leadAgentProfile", leadAgentId],
-    queryFn: () => getProfileFromID(leadAgentId || ""),
+    queryKey: ['leadAgentProfile', leadAgentId],
+    queryFn: () => getProfileFromID(leadAgentId || ''),
     enabled: !!leadAgentId,
   });
 
 // Query option for fetching properties
 export const propertiesOptions = () =>
   queryOptions<PropertiesData>({
-    queryKey: ["properties"],
+    queryKey: ['properties'],
     queryFn: async () => {
       const supabase = createBrowserClient();
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData.user?.id;
 
-      const { data, error } = await supabase.from("properties").select(`
+      const { data, error } = await supabase.from('properties').select(`
           id,
           street_number,
           streets(street_name),
@@ -607,13 +621,11 @@ export const propertiesOptions = () =>
       const allProperties = data as unknown as Property[];
       const myProperties = allProperties.filter(
         (prop) =>
-          prop.lead_agent === userId ||
-          prop?.associated_agents?.includes(userId || ""),
+          prop.lead_agent === userId || prop?.associated_agents?.includes(userId || ''),
       );
       const otherProperties = allProperties.filter(
         (prop) =>
-          prop.lead_agent !== userId &&
-          !prop?.associated_agents?.includes(userId || ""),
+          prop.lead_agent !== userId && !prop?.associated_agents?.includes(userId || ''),
       );
 
       return {
@@ -624,33 +636,18 @@ export const propertiesOptions = () =>
     },
   });
 
-const updateQueryKeys = (
-  queryClient: QueryClient,
-  documentSnapshot: DocumentData,
-) => {
+const updateQueryKeys = (queryClient: QueryClient, documentSnapshot: DocumentData) => {
   // Update headline data
-  queryClient.setQueryData(
-    headlineDataOptions.queryKey,
-    documentSnapshot.headlineData,
-  );
+  queryClient.setQueryData(headlineDataOptions.queryKey, documentSnapshot.headlineData);
 
   // Update finance data
-  queryClient.setQueryData(
-    financeDataOptions.queryKey,
-    documentSnapshot.financeData,
-  );
+  queryClient.setQueryData(financeDataOptions.queryKey, documentSnapshot.financeData);
 
   // Update address data
-  queryClient.setQueryData(
-    addressDataOptions.queryKey,
-    documentSnapshot.addressData,
-  );
+  queryClient.setQueryData(addressDataOptions.queryKey, documentSnapshot.addressData);
 
   // Update photo data
-  queryClient.setQueryData(
-    photoDataOptions.queryKey,
-    documentSnapshot.photoData,
-  );
+  queryClient.setQueryData(photoDataOptions.queryKey, documentSnapshot.photoData);
 
   // Update property copy data
   queryClient.setQueryData(
@@ -659,16 +656,10 @@ const updateQueryKeys = (
   );
 
   // Update agents data
-  queryClient.setQueryData(
-    agentsDataOptions.queryKey,
-    documentSnapshot.agentsData,
-  );
+  queryClient.setQueryData(agentsDataOptions.queryKey, documentSnapshot.agentsData);
 
   // Update sale type data
-  queryClient.setQueryData(
-    saleTypeDataOptions.queryKey,
-    documentSnapshot.saleTypeData,
-  );
+  queryClient.setQueryData(saleTypeDataOptions.queryKey, documentSnapshot.saleTypeData);
 
   // Update logo data
   queryClient.setQueryData(logoDataOptions.queryKey, documentSnapshot.logoData);
@@ -681,14 +672,14 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
   const pathname = usePathname();
 
   return useQuery({
-    queryKey: ["documentData", selectedPropertyId],
+    queryKey: ['documentData', selectedPropertyId],
     queryFn: async () => {
       if (!selectedPropertyId) return null;
 
-      if (selectedPropertyId === "sandbox") {
+      if (selectedPropertyId === 'sandbox') {
         // Exit early for sandbox mode
         return {
-          docId: "sandbox",
+          docId: 'sandbox',
           versionNumber: 1,
           documentSnapshot: {} as DocumentData,
           canEdit: true,
@@ -700,27 +691,24 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("No authenticated user found");
+      if (!user) throw new Error('No authenticated user found');
 
       const userId = user.id;
 
       // Fetch property data
       const { data: propertyData, error: propertyError } = await supabase
-        .from("properties")
-        .select("id, lead_agent")
-        .eq("id", selectedPropertyId)
+        .from('properties')
+        .select('id, lead_agent')
+        .eq('id', selectedPropertyId)
         .single();
 
       if (propertyError) throw propertyError;
-      if (!propertyData) throw new Error("Property not found");
+      if (!propertyData) throw new Error('Property not found');
 
       const isAuthorised = propertyData.lead_agent === userId;
 
       // Fetch or create document
-      const documentData = await fetchOrCreateDocument(
-        propertyData.id,
-        isAuthorised,
-      );
+      const documentData = await fetchOrCreateDocument(propertyData.id, isAuthorised);
 
       // Fetch latest version
       const latestVersionData = await fetchLatestVersion(documentData.id);
@@ -736,16 +724,16 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
       updateQueryKeys(queryClient, result.documentSnapshot);
 
       // Update URL parameters if necessary
-      const currentDocId = searchParams.get("document");
-      const currentVersion = searchParams.get("version");
+      const currentDocId = searchParams.get('document');
+      const currentVersion = searchParams.get('version');
 
       if (
         result.docId.toString() !== currentDocId ||
         result.versionNumber.toString() !== currentVersion
       ) {
         const newParams = new URLSearchParams(searchParams.toString());
-        newParams.set("document", result.docId.toString());
-        newParams.set("version", result.versionNumber.toString());
+        newParams.set('document', result.docId.toString());
+        newParams.set('version', result.versionNumber.toString());
         router.push(`${pathname}?${newParams.toString()}`, {
           scroll: false,
         });
@@ -757,33 +745,30 @@ export const useDocumentSetup = (selectedPropertyId: string | null) => {
   });
 };
 
-async function fetchOrCreateDocument(
-  propertyId: string,
-  isAuthorised: boolean,
-) {
+async function fetchOrCreateDocument(propertyId: string, isAuthorised: boolean) {
   const supabase = createBrowserClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("No authenticated user found");
+  if (!user) throw new Error('No authenticated user found');
 
   const userId = user.id;
 
   const { data: existingDoc, error: docError } = await supabase
-    .from("documents")
-    .select("id, document_owner")
-    .eq("property_id", propertyId)
-    .eq("document_type_id", 2)
+    .from('documents')
+    .select('id, document_owner')
+    .eq('property_id', propertyId)
+    .eq('document_type_id', 2)
     .single();
 
-  if (docError && docError.code !== "PGRST116") throw docError;
+  if (docError && docError.code !== 'PGRST116') throw docError;
 
   if (existingDoc) return existingDoc;
 
-  if (!isAuthorised) throw new Error("Not authorized to create document");
+  if (!isAuthorised) throw new Error('Not authorized to create document');
 
   const { data: newDoc, error: createError } = await supabase
-    .from("documents")
+    .from('documents')
     .insert({
       property_id: propertyId,
       document_type_id: 2,
@@ -801,15 +786,13 @@ async function fetchOrCreateDocument(
 
 async function createInitialVersion(documentId: string, userId: string) {
   const supabase = createBrowserClient();
-  const { error: versionError } = await supabase
-    .from("document_history")
-    .insert({
-      document_id: documentId,
-      version_number: 1,
-      document_snapshot: {},
-      edited_by: userId,
-      change_summary: "Initial document creation",
-    });
+  const { error: versionError } = await supabase.from('document_history').insert({
+    document_id: documentId,
+    version_number: 1,
+    document_snapshot: {},
+    edited_by: userId,
+    change_summary: 'Initial document creation',
+  });
 
   if (versionError) throw versionError;
 }
@@ -817,10 +800,10 @@ async function createInitialVersion(documentId: string, userId: string) {
 async function fetchLatestVersion(documentId: string) {
   const supabase = createBrowserClient();
   const { data: latestVersion, error: versionError } = await supabase
-    .from("document_history")
-    .select("version_number, document_snapshot")
-    .eq("document_id", documentId)
-    .order("version_number", { ascending: false })
+    .from('document_history')
+    .select('version_number, document_snapshot')
+    .eq('document_id', documentId)
+    .order('version_number', { ascending: false })
     .limit(1)
     .single();
 

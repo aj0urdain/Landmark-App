@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { createBrowserClient } from "./client";
+import { useQuery } from '@tanstack/react-query';
+import { createBrowserClient } from './client';
 
 export interface Auction {
   id: string;
@@ -27,10 +27,10 @@ export interface UserProfile {
 const fetchUserProfileEvents = async () => {
   const supabase = createBrowserClient();
   const { data, error } = await supabase
-    .from("user_profile_complete")
-    .select("id, first_name, last_name, birthday, work_anniversary")
-    .not("birthday", "is", null)
-    .not("work_anniversary", "is", null);
+    .from('user_profile_complete')
+    .select('id, first_name, last_name, birthday, work_anniversary')
+    .not('birthday', 'is', null)
+    .not('work_anniversary', 'is', null);
 
   if (error) throw error;
   return data as UserProfileEvent[];
@@ -38,7 +38,7 @@ const fetchUserProfileEvents = async () => {
 
 export const useUserProfileEvents = () => {
   return useQuery({
-    queryKey: ["userProfileEvents"],
+    queryKey: ['userProfileEvents'],
     queryFn: fetchUserProfileEvents,
   });
 };
@@ -48,21 +48,22 @@ export async function getUpcomingAuctions(limit?: number): Promise<Auction[]> {
   const currentDate = new Date().toISOString();
 
   const { data, error } = await supabase
-    .from("auctions")
+    .from('auctions')
     .select(
       `
       id,
       start_date,
       auction_locations(name),
-      auction_venues(name)
+      auction_venues(name),
+      portfolio_id
     `,
     )
-    .gte("start_date", currentDate)
-    .order("start_date", { ascending: true })
+    .gte('start_date', currentDate)
+    .order('start_date', { ascending: true })
     .limit(limit ?? 3);
 
   if (error) {
-    console.error("Error fetching auctions:", error);
+    console.error('Error fetching auctions:', error);
     return [];
   }
 
@@ -71,19 +72,17 @@ export async function getUpcomingAuctions(limit?: number): Promise<Auction[]> {
   return data as unknown as Auction[];
 }
 
-export async function getProfileFromID(
-  userId: string,
-): Promise<UserProfile | null> {
+export async function getProfileFromID(userId: string): Promise<UserProfile | null> {
   const supabase = createBrowserClient();
 
   const { data, error } = await supabase
-    .from("user_profile_complete")
-    .select("*")
-    .eq("id", userId)
+    .from('user_profile_complete')
+    .select('*')
+    .eq('id', userId)
     .single();
 
   if (error) {
-    console.error("Error fetching user profile:", error);
+    console.error('Error fetching user profile:', error);
     return null;
   }
 
