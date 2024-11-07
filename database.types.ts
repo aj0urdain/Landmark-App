@@ -508,6 +508,7 @@ export type Database = {
           document_type_id: number | null;
           editors: string[] | null;
           id: number;
+          listing_id: number | null;
           property_id: number | null;
           status_id: number | null;
           updated_at: string | null;
@@ -519,6 +520,7 @@ export type Database = {
           document_type_id?: number | null;
           editors?: string[] | null;
           id?: number;
+          listing_id?: number | null;
           property_id?: number | null;
           status_id?: number | null;
           updated_at?: string | null;
@@ -530,6 +532,7 @@ export type Database = {
           document_type_id?: number | null;
           editors?: string[] | null;
           id?: number;
+          listing_id?: number | null;
           property_id?: number | null;
           status_id?: number | null;
           updated_at?: string | null;
@@ -540,6 +543,13 @@ export type Database = {
             columns: ['document_type_id'];
             isOneToOne: false;
             referencedRelation: 'document_types';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'documents_listing_id_fkey';
+            columns: ['listing_id'];
+            isOneToOne: false;
+            referencedRelation: 'property_listings';
             referencedColumns: ['id'];
           },
           {
@@ -773,6 +783,7 @@ export type Database = {
           created_at: string | null;
           id: number;
           lead_agent: string | null;
+          portfolios: number[] | null;
           property_type: string | null;
           salesforce_listing_id: string | null;
           salesforce_property_id: string | null;
@@ -788,6 +799,7 @@ export type Database = {
           created_at?: string | null;
           id?: number;
           lead_agent?: string | null;
+          portfolios?: number[] | null;
           property_type?: string | null;
           salesforce_listing_id?: string | null;
           salesforce_property_id?: string | null;
@@ -803,6 +815,7 @@ export type Database = {
           created_at?: string | null;
           id?: number;
           lead_agent?: string | null;
+          portfolios?: number[] | null;
           property_type?: string | null;
           salesforce_listing_id?: string | null;
           salesforce_property_id?: string | null;
@@ -833,6 +846,65 @@ export type Database = {
             columns: ['suburb_id'];
             isOneToOne: false;
             referencedRelation: 'suburbs';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      property_listings: {
+        Row: {
+          associated_agents: string[] | null;
+          created_at: string;
+          id: number;
+          lead_agent: string;
+          portfolio: number | null;
+          property_id: number | null;
+          salesforce_listing_id: string | null;
+        };
+        Insert: {
+          associated_agents?: string[] | null;
+          created_at?: string;
+          id?: number;
+          lead_agent: string;
+          portfolio?: number | null;
+          property_id?: number | null;
+          salesforce_listing_id?: string | null;
+        };
+        Update: {
+          associated_agents?: string[] | null;
+          created_at?: string;
+          id?: number;
+          lead_agent?: string;
+          portfolio?: number | null;
+          property_id?: number | null;
+          salesforce_listing_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'property_listing_lead_agent_fkey';
+            columns: ['lead_agent'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_listing_lead_agent_fkey';
+            columns: ['lead_agent'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_listing_portfolio_fkey';
+            columns: ['portfolio'];
+            isOneToOne: false;
+            referencedRelation: 'portfolios';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_listing_property_id_fkey';
+            columns: ['property_id'];
+            isOneToOne: false;
+            referencedRelation: 'properties';
             referencedColumns: ['id'];
           },
         ];

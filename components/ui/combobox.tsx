@@ -56,18 +56,21 @@ export function Combobox({
           className={cn('w-full justify-between', className)}
         >
           <div className="flex items-center gap-2">
-            <Avatar className="border-muted border flex items-center w-5 h-5">
-              <AvatarImage
-                src={
-                  options.find((option) => option.value === selectedValue)?.imageUrl ?? ''
-                }
-                alt={
-                  options.find((option) => option.value === selectedValue)
-                    ?.label as string
-                }
-                className="h-full w-full object-cover"
-              />
-            </Avatar>
+            {avatar && (
+              <Avatar className="border-muted border flex items-center w-5 h-5">
+                <AvatarImage
+                  src={
+                    options.find((option) => option.value === selectedValue)?.imageUrl ??
+                    ''
+                  }
+                  alt={
+                    options.find((option) => option.value === selectedValue)
+                      ?.label as string
+                  }
+                  className="h-full w-full object-cover"
+                />
+              </Avatar>
+            )}
             {selectedValue
               ? options.find((option) => option.value === selectedValue)?.label
               : placeholder}
