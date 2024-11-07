@@ -1,18 +1,17 @@
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { textAlgorithm } from '@/utils/sandbox/document-generator/portfolio-page/textAlgorithm';
-import {
-  headlineDataOptions,
-  logoDataOptions,
-} from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
+import { logoDataOptions } from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
 import { SectionName } from '@/types/portfolioControlsTypes';
+import { useSearchParams } from 'next/navigation';
 
 const HeadlineSection = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
 
-  const { data: headlineData } = useQuery(headlineDataOptions);
   const { data: logoData } = useQuery(logoDataOptions);
-
-  const textProps = textAlgorithm('headline', queryClient);
+  const textProps = textAlgorithm('headline');
 
   const getHeadlineWidth = () => {
     if (!logoData || logoData.logoCount === 0) return '90.5%';
@@ -21,6 +20,10 @@ const HeadlineSection = () => {
   };
 
   const headlineWidth = getHeadlineWidth();
+
+  const { data: draftHeadline } = useQuery({
+    queryKey: ['draftHeadline', selectedListingId, selectedDocumentType],
+  });
 
   const { mutate: updateSelectedSection } = useMutation({
     mutationFn: (section: SectionName) => {
@@ -31,16 +34,19 @@ const HeadlineSection = () => {
 
   return (
     <div
-      className={`absolute left-[4.75%] top-[68%] flex h-[5.5%] font-medium cursor-pointer hover:animate-pulse hover:scale-110 transition-all duration-300 hover:translate-x-[20px]`}
+      className={`absolute left-[4.75%] top-[68%] flex h-[5.5%] font-medium group cursor-pointer hover:scale-[1.01] transition-all duration-300`}
       style={{ width: headlineWidth }}
       onClick={() => {
         updateSelectedSection('Headline' as SectionName);
       }}
     >
-      <span className={textProps.getTailwind()} style={textProps.getStyle()}>
-        {headlineData?.headline ??
+      <p
+        className={`${textProps.getTailwind()} line-clamp-2 group-hover:text-warning-foreground`}
+        style={textProps.getStyle()}
+      >
+        {(draftHeadline as string) ||
           'Insert the Headline for your property here! Make it good!'}
-      </span>
+      </p>
     </div>
   );
 };

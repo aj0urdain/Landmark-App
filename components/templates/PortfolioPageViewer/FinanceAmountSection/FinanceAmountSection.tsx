@@ -1,49 +1,67 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { textAlgorithm } from "@/utils/sandbox/document-generator/portfolio-page/textAlgorithm";
-import { financeDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { textAlgorithm } from '@/utils/sandbox/document-generator/portfolio-page/textAlgorithm';
+import { SectionName } from '@/types/portfolioControlsTypes';
+import { useSearchParams } from 'next/navigation';
 
 const FinanceAmountSection = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
 
-  const { data: financeData } = useQuery(financeDataOptions);
+  const textProps = textAlgorithm('netIncome');
 
-  const textProps = textAlgorithm("netIncome", queryClient);
+  // Get draft finance data with useQuery for real-time updates
+  const { data: draftFinanceData } = useQuery({
+    queryKey: ['draftFinance', selectedListingId, selectedDocumentType],
+  });
+
+  const { mutate: updateSelectedSection } = useMutation({
+    mutationFn: (section: SectionName) => {
+      queryClient.setQueryData(['selectedSection'], section);
+      return Promise.resolve(section);
+    },
+  });
 
   // Format finance amount with commas
   const formatAmount = (amount: string) => {
     const numAmount = parseFloat(amount);
-    if (isNaN(numAmount)) return "$0";
-    return "$" + numAmount.toLocaleString();
+    if (isNaN(numAmount)) return '$0';
+    return '$' + numAmount.toLocaleString();
   };
 
   // Determine finance type label
   const getFinanceTypeLabel = () => {
-    if (!financeData) return "Net Income";
+    if (!draftFinanceData?.financeType) return 'Net Income';
 
-    switch (financeData.financeType) {
-      case "rent":
-        return "Rent";
-      case "net_income":
-        return "Net Income";
-      case "custom":
-        return financeData.customFinanceType || "Custom";
+    switch (draftFinanceData.financeType) {
+      case 'rent':
+        return 'Rent';
+      case 'net_income':
+        return 'Net Income';
+      case 'custom':
+        return draftFinanceData.customFinanceType || 'Custom';
       default:
-        return "Net Income";
+        return 'Net Income';
     }
   };
 
   // Get formatted finance amount
   const getFormattedAmount = () => {
-    if (!financeData || !financeData.financeAmount) return "$999,999";
-    return formatAmount(financeData.financeAmount);
+    if (!draftFinanceData?.financeAmount) return '$0';
+    return formatAmount(draftFinanceData.financeAmount);
   };
 
   return (
     <div
-      className={`absolute bottom-[5.8%] left-[4.75%] flex h-[5%] w-[30%] flex-col items-end justify-end`}
+      className={`absolute bottom-[5.8%] left-[4.75%] flex h-[5%] w-[30%] flex-col items-end justify-end
+        group cursor-pointer hover:scale-[1.01] transition-all duration-300 z-10`}
+      onClick={() => {
+        updateSelectedSection('Finance' as SectionName);
+      }}
     >
       <p
-        className={`${textProps.getTailwind()} w-full`}
+        className={`${textProps.getTailwind()} w-full group-hover:text-warning-foreground`}
         style={textProps.getStyle()}
       >
         {`${getFinanceTypeLabel()}: ${getFormattedAmount()} pa* + GST`}

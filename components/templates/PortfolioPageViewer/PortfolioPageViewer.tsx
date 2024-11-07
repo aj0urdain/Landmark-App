@@ -1,42 +1,44 @@
-"use client";
+'use client';
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
-import React, { useRef, useEffect } from "react";
-import LocationTab from "./LocationTab/LocationTab";
-import HeadlineSection from "./HeadlineSection/HeadlineSection";
-import AddressSection from "./AddressSection/AddressSection";
-import FinanceCopySection from "./FinanceCopySection/FinanceCopySection";
-import FinanceAmountSection from "./FinanceAmountSection/FinanceAmountSection";
-import BottomPageBorder from "./BottomPageBorder/BottomPageBorder";
-import PropertyCopySection from "./PropertyCopySection/PropertyCopySection";
-import ContactSection from "./ContactSection/ContactSection";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import React, { useRef, useEffect } from 'react';
+import LocationTab from './LocationTab/LocationTab';
+import HeadlineSection from './HeadlineSection/HeadlineSection';
+import AddressSection from './AddressSection/AddressSection';
+import FinanceCopySection from './FinanceCopySection/FinanceCopySection';
+import FinanceAmountSection from './FinanceAmountSection/FinanceAmountSection';
+import BottomPageBorder from './BottomPageBorder/BottomPageBorder';
+import PropertyCopySection from './PropertyCopySection/PropertyCopySection';
+import ContactSection from './ContactSection/ContactSection';
 
-import LogoSection from "./LogoSection/LogoSection";
-import PhotoRender from "./PhotoRender/PhotoRender";
+import LogoSection from './LogoSection/LogoSection';
+import PhotoRender from './PhotoRender/PhotoRender';
+import { useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { createBrowserClient } from '@/utils/supabase/client';
 
 const A4_ASPECT_RATIO = 297 / 210; // height / width
 
-interface PortfolioPageViewerProps {
-  selectedPropertyId: string | null;
-  renderEmpty: boolean;
-  renderError: boolean;
-  isLoading: boolean;
-  key: number;
-}
-
-const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
-  selectedPropertyId,
-  renderEmpty,
-  renderError,
-  isLoading,
-  key,
-}) => {
+const PortfolioPageViewer: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
+
+  const supabase = createBrowserClient();
+
+  const { data: documentTypes } = useQuery({
+    queryKey: ['documentTypes'],
+  });
+
+  const documentTypeName = documentTypes?.find(
+    (type) => type.id == selectedDocumentType,
+  )?.type_name;
 
   const { data: previewSettings } = useQuery({
-    queryKey: ["previewSettings"],
+    queryKey: ['previewSettings'],
   }) as {
     data:
       | {
@@ -44,10 +46,14 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
           scale: number;
           overlayOpacity: number;
           showOverlay: boolean;
-          pageSide: "left" | "right";
+          pageSide: 'left' | 'right';
         }
       | undefined;
   };
+
+  const { data: documentData } = useQuery({
+    queryKey: ['document', selectedListingId, selectedDocumentType],
+  });
 
   const updateScale = () => {
     if (containerRef.current) {
@@ -63,7 +69,7 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
       }
 
       queryClient.setQueryData(
-        ["previewSettings"],
+        ['previewSettings'],
         (oldData: typeof previewSettings) => ({
           ...oldData,
           scale: newScale,
@@ -72,11 +78,61 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
     }
   };
 
+  const createDocument = async () => {
+    const { data, error } = await supabase
+      .from('documents')
+      .insert({
+        listing_id: selectedListingId ?? '',
+        document_type_id: selectedDocumentType ?? '',
+      })
+      .select();
+
+    if (error) {
+      console.error(error);
+    }
+
+    if (!data) {
+      console.error('No data returned from document creation');
+    }
+
+    console.log('Document created with supabase');
+    console.log(data);
+
+    return { data, error };
+  };
+
+  const mutateCreateDocument = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await createDocument();
+      if (error) {
+        console.error(error);
+        throw error;
+      }
+
+      console.log('Document created with mutation');
+      console.log(data);
+
+      return data;
+    },
+    onSuccess: async () => {
+      console.log('Invalidating document query');
+      await queryClient.invalidateQueries({
+        queryKey: ['document', selectedListingId, selectedDocumentType],
+        exact: true,
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
   useEffect(() => {
     updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
-  }, []);
+    window.addEventListener('resize', updateScale);
+    return () => {
+      window.removeEventListener('resize', updateScale);
+    };
+  }, [previewSettings?.scale]);
 
   useEffect(() => {
     if (containerRef.current && previewSettings?.zoom) {
@@ -89,18 +145,17 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
       const centerY = container.scrollTop + container.clientHeight / 2;
 
       // Adjust the scroll position
-      container.scrollLeft =
-        (centerX * newZoom) / prevZoom - container.clientWidth / 2;
-      container.scrollTop =
-        (centerY * newZoom) / prevZoom - container.clientHeight / 2;
+      container.scrollLeft = (centerX * newZoom) / prevZoom - container.clientWidth / 2;
+      container.scrollTop = (centerY * newZoom) / prevZoom - container.clientHeight / 2;
     }
   }, [previewSettings?.zoom]);
 
-  if (!selectedPropertyId || renderEmpty || isLoading) {
+  if (!documentData) {
     return (
       <div
         ref={containerRef}
         className="relative flex h-full w-full items-center justify-center overflow-auto"
+        key={`${selectedListingId ?? ''}-${selectedDocumentType ?? ''}`}
       >
         <div
           className="flex items-center justify-center border-2 border-dashed border-gray-300 bg-transparent text-gray-500"
@@ -109,19 +164,34 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
             height: `${297 * (previewSettings?.scale ?? 1) * (previewSettings?.zoom ?? 1)}px`,
           }}
         >
-          {renderError && <p>Error loading property data</p>}
-          {renderEmpty && (
-            <p>Select a property or sandbox mode to get started</p>
-          )}
-          {isLoading && <p>Loading...</p>}
-          {!selectedPropertyId &&
-            !isLoading &&
-            !renderError &&
-            !renderEmpty && (
-              <p className="animate-pulse text-lg text-foreground">
-                Select a property or sandbox mode to get started!
+          {selectedListingId && selectedDocumentType && !documentData && (
+            <div className="flex flex-col gap-4 items-center justify-center w-full animate-slide-down-fade-in">
+              <p className="text-warning-foreground w-2/5 text-center text-sm animate-pulse">
+                The document type you have selected has not been created for this listing
+                yet!
               </p>
-            )}
+              <Button
+                onClick={() => {
+                  mutateCreateDocument.mutate();
+                }}
+                className="animate-slide-up-fade-in"
+              >
+                Create {documentTypeName}
+              </Button>
+            </div>
+          )}
+
+          {!selectedListingId && (
+            <p className="animate-pulse text-lg text-foreground">
+              Select a listing to get started!
+            </p>
+          )}
+
+          {!selectedDocumentType && (
+            <p className="animate-pulse text-lg text-foreground">
+              Select a document type to get started!
+            </p>
+          )}
         </div>
       </div>
     );
@@ -130,7 +200,7 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
   return (
     <div
       ref={containerRef}
-      key={key}
+      key={`${selectedListingId ?? ''}-${selectedDocumentType ?? ''}`}
       className="relative h-full w-full overflow-auto"
     >
       <div
@@ -138,14 +208,14 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
         style={{
           width: `${210 * (previewSettings?.scale ?? 1) * (previewSettings?.zoom ?? 1)}px`,
           height: `${297 * (previewSettings?.scale ?? 1) * (previewSettings?.zoom ?? 1)}px`,
-          margin: "auto",
+          margin: 'auto',
         }}
       >
         <div
           className="bg-white text-slate-950 shadow-lg"
           style={{
-            width: "100%",
-            height: "100%",
+            width: '100%',
+            height: '100%',
           }}
         >
           {previewSettings?.showOverlay && (
@@ -154,8 +224,8 @@ const PortfolioPageViewer: React.FC<PortfolioPageViewerProps> = ({
               style={{
                 backgroundImage: `url('/images/portfolio-reference.png')`,
                 opacity: previewSettings.overlayOpacity,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
               }}
             />
           )}
