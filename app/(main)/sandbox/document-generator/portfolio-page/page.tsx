@@ -1,12 +1,7 @@
-import PortfolioPageContent from "@/components/templates/PortfolioPageContent/PortfolioPageContent";
-import { Suspense } from "react";
+import PortfolioPageContent from '@/components/templates/PortfolioPageContent/PortfolioPageContent';
 
 const PortfolioPage = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PortfolioPageContent />
-    </Suspense>
-  );
+  return <PortfolioPageContent />;
 };
 
 export default PortfolioPage;

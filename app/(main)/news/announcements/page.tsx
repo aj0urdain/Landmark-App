@@ -39,7 +39,7 @@ const AnnouncementsNewsPage = () => {
       .select('*')
       .eq('article_type', 'announcement');
 
-    return data;
+    return { data, error };
   };
 
   const {
