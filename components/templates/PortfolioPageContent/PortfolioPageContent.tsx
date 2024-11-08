@@ -222,6 +222,27 @@ const PortfolioPageContent = () => {
         );
       }
 
+      if (documentData?.document_data.addressData) {
+        queryClient.setQueryData(
+          ['draftAddress', selectedListingId, selectedDocumentType],
+          documentData.document_data.addressData,
+        );
+      }
+
+      if (documentData?.document_data?.photoData) {
+        queryClient.setQueryData(
+          ['draftPhoto', selectedListingId, selectedDocumentType],
+          documentData.document_data.photoData,
+        );
+      }
+
+      if (documentData?.document_data?.logoData) {
+        queryClient.setQueryData(
+          ['draftLogo', selectedListingId, selectedDocumentType],
+          documentData.document_data.logoData,
+        );
+      }
+
       return documentData;
     },
     staleTime: Infinity,
@@ -355,7 +376,7 @@ const PortfolioPageContent = () => {
                 {listingData && (
                   <div className="flex flex-col gap-2">
                     <Label className="pl-2 text-xs text-muted-foreground">
-                      Select Document Type
+                      Select Portfolio Page Type
                     </Label>
 
                     <Popover open={documentTypeOpen} onOpenChange={setDocumentTypeOpen}>
@@ -370,7 +391,7 @@ const PortfolioPageContent = () => {
                             ? documentTypes?.find(
                                 (dt) => dt.id.toString() === selectedDocumentType,
                               )?.type_name
-                            : 'Select document type...'}
+                            : 'Select Portfolio Page type...'}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>

@@ -10,7 +10,9 @@ const HeadlineSection = () => {
   const selectedListingId = searchParams.get('listing') ?? null;
   const selectedDocumentType = searchParams.get('documentType') ?? null;
 
-  const { data: logoData } = useQuery(logoDataOptions);
+  const { data: logoData } = useQuery({
+    queryKey: ['draftLogo', selectedListingId, selectedDocumentType],
+  });
   const textProps = textAlgorithm('headline');
 
   const getHeadlineWidth = () => {

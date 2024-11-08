@@ -1,49 +1,62 @@
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-
-import Image from "next/image";
-import { ImageIcon } from "lucide-react";
-import { photoDataOptions } from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import Image from 'next/image';
+import { ImageIcon } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { SectionName } from '@/types/portfolioControlsTypes';
 
 const PhotoRender = () => {
   const queryClient = useQueryClient();
-  const { data: photoData } = useQuery(photoDataOptions);
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
 
-  const previewSettings = queryClient.getQueryData(["previewSettings"]) as
-    | { zoom: number; pageSide?: "left" | "right"; scale: number }
+  const { data: draftPhotoData } = useQuery({
+    queryKey: ['draftPhoto', selectedListingId, selectedDocumentType],
+  });
+
+  const previewSettings = queryClient.getQueryData(['previewSettings']) as
+    | { zoom: number; pageSide?: 'left' | 'right'; scale: number }
     | undefined;
 
-  const pageSide = previewSettings?.pageSide ?? "right";
+  const { mutate: updateSelectedSection } = useMutation({
+    mutationFn: (section: SectionName) => {
+      queryClient.setQueryData(['selectedSection'], section);
+      return Promise.resolve(section);
+    },
+  });
+
+  const pageSide = previewSettings?.pageSide ?? 'right';
   const zoom = previewSettings?.zoom ?? 1;
   const scale = previewSettings?.scale ?? 1;
 
-  if (!photoData) return null;
+  if (!draftPhotoData) return null;
 
   const renderPhotoLayout = () => {
     const baseClasses = `absolute ${
-      pageSide === "right"
-        ? "items-end justify-end pr-[4.75%]"
-        : "items-end justify-start pl-[4.75%]"
-    } bg-muted pb-[1.9%] font-extrabold`;
+      pageSide === 'right'
+        ? 'items-end justify-end pr-[4.75%]'
+        : 'items-end justify-start pl-[4.75%]'
+    } bg-muted pb-[1.9%] font-extrabold group/photo-container transition-colors duration-300`;
 
-    const containerClasses = `absolute left-[4.75%] top-[6%] w-[90.5%] h-[60.25%]`;
+    const containerClasses = `absolute left-[4.75%] top-[6%] w-[90.5%] h-[60.25%] cursor-pointer group`;
 
     // Calculate the scaled border radius
-    const baseRadius = 15; // Adjust this value as needed
+    const baseRadius = 15;
     const scaledRadius = `${baseRadius * scale * zoom}px`;
 
     const roundedCornerStyle =
-      pageSide === "left"
+      pageSide === 'left'
         ? { borderTopLeftRadius: scaledRadius }
         : { borderTopRightRadius: scaledRadius };
 
     const renderPhoto = (index: number, style: React.CSSProperties) => {
-      const photo = photoData.photos[index];
+      const photo = draftPhotoData.photos[index];
       return (
         <div
-          className={`${baseClasses} flex items-center justify-center`}
+          className={`${baseClasses} flex items-center justify-center group-hover/photo-container:scale-110`}
           style={{
             ...style,
-            overflow: "hidden",
+            overflow: 'hidden',
           }}
         >
           {photo?.cropped ? (
@@ -52,97 +65,102 @@ const PhotoRender = () => {
               alt={`Photo ${index + 1}`}
               layout="fill"
               objectFit="cover"
+              className="group-hover/photo-container:scale-110 transition-all duration-300"
             />
           ) : (
-            <ImageIcon className="h-1/4 w-1/4 text-gray-400" />
+            <ImageIcon className="h-1/4 w-1/4 text-gray-400 group-hover/photo-container:text-warning-foreground group-hover/photo-container:scale-110 transition-all duration-300" />
           )}
         </div>
       );
     };
 
-    switch (photoData.photoCount) {
+    const handleClick = () => {
+      updateSelectedSection('Photos' as SectionName);
+    };
+
+    switch (draftPhotoData.photoCount) {
       case 1:
         return (
-          <div className={containerClasses}>
+          <div className={containerClasses} onClick={handleClick}>
             {renderPhoto(0, {
-              left: "0",
-              top: "0",
-              width: "100%",
-              height: "100%",
+              left: '0',
+              top: '0',
+              width: '100%',
+              height: '100%',
               ...roundedCornerStyle,
             })}
           </div>
         );
       case 2:
         return (
-          <div className={containerClasses}>
+          <div className={containerClasses} onClick={handleClick}>
             {renderPhoto(0, {
-              left: "0",
-              top: "0",
-              width: "100%",
-              height: "58.91%",
+              left: '0',
+              top: '0',
+              width: '100%',
+              height: '58.91%',
               ...roundedCornerStyle,
             })}
             {renderPhoto(1, {
-              left: "0",
-              bottom: "0",
-              width: "100%",
-              height: "39.01%",
+              left: '0',
+              bottom: '0',
+              width: '100%',
+              height: '39.01%',
             })}
           </div>
         );
       case 3:
         return (
-          <div className={containerClasses}>
+          <div className={containerClasses} onClick={handleClick}>
             {renderPhoto(0, {
-              left: "0",
-              top: "0",
-              width: "100%",
-              height: "58.91%",
+              left: '0',
+              top: '0',
+              width: '100%',
+              height: '58.91%',
               ...roundedCornerStyle,
             })}
             {renderPhoto(1, {
-              left: "0",
-              bottom: "0",
-              width: "49.17%",
-              height: "39.01%",
+              left: '0',
+              bottom: '0',
+              width: '49.17%',
+              height: '39.01%',
             })}
             {renderPhoto(2, {
-              right: "0",
-              bottom: "0",
-              width: "49.17%",
-              height: "39.01%",
+              right: '0',
+              bottom: '0',
+              width: '49.17%',
+              height: '39.01%',
             })}
           </div>
         );
       case 4:
         return (
-          <div className={containerClasses}>
+          <div className={containerClasses} onClick={handleClick}>
             {renderPhoto(0, {
-              left: "0",
-              top: "0",
-              width: "49.17%",
-              height: "58.91%",
-              ...(pageSide === "left" ? roundedCornerStyle : {}),
+              left: '0',
+              top: '0',
+              width: '49.17%',
+              height: '58.91%',
+              ...(pageSide === 'left' ? roundedCornerStyle : {}),
             })}
             {renderPhoto(1, {
-              right: "0",
-              top: "0",
-              width: "49.17%",
-              height: "58.91%",
-              ...(pageSide === "right" ? roundedCornerStyle : {}),
+              right: '0',
+              top: '0',
+              width: '49.17%',
+              height: '58.91%',
+              ...(pageSide === 'right' ? roundedCornerStyle : {}),
             })}
             {renderPhoto(2, {
-              left: "0",
-              bottom: "0",
-              width: "49.17%",
-              height: "39.01%",
+              left: '0',
+              bottom: '0',
+              width: '49.17%',
+              height: '39.01%',
             })}
             {renderPhoto(3, {
-              right: "0",
-              bottom: "0",
-              width: "49.17%",
-              height: "39.01%",
+              right: '0',
+              bottom: '0',
+              width: '49.17%',
+              height: '39.01%',
             })}
           </div>
         );
