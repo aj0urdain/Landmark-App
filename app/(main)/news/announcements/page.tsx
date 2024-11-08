@@ -39,6 +39,8 @@ const AnnouncementsNewsPage = () => {
       .select('*')
       .eq('article_type', 'announcement');
 
+    console.log('announcements', data);
+
     return { data, error };
   };
 
@@ -70,8 +72,9 @@ const AnnouncementsNewsPage = () => {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {announcements &&
-          announcements.length > 0 &&
-          announcements.map((announcement) => (
+          announcements.data &&
+          announcements.data.length > 0 &&
+          announcements.data.map((announcement) => (
             <Link
               href={`/news/announcements/${announcement.id.toString()}`}
               key={announcement.id}
@@ -101,6 +104,8 @@ const AnnouncementsNewsPage = () => {
       </div>
 
       <Separator className="my-12" />
+
+      {/* dont need to show more announcements for now */}
 
       <div className="mt-6">
         {/* <h1 className="text-lg font-bold text-muted-foreground">More Announcements</h1> */}

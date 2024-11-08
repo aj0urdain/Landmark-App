@@ -4,6 +4,7 @@ import { Link2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
 
 // Define the link type
 type QuickLink = {
@@ -138,10 +139,21 @@ const PersonalLinks = () => {
 
         <ScrollArea className="flex-1">
           {Object.entries(QUICK_LINKS).map(([category, links]) => (
-            <TabsContent key={category} value={category} className="p-4">
+            <TabsContent
+              key={category}
+              value={category}
+              className="p-4 animate-slide-down-fade-in"
+            >
               <div className="grid grid-cols-3 gap-3">
-                {filterLinksByAccess(links).map((link) => (
-                  <LinkTile key={link.id} {...link} />
+                {filterLinksByAccess(links).map((link, index) => (
+                  <StaggeredAnimation
+                    key={link.id}
+                    index={index}
+                    baseDelay={0.1}
+                    incrementDelay={0.05}
+                  >
+                    <LinkTile key={link.id} {...link} />
+                  </StaggeredAnimation>
                 ))}
               </div>
             </TabsContent>
