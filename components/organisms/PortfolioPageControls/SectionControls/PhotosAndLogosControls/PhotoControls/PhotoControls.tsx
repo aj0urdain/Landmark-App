@@ -1,16 +1,45 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { PhotoLayoutSelector } from './PhotoLayoutSelector/PhotoLayoutSelector';
 import PhotoSelectionDialog from './PhotoSelectionDialog/PhotoSelectionDialog';
-import { photoDataOptions } from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
+import { useSearchParams } from 'next/navigation';
 
 const PhotoControls: React.FC = () => {
-  const { data: photoData } = useQuery(photoDataOptions);
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
 
-  if (!photoData) return null;
+  // Get the document data
+  const { data: documentData } = useQuery({
+    queryKey: ['document', selectedListingId, selectedDocumentType],
+  });
+
+  // Get draft photo data
+  const { data: draftPhotoData } = useQuery({
+    queryKey: ['draftPhoto', selectedListingId, selectedDocumentType],
+  });
+
+  // Initialize draft state if needed
+  React.useEffect(() => {
+    if (documentData && !draftPhotoData) {
+      queryClient.setQueryData(['draftPhoto', selectedListingId, selectedDocumentType], {
+        photoCount: documentData.document_data?.photoData?.photoCount ?? 1,
+        photos: documentData.document_data?.photoData?.photos ?? [],
+      });
+    }
+  }, [
+    documentData,
+    draftPhotoData,
+    queryClient,
+    selectedListingId,
+    selectedDocumentType,
+  ]);
+
+  if (!draftPhotoData) return null;
 
   const renderPhotoLayout = () => {
-    switch (photoData.photoCount) {
+    switch (draftPhotoData.photoCount) {
       case 1:
         return (
           <div className="flex h-full flex-col">
@@ -73,7 +102,7 @@ const PhotoControls: React.FC = () => {
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 animate-slide-down-fade-in">
       <PhotoLayoutSelector />
       <div className="aspect-[16/9] w-full rounded-lg border border-slate-900 p-4 pb-[calc(1rem+0.5rem)]">
         {renderPhotoLayout()}

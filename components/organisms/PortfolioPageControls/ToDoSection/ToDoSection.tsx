@@ -1,66 +1,108 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Label } from '@/components/ui/label';
 import { SectionName } from '@/types/portfolioControlsTypes';
 import { sectionIcons } from '@/constants/portfolioPageConstants';
+import { useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import {
-  photoDataOptions,
-  headlineDataOptions,
-  addressDataOptions,
-  financeDataOptions,
-  propertyCopyDataOptions,
-  agentsDataOptions,
-  saleTypeDataOptions,
-} from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
-
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 const ToDoSection: React.FC = () => {
-  const { data: photoData } = useQuery(photoDataOptions);
-  const { data: headlineData } = useQuery(headlineDataOptions);
-  const { data: addressData } = useQuery(addressDataOptions);
-  const { data: financeData } = useQuery(financeDataOptions);
-  const { data: propertyCopyData } = useQuery(propertyCopyDataOptions);
-  const { data: agentsData } = useQuery(agentsDataOptions);
-  const { data: saleTypeData } = useQuery(saleTypeDataOptions);
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
+
+  const queryClient = useQueryClient();
+
+  // Get the document data
+  const { data: documentData } = useQuery({
+    queryKey: ['document', selectedListingId, selectedDocumentType],
+  });
 
   const incompleteItems = {
-    Photos: [{ isNecessary: true, isDone: photoData?.photoCount ?? 0 > 0 }].filter(
-      (task) => task.isNecessary && !task.isDone,
-    ).length,
-    Logos: 0, // Assuming logos are not necessary for now
-    Headline: [{ isNecessary: true, isDone: !!headlineData?.headline }].filter(
-      (task) => task.isNecessary && !task.isDone,
-    ).length,
+    Photos: [
+      {
+        isNecessary: false,
+        isDone: documentData?.document_data?.photoData?.photoCount ?? 0 > 0,
+      },
+    ].filter((task) => task.isNecessary && !task.isDone).length,
+    Logos: [
+      {
+        isNecessary: false,
+        isDone: documentData?.document_data?.logoData?.logoCount ?? 0 > 0,
+      },
+    ].filter((task) => task.isNecessary && !task.isDone).length,
+    Headline: [
+      {
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.headlineData?.headline,
+      },
+    ].filter((task) => task.isNecessary && !task.isDone).length,
     Address: [
-      { isNecessary: true, isDone: !!addressData?.suburb },
-      { isNecessary: true, isDone: !!addressData?.state },
-      { isNecessary: true, isDone: !!addressData?.street },
+      {
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.addressData?.addressLine1,
+      },
+      {
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.addressData?.addressLine2,
+      },
     ].filter((task) => task.isNecessary && !task.isDone).length,
     Finance: [
-      { isNecessary: true, isDone: !!financeData?.financeCopy },
-      { isNecessary: true, isDone: !!financeData?.financeType },
-      { isNecessary: true, isDone: !!financeData?.financeAmount },
+      {
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.financeData?.financeCopy,
+      },
+      {
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.financeData?.financeType,
+      },
+      {
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.financeData?.financeAmount,
+      },
     ].filter((task) => task.isNecessary && !task.isDone).length,
     'Property Copy': [
-      { isNecessary: true, isDone: !!propertyCopyData?.propertyCopy },
+      {
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.propertyCopyData?.propertyCopy,
+      },
     ].filter((task) => task.isNecessary && !task.isDone).length,
     Agents: [
       {
         isNecessary: true,
-        isDone: agentsData?.agents && agentsData.agents.length > 0,
+        isDone:
+          documentData?.document_data?.agentsData?.agents &&
+          documentData.document_data.agentsData.agents.length > 0,
       },
     ].filter((task) => task.isNecessary && !task.isDone).length,
     'Sale Type': [
-      { isNecessary: true, isDone: !!saleTypeData?.saleType },
       {
-        isNecessary: saleTypeData?.saleType === 'auction',
-        isDone: !!saleTypeData?.auctionId,
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.saleTypeData?.saleType,
       },
       {
-        isNecessary: saleTypeData?.saleType === 'expression',
-        isDone: !!saleTypeData?.expressionOfInterest?.closingDate,
+        isNecessary: documentData?.document_data?.saleTypeData?.saleType === 'auction',
+        isDone: !!documentData?.document_data?.saleTypeData?.auctionId,
+      },
+      {
+        isNecessary: documentData?.document_data?.saleTypeData?.saleType === 'expression',
+        isDone:
+          !!documentData?.document_data?.saleTypeData?.expressionOfInterest?.closingDate,
       },
     ].filter((task) => task.isNecessary && !task.isDone).length,
   };
+
+  const { mutate: updateSelectedSection } = useMutation({
+    mutationFn: (section: SectionName) => {
+      queryClient.setQueryData(['selectedSection'], section);
+      return Promise.resolve(section);
+    },
+  });
 
   return (
     <div className="my-2 flex items-center justify-between">
@@ -74,15 +116,33 @@ const ToDoSection: React.FC = () => {
         </p>
       </Label>
 
-      <div className="flex space-x-4">
+      <div className="flex space-x-1">
         {Object.entries(incompleteItems).map(([section, count]) => {
           if (count > 0) {
             const IconComponent = sectionIcons[section as SectionName];
             return (
-              <div key={section} className="flex items-center" title={section}>
-                <IconComponent className="mr-1 h-3 w-3" />
-                <span className="text-xs">{count}</span>
-              </div>
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      key={section}
+                      className="flex items-center py-0 hover:text-warning-foreground"
+                      size="icon"
+                      variant="ghost"
+                      title={section}
+                      onClick={() => {
+                        updateSelectedSection(section as SectionName);
+                      }}
+                    >
+                      <IconComponent className="mr-0.5 h-3 w-3" />
+                      <span className="text-xs">{count}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-muted/50 text-warning-foreground">
+                    {section}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             );
           }
           return null;

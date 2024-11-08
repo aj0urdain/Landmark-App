@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Combobox } from '@/components/ui/combobox';
 
 interface LogoDatabaseProps {
   onLogoSelect: (logoUrl: string) => void;
@@ -8,20 +8,20 @@ interface LogoDatabaseProps {
 
 const databaseLogos = [
   {
-    value: "guzman-y-gomez",
-    label: "Guzman Y Gomez",
-    url: "https://i.imgur.com/Oy0eUvg.png",
+    value: 'guzman-y-gomez',
+    label: 'Guzman Y Gomez',
+    url: 'https://i.imgur.com/Oy0eUvg.png',
   },
-  { value: "kfc", label: "KFC", url: "https://i.imgur.com/jiVKH5p.png" },
+  { value: 'kfc', label: 'KFC', url: 'https://i.imgur.com/jiVKH5p.png' },
   {
-    value: "mcdonalds",
-    label: "McDonalds",
-    url: "https://i.imgur.com/qiJX3cq.png",
+    value: 'mcdonalds',
+    label: 'McDonalds',
+    url: 'https://i.imgur.com/qiJX3cq.png',
   },
   {
-    value: "pearl-energy",
-    label: "Pearl Energy",
-    url: "https://i.imgur.com/RpRAfXx.png",
+    value: 'pearl-energy',
+    label: 'Pearl Energy',
+    url: 'https://i.imgur.com/RpRAfXx.png',
   },
 ];
 
@@ -50,6 +50,7 @@ const LogoDatabase: React.FC<LogoDatabaseProps> = ({ onLogoSelect }) => {
         placeholder="Select logo..."
         onSelect={handleSelect}
         selectedValue={selectedLogo}
+        modal
       />
       <Button onClick={handleSave} disabled={!selectedLogo}>
         Save Selection

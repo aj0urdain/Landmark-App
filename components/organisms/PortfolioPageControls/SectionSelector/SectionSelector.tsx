@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 import {
   Select,
   SelectContent,
@@ -11,15 +12,6 @@ import {
 } from '@/components/ui/select';
 import { sectionIcons } from '@/constants/portfolioPageConstants';
 import { SectionName } from '@/types/portfolioControlsTypes';
-import {
-  photoDataOptions,
-  headlineDataOptions,
-  addressDataOptions,
-  financeDataOptions,
-  propertyCopyDataOptions,
-  agentsDataOptions,
-  saleTypeDataOptions,
-} from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
 import { Dot } from '@/components/atoms/Dot/Dot';
 
 interface SectionSelectorProps {
@@ -27,13 +19,13 @@ interface SectionSelectorProps {
 }
 
 const SectionSelector: React.FC<SectionSelectorProps> = ({ onValueChange }) => {
-  const { data: photoData } = useQuery(photoDataOptions);
-  const { data: headlineData } = useQuery(headlineDataOptions);
-  const { data: addressData } = useQuery(addressDataOptions);
-  const { data: financeData } = useQuery(financeDataOptions);
-  const { data: propertyCopyData } = useQuery(propertyCopyDataOptions);
-  const { data: agentsData } = useQuery(agentsDataOptions);
-  const { data: saleTypeData } = useQuery(saleTypeDataOptions);
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
+
+  const { data: documentData } = useQuery({
+    queryKey: ['document', selectedListingId, selectedDocumentType],
+  });
 
   const { data: currentSection } = useQuery({
     queryKey: ['selectedSection'],
@@ -45,95 +37,117 @@ const SectionSelector: React.FC<SectionSelectorProps> = ({ onValueChange }) => {
       {
         name: 'Set Layout',
         isNecessary: true,
-        isDone: photoData?.photoCount ?? 0 > 0,
+        isDone: documentData?.document_data?.photoData?.photoCount ?? 0 > 0,
       },
       {
         name: 'Choose Photos',
         isNecessary: false,
-        isDone: photoData?.photos.some((photo) => photo.original !== null),
+        isDone: documentData?.document_data?.photoData?.photos?.some(
+          (photo) => photo.original !== null,
+        ),
       },
     ],
     Logos: [
-      { name: 'Choose Logo Count', isNecessary: false, isDone: false },
-      { name: 'Set Orientation', isNecessary: false, isDone: false },
-      { name: 'Upload Logos', isNecessary: false, isDone: false },
+      {
+        name: 'Set Logo Count',
+        isNecessary: true,
+        isDone: documentData?.document_data?.logoData?.logoCount ?? 0 > 0,
+      },
+      {
+        name: 'Set Orientation',
+        isNecessary: false,
+        isDone: !!documentData?.document_data?.logoData?.logoOrientation,
+      },
+      {
+        name: 'Upload Logos',
+        isNecessary: false,
+        isDone: documentData?.document_data?.logoData?.logos?.some((logo) => logo),
+      },
     ],
     Headline: [
       {
         name: 'Enter Headline',
         isNecessary: true,
-        isDone: !!headlineData?.headline,
+        isDone: !!documentData?.document_data?.headlineData?.headline,
       },
     ],
     Address: [
       {
         name: 'Enter Suburb',
         isNecessary: true,
-        isDone: !!addressData?.suburb,
+        isDone: !!documentData?.document_data?.addressData?.suburb,
       },
-      { name: 'Enter State', isNecessary: true, isDone: !!addressData?.state },
+      {
+        name: 'Enter State',
+        isNecessary: true,
+        isDone: !!documentData?.document_data?.addressData?.state,
+      },
       {
         name: 'Enter Additional',
         isNecessary: false,
-        isDone: !!addressData?.additional,
+        isDone: !!documentData?.document_data?.addressData?.additional,
       },
       {
         name: 'Enter Street',
         isNecessary: true,
-        isDone: !!addressData?.street,
+        isDone: !!documentData?.document_data?.addressData?.street,
       },
     ],
     Finance: [
       {
         name: 'Enter Finance Copy',
         isNecessary: true,
-        isDone: !!financeData?.financeCopy,
+        isDone: !!documentData?.document_data?.financeData?.financeCopy,
       },
       {
         name: 'Select Finance Type',
         isNecessary: true,
-        isDone: !!financeData?.financeType,
+        isDone: !!documentData?.document_data?.financeData?.financeType,
       },
       {
         name: 'Enter Finance Amount',
         isNecessary: true,
-        isDone: !!financeData?.financeAmount,
+        isDone: !!documentData?.document_data?.financeData?.financeAmount,
       },
     ],
     'Property Copy': [
       {
         name: 'Enter Property Copy',
         isNecessary: true,
-        isDone: !!propertyCopyData?.propertyCopy,
+        isDone: !!documentData?.document_data?.propertyCopyData?.propertyCopy,
       },
     ],
     Agents: [
       {
         name: 'Add Agents',
         isNecessary: true,
-        isDone: agentsData?.agents && agentsData.agents.length > 0,
+        isDone:
+          documentData?.document_data?.agentsData?.agents &&
+          documentData.document_data.agentsData.agents.length > 0,
       },
     ],
     'Sale Type': [
       {
         name: 'Select Sale Type',
         isNecessary: true,
-        isDone: !!saleTypeData?.saleType,
+        isDone: !!documentData?.document_data?.saleTypeData?.saleType,
       },
-      ...(saleTypeData?.saleType === 'auction'
+      ...(documentData?.document_data?.saleTypeData?.saleType === 'auction'
         ? [
             {
               name: 'Enter Auction Details',
               isNecessary: true,
-              isDone: !!saleTypeData?.auctionId,
+              isDone: !!documentData?.document_data?.saleTypeData?.auctionId,
             },
           ]
-        : saleTypeData?.saleType === 'expression'
+        : documentData?.document_data?.saleTypeData?.saleType === 'expression'
           ? [
               {
                 name: 'Enter EOI Details',
                 isNecessary: true,
-                isDone: !!saleTypeData?.expressionOfInterest?.closingDate,
+                isDone:
+                  !!documentData?.document_data?.saleTypeData?.expressionOfInterest
+                    ?.closingDate,
               },
             ]
           : []),

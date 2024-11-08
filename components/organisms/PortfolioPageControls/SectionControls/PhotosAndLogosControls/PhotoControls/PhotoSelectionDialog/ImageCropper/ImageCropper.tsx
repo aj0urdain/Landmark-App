@@ -1,20 +1,17 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import ReactCrop, {
   centerCrop,
   makeAspectCrop,
   Crop,
   PixelCrop,
   convertToPixelCrop,
-} from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
-import { Button } from "@/components/ui/button";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  photoDataOptions,
-  updatePhoto,
-} from "@/utils/sandbox/document-generator/portfolio-page/portfolio-queries";
-import { getAspectRatio } from "@/utils/sandbox/document-generator/portfolio-page/getAspectRatio";
-import { createBrowserClient } from "@/utils/supabase/client";
+} from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import { Button } from '@/components/ui/button';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getAspectRatio } from '@/utils/sandbox/document-generator/portfolio-page/getAspectRatio';
+import { createBrowserClient } from '@/utils/supabase/client';
+import { useSearchParams } from 'next/navigation';
 
 interface ImageCropperProps {
   src: string;
@@ -23,15 +20,11 @@ interface ImageCropperProps {
   onCancel: () => void;
 }
 
-function centerAspectCrop(
-  mediaWidth: number,
-  mediaHeight: number,
-  aspect: number,
-) {
+function centerAspectCrop(mediaWidth: number, mediaHeight: number, aspect: number) {
   return centerCrop(
     makeAspectCrop(
       {
-        unit: "%",
+        unit: '%',
         width: 90,
       },
       aspect,
@@ -50,16 +43,20 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   onCancel,
 }) => {
   const queryClient = useQueryClient();
-  const { data: photoData } = useQuery(photoDataOptions);
+  const searchParams = useSearchParams();
+  const selectedListingId = searchParams.get('listing') ?? null;
+  const selectedDocumentType = searchParams.get('documentType') ?? null;
+
+  const { data: photoData } = useQuery({
+    queryKey: ['draftPhoto', selectedListingId, selectedDocumentType],
+  });
 
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [scale, setScale] = useState(1);
   const imgRef = useRef<HTMLImageElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const aspect = photoData
-    ? getAspectRatio(photoData.photoCount, index)
-    : 16 / 9;
+  const aspect = photoData ? getAspectRatio(photoData.photoCount, index) : 16 / 9;
 
   console.log(scale);
 
@@ -69,17 +66,25 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       cropped: string;
       crop: { x: number; y: number; width: number; height: number };
     }) => {
-      if (!photoData) throw new Error("Photo data not available");
-      return updatePhoto(
-        index,
-        newPhotoData.original,
-        newPhotoData.cropped,
-        newPhotoData.crop,
-        photoData,
-      );
+      if (!photoData) throw new Error('Photo data not available');
+      const updatedPhotos = [...photoData.photos];
+      updatedPhotos[index] = {
+        ...updatedPhotos[index],
+        original: newPhotoData.original,
+        cropped: newPhotoData.cropped,
+        crop: newPhotoData.crop,
+      };
+
+      return Promise.resolve({
+        ...photoData,
+        photos: updatedPhotos,
+      });
     },
     onSuccess: (newPhotoData) => {
-      queryClient.setQueryData(photoDataOptions.queryKey, newPhotoData);
+      queryClient.setQueryData(
+        ['draftPhoto', selectedListingId, selectedDocumentType],
+        newPhotoData,
+      );
       onCropComplete();
     },
   });
@@ -87,7 +92,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   const onImageLoad = useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {
       const { width, height, naturalWidth, naturalHeight } = e.currentTarget;
-      const savedCrop = photoData?.photos[index].crop;
+      const savedCrop = photoData?.photos[index]?.crop;
 
       // Calculate scale
       const containerWidth = 800; // Adjust this to your container width
@@ -100,7 +105,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       if (savedCrop) {
         // Convert saved crop to percentage
         const percentCrop: Crop = {
-          unit: "%",
+          unit: '%',
           x: (savedCrop.x / naturalWidth) * 100,
           y: (savedCrop.y / naturalHeight) * 100,
           width: (savedCrop.width / naturalWidth) * 100,
@@ -125,10 +130,10 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
     if (completedCrop && imgRef.current && previewCanvasRef.current) {
       const image = imgRef.current;
       const canvas = previewCanvasRef.current;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
 
       if (!ctx) {
-        throw new Error("No 2d context");
+        throw new Error('No 2d context');
       }
 
       const scaleX = image.naturalWidth / image.width;
@@ -152,31 +157,31 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
 
       canvas.toBlob(async (blob) => {
         if (!blob) {
-          console.error("Canvas is empty");
+          console.error('Canvas is empty');
           return;
         }
 
         const supabase = createBrowserClient();
         const file = new File([blob], `cropped_image_${Date.now()}.jpg`, {
-          type: "image/jpeg",
+          type: 'image/jpeg',
         });
 
         const { data, error } = await supabase.storage
-          .from("user_uploads")
+          .from('user_uploads')
           .upload(`cropped_images/${file.name}`, file, {
-            cacheControl: "3600",
+            cacheControl: '3600',
             upsert: false,
           });
 
         console.log(data);
 
         if (error) {
-          console.error("Error uploading file:", error);
+          console.error('Error uploading file:', error);
           return;
         }
 
         const { data: urlData } = supabase.storage
-          .from("user_uploads")
+          .from('user_uploads')
           .getPublicUrl(`cropped_images/${file.name}`);
 
         const croppedImageUrl = urlData.publicUrl;
@@ -191,7 +196,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
             height: completedCrop.height * scaleY,
           },
         });
-      }, "image/jpeg");
+      }, 'image/jpeg');
     }
   }, [completedCrop, imgRef, src, updatePhotoMutation]);
 
@@ -209,10 +214,10 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
           alt="Crop me"
           onLoad={onImageLoad}
           style={{
-            maxHeight: "600px",
-            maxWidth: "800px",
-            width: "auto",
-            height: "auto",
+            maxHeight: '600px',
+            maxWidth: '800px',
+            width: 'auto',
+            height: 'auto',
           }}
           crossOrigin="anonymous"
         />
@@ -220,7 +225,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       <canvas
         ref={previewCanvasRef}
         style={{
-          display: "none", // Hide the canvas, we just need it for processing
+          display: 'none', // Hide the canvas, we just need it for processing
         }}
       />
       <div className="mt-4 flex justify-end space-x-2">
