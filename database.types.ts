@@ -539,6 +539,20 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: 'documents_document_owner_fkey1';
+            columns: ['document_owner'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'documents_document_owner_fkey1';
+            columns: ['document_owner'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+          {
             foreignKeyName: 'documents_document_type_id_fkey';
             columns: ['document_type_id'];
             isOneToOne: false;
@@ -864,7 +878,7 @@ export type Database = {
           associated_agents?: string[] | null;
           created_at?: string;
           id?: number;
-          lead_agent: string;
+          lead_agent?: string;
           portfolio?: number | null;
           property_id?: number | null;
           salesforce_listing_id?: string | null;
