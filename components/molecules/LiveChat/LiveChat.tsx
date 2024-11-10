@@ -62,9 +62,9 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      setCurrentUser(user?.id || null);
+      setCurrentUser(user?.id ?? null);
     };
-    fetchCurrentUser();
+    void fetchCurrentUser();
   }, [supabase]);
 
   const fetchMessages = useCallback(async () => {
@@ -89,7 +89,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
   }, [chatName, supabase]);
 
   useEffect(() => {
-    fetchMessages();
+    void fetchMessages();
     const channel = supabase
       .channel('chat_messages')
       .on(
@@ -100,7 +100,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
           table: 'chat_messages',
         },
         () => {
-          fetchMessages();
+          void fetchMessages();
           // Clear the floating message when new messages are received
           setFloatingMessage(null);
         },
@@ -108,7 +108,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      void supabase.removeChannel(channel);
     };
   }, [chatName, supabase, fetchMessages]);
 
@@ -302,7 +302,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
 
   return (
     <Card
-      style={{ height: height }}
+      style={{ height: height ?? '100%' }}
       className="flex h-full w-full flex-col overflow-visible"
     >
       <CardHeader>
