@@ -1,51 +1,44 @@
-"use client";
+'use client';
 
-import SubNavigationMenu from "@/components/molecules/SubNavigationMenu/SubNavigationMenu";
-import {
-  Home,
-  LibraryBig,
-  Component,
-  MapPin,
-  GraduationCap,
-  Users,
-} from "lucide-react";
+import SubNavigationMenu from '@/components/molecules/SubNavigationMenu/SubNavigationMenu';
+import { Home, LibraryBig, Component, MapPin, GraduationCap, Users } from 'lucide-react';
 
 const wikiLinks = [
   {
-    name: "Home",
+    name: 'Home',
     icon: Home,
-    href: "/wiki",
+    href: '/wiki',
   },
   {
-    name: "Library",
+    name: 'Library',
     icon: LibraryBig,
-    href: "/wiki/library",
+    href: '/wiki/library',
   },
   {
-    name: "Departments",
+    name: 'Departments',
     icon: Component,
-    href: "/wiki/departments",
+    href: '/wiki/departments',
   },
   {
-    name: "Branches",
+    name: 'Branches',
     icon: MapPin,
-    href: "/wiki/branches",
+    href: '/wiki/branches',
   },
   {
-    name: "People",
+    name: 'People',
     icon: Users,
-    href: "/wiki/people",
+    href: '/wiki/people',
   },
   {
-    name: "Learn",
+    name: 'Learn',
     icon: GraduationCap,
-    href: "/wiki/learn",
+    href: '/wiki/learn',
   },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <SubNavigationMenu title="Wiki" links={wikiLinks} rootPath="/wiki" />
       {children}
     </div>
