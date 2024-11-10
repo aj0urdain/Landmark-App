@@ -29,8 +29,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (userProfile?.departments) {
-      const allDepartments = ['Burgess Rawson', ...userProfile.departments];
-      setSelectedDepartments(allDepartments);
+      setSelectedDepartments(userProfile.departments);
     }
   }, [userProfile?.departments]);
 

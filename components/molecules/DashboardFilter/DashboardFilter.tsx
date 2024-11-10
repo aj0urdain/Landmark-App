@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Card } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { userProfileOptions } from "@/types/userProfileTypes";
-import { Filter } from "lucide-react";
-import { useState, useEffect } from "react";
-import { DepartmentFilterBadge } from "@/components/atoms/DepartmentFilterBadge/DepartmentFilterBadge";
+import { Card } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
+import { userProfileOptions } from '@/types/userProfileTypes';
+import { Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { DepartmentFilterBadge } from '@/components/atoms/DepartmentFilterBadge/DepartmentFilterBadge';
 
 export default function DashboardFilter({
   onFilterChange,
@@ -26,7 +26,7 @@ export default function DashboardFilter({
 
   useEffect(() => {
     if (userProfile?.departments && !isInitialized) {
-      const allDepartments = ["Burgess Rawson", ...userProfile.departments];
+      const allDepartments = ['Burgess Rawson', ...userProfile.departments];
       setSelectedDepartments(allDepartments);
       onFilterChange(allDepartments);
       setIsInitialized(true);
@@ -70,17 +70,14 @@ export default function DashboardFilter({
         </span>
       </div>
       <div className="flex flex-wrap items-center gap-4">
-        <DepartmentFilterBadge
-          department="Burgess Rawson"
-          isSelected={selectedDepartments.includes("Burgess Rawson")}
-          onClick={() => handleFilterClick("Burgess Rawson")}
-        />
         {userProfile?.departments?.map((department) => (
           <DepartmentFilterBadge
             key={department}
             department={department}
             isSelected={selectedDepartments.includes(department)}
-            onClick={() => handleFilterClick(department)}
+            onClick={() => {
+              handleFilterClick(department);
+            }}
           />
         ))}
       </div>

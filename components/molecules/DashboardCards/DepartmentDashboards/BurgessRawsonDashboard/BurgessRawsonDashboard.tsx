@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 import DashboardContainer from '@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer';
 import LiveChat from '@/components/molecules/LiveChat/LiveChat';
-import { Bell, Cake, Calendar, Link2, Timer } from 'lucide-react';
+import { Bell, Calendar } from 'lucide-react';
 
 const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
@@ -36,61 +36,9 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
           </Card>
         </div>
         <div className="col-span-6 h-full overflow-visible">
-          <LiveChat chatName="company" height={420} />
+          <LiveChat chatName="Burgess Rawson" height={420} />
         </div>
       </DashboardCardRow>
-      {/* <DashboardCardRow>
-        <div className="col-span-2 h-full">
-          <Card className="flex h-full flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Timer className="h-3 w-3" />
-                Countdown
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center text-sm text-muted">
-              <p>
-                choose event to display interactive countdown, otherwise default to next
-                company event
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="col-span-3 h-full">
-          <Card className="flex h-full flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Cake className="h-3 w-3" />
-                Birthdays
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted">
-              <p>
-                Table of birthdays with name, role, and age.
-                <br />
-                <br />
-                Add a filter to change birthdays via day/week/month
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="col-span-7 h-full">
-          <Card className="flex h-full flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Link2 className="h-3 w-3" />
-                Links and Resources
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted">
-              <p>
-                Links to commonly used websites and applications, could either be icons
-                with floating tooltips or a table?
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </DashboardCardRow> */}
     </DashboardContainer>
   );
 };

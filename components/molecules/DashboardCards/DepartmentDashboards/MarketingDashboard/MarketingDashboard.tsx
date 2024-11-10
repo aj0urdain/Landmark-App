@@ -1,28 +1,46 @@
-import React from "react";
-import { DashboardCardRow } from "@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import React from 'react';
+import { DashboardCardRow } from '@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
-import DashboardContainer from "@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer";
+import DashboardContainer from '@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer';
+import LiveChat from '@/components/molecules/LiveChat/LiveChat';
+import { Bell, Calendar } from 'lucide-react';
 
 const MarketingDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
     <DashboardContainer department="Marketing" isLast={isLast}>
-      <DashboardCardRow>
-        <div className="col-span-12 h-full">
-          <Card className="flex h-full flex-col">
+      <DashboardCardRow height={420}>
+        <div className="col-span-6 flex h-full flex-col gap-4">
+          <Card className="row-span-1 flex h-1/2 flex-col">
             <CardHeader>
-              <CardTitle>Marketing</CardTitle>
-              <CardDescription>Marketing dashboard!</CardDescription>
+              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                Marketing Events
+              </CardTitle>
             </CardHeader>
+            <CardContent className="flex flex-col text-sm text-muted">
+              <p>Possible table of events?</p>
+              <p>May include filter to change upcoming events via day/week/month</p>
+            </CardContent>
           </Card>
+          <Card className="row-span-1 flex h-1/2 flex-col">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Bell className="h-3 w-3" />
+                Marketing Announcements
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col text-sm text-muted">
+              <p>Either show card or multiple cards</p>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="col-span-6 h-full overflow-visible">
+          <LiveChat chatName="Marketing" height={420} />
         </div>
       </DashboardCardRow>
     </DashboardContainer>
   );
 };
+
 export default MarketingDashboard;
