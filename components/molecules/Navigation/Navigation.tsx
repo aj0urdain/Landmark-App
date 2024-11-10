@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { NavLink } from "@/components/atoms/NavLink/NavLink";
+import { NavLink } from '@/components/atoms/NavLink/NavLink';
 import {
   Home,
   Newspaper,
@@ -13,19 +13,14 @@ import {
   LayoutDashboard,
   CalendarRange,
   WandSparkles,
-} from "lucide-react";
-import React from "react";
+  MessageCircle,
+} from 'lucide-react';
+import React from 'react';
 
-import { Separator } from "@/components/ui/separator";
+import { Separator } from '@/components/ui/separator';
 
-import {
-  LibraryBig,
-  Component,
-  MapPin,
-  Users,
-  GraduationCap,
-} from "lucide-react";
-import { FeedbackButton } from "@/components/molecules/Feedback/FeedbackButton/FeedbackButton";
+import { LibraryBig, Component, MapPin, Users, GraduationCap } from 'lucide-react';
+import { FeedbackButton } from '@/components/molecules/Feedback/FeedbackButton/FeedbackButton';
 
 interface NavigationProps {
   isCollapsed: boolean;
@@ -33,97 +28,105 @@ interface NavigationProps {
 
 const links = [
   {
-    href: "/admin",
+    href: '/admin',
     icon: ShieldCheck,
-    label: "Admin",
-    access: ["Technology, Senior Leadership"],
+    label: 'Admin',
+    access: ['Technology, Senior Leadership'],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
   {
-    href: "/create",
+    href: '/create',
     icon: WandSparkles,
-    label: "Create",
-    access: ["Technology"],
+    label: 'Create',
+    access: ['Technology'],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
   {
-    href: "/sandbox",
+    href: '/sandbox',
     icon: Box,
-    label: "Sandbox",
-    access: ["Technology"],
+    label: 'Sandbox',
+    access: ['Technology'],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
-  { type: "separator" },
+  { type: 'separator' },
 
   {
-    href: "/dashboard",
+    href: '/dashboard',
     icon: LayoutDashboard,
-    label: "Dashboard",
+    label: 'Dashboard',
     access: [],
     comingSoon: false,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
   {
-    href: "/events",
+    href: '/events',
     icon: CalendarRange,
-    label: "Events",
+    label: 'Events',
     access: [],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
   {
-    href: "/tasks",
+    href: '/tasks',
     icon: CheckSquare,
-    label: "Tasks",
+    label: 'Tasks',
     access: [],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
   {
-    href: "/news",
+    href: '/news',
     icon: Newspaper,
-    label: "News",
+    label: 'News',
     access: [],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
   {
-    href: "/properties",
-    icon: HousePlus,
-    label: "Properties",
+    href: '/chat',
+    icon: MessageCircle,
+    label: 'Chat',
     access: [],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
-  { type: "separator" },
+  {
+    href: '/properties',
+    icon: HousePlus,
+    label: 'Properties',
+    access: [],
+    comingSoon: true,
+    requiredAccess: ['Technology'],
+  },
+  { type: 'separator' },
 
   {
-    href: "/wiki",
+    href: '/wiki',
     icon: BookText,
-    label: "Wiki",
+    label: 'Wiki',
     access: [],
     comingSoon: false,
     requiredAccess: [],
     subsections: [
-      { name: "Home", href: "/wiki", icon: Home },
-      { name: "Library", href: "/wiki/library", icon: LibraryBig },
-      { name: "Departments", href: "/wiki/departments", icon: Component },
-      { name: "Branches", href: "/wiki/branches", icon: MapPin },
-      { name: "People", href: "/wiki/people", icon: Users },
-      { name: "Learn", href: "/wiki/learn", icon: GraduationCap },
+      { name: 'Home', href: '/wiki', icon: Home },
+      { name: 'Library', href: '/wiki/library', icon: LibraryBig },
+      { name: 'Departments', href: '/wiki/departments', icon: Component },
+      { name: 'Branches', href: '/wiki/branches', icon: MapPin },
+      { name: 'People', href: '/wiki/people', icon: Users },
+      { name: 'Learn', href: '/wiki/learn', icon: GraduationCap },
     ],
   },
-  { type: "separator" },
+  { type: 'separator' },
   {
-    href: "/updates",
+    href: '/updates',
     icon: FileCode,
-    label: " Updates",
+    label: ' Updates',
     access: [],
     comingSoon: true,
-    requiredAccess: ["Technology"],
+    requiredAccess: ['Technology'],
   },
 ];
 
@@ -133,13 +136,13 @@ export const Navigation = React.memo(function Navigation({
   return (
     <nav className="flex w-full flex-col gap-2 pt-4">
       {links.map((link, index) => {
-        if (link.type === "separator") {
+        if (link.type === 'separator') {
           return <Separator key={`separator-${index}`} className="my-4" />;
         }
         return (
           <NavLink
             key={link.href}
-            href={link.href || ""}
+            href={link.href || ''}
             icon={link.icon ?? Home}
             isCollapsed={isCollapsed}
             comingSoon={link.comingSoon}
