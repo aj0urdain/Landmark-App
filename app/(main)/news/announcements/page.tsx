@@ -71,8 +71,7 @@ const AnnouncementsNewsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {announcements &&
-          announcements.data &&
+        {announcements?.data &&
           announcements.data.length > 0 &&
           announcements.data.map((announcement) => (
             <Link
