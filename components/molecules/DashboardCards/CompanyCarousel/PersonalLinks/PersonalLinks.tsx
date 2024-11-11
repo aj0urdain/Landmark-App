@@ -19,12 +19,25 @@ type QuickLink = {
 const QUICK_LINKS: Record<string, QuickLink[]> = {
   general: [
     { id: 1, title: 'Propertybase', url: '#', icon: '💼', access: ['ALL'] },
-    { id: 2, title: 'BR Website', url: '#', icon: '🌐', access: ['ALL'] },
+    {
+      id: 2,
+      title: 'BR Website',
+      url: 'https://burgessrawson.com.au/',
+      icon: '📊',
+      access: ['ALL'],
+    },
     { id: 3, title: 'Docusign', url: '#', icon: '✍️', access: ['ALL'] },
     { id: 4, title: 'Formstack', url: '#', icon: '📝', access: ['ALL'] },
     { id: 5, title: 'Central Station', url: '#', icon: '🚉', access: ['ALL'] },
     { id: 6, title: 'RP Data', url: '#', icon: '📊', access: ['ALL'] },
     { id: 7, title: 'LandChecker', url: '#', icon: '🗺️', access: ['ALL'] },
+    {
+      id: 8,
+      title: 'Supabase',
+      url: 'https://supabase.com/dashboard/project/dodfdwvvwmnnlntpnrec/editor',
+      icon: '🗺️',
+      access: ['ALL'],
+    },
   ],
   social: [
     { id: 8, title: 'BR Facebook', url: '#', icon: '📱', access: ['ALL'] },
@@ -39,11 +52,35 @@ const QUICK_LINKS: Record<string, QuickLink[]> = {
     { id: 15, title: 'Management', url: '#', icon: '📁', access: ['MANAGEMENT'] },
   ],
   news: [
-    { id: 16, title: 'AFR', url: '#', icon: '📰', access: ['ALL'] },
-    { id: 17, title: 'Herald Sun', url: '#', icon: '📰', access: ['ALL'] },
-    { id: 18, title: 'Sydney Morning Herald', url: '#', icon: '📰', access: ['ALL'] },
-    { id: 19, title: 'The Age', url: '#', icon: '📰', access: ['ALL'] },
-    { id: 20, title: 'The Australian', url: '#', icon: '📰', access: ['ALL'] },
+    { id: 16, title: 'AFR', url: 'https://www.afr.com/', icon: '📰', access: ['ALL'] },
+    {
+      id: 17,
+      title: 'Herald Sun',
+      url: 'https://www.heraldsun.com.au/',
+      icon: '📰',
+      access: ['ALL'],
+    },
+    {
+      id: 18,
+      title: 'Sydney Morning Herald',
+      url: 'https://www.smh.com.au/',
+      icon: '📰',
+      access: ['ALL'],
+    },
+    {
+      id: 19,
+      title: 'The Age',
+      url: 'https://www.theage.com.au/',
+      icon: '📰',
+      access: ['ALL'],
+    },
+    {
+      id: 20,
+      title: 'The Australian',
+      url: 'https://www.theaustralian.com.au/',
+      icon: '📰',
+      access: ['ALL'],
+    },
   ],
   department: [
     { id: 21, title: 'MYOB', url: '#', icon: '📒', access: ['ACCOUNTS'] },
@@ -81,17 +118,34 @@ const QUICK_LINKS: Record<string, QuickLink[]> = {
   ],
 };
 
-const LinkTile = ({ title, url, icon }: { title: string; url: string; icon: string }) => (
-  <a
-    href={url}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="flex items-center justify-start gap-1 rounded-lg text-muted-foreground truncate whitespace-nowrap hover:text-foreground border px-2 border-border hover:bg-accent transition-colors"
-  >
-    <span className="">{icon}</span>
-    <span className="text-xs">{title}</span>
-  </a>
-);
+const LinkTile = ({ title, url, icon }: { title: string; url: string; icon: string }) => {
+  const getFaviconUrl = (url: string) => {
+    try {
+      const domain = new URL(url).hostname;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    } catch {
+      return null;
+    }
+  };
+
+  const faviconUrl = url.startsWith('http') ? getFaviconUrl(url) : null;
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-start gap-1 rounded-lg text-muted-foreground truncate whitespace-nowrap hover:text-foreground border px-2 border-border hover:bg-accent transition-colors"
+    >
+      {faviconUrl ? (
+        <img src={faviconUrl} alt="" className="w-4 h-4" />
+      ) : (
+        <span className="">{icon}</span>
+      )}
+      <span className="text-xs">{title}</span>
+    </a>
+  );
+};
 
 // TODO: Get user's departments from auth context
 const userDepartments = ['ACCOUNTS']; // This should come from your auth system
