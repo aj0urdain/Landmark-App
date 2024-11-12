@@ -135,14 +135,14 @@ export const Navigation = React.memo(function Navigation({
 }: NavigationProps) {
   return (
     <nav className="flex w-full flex-col gap-2 pt-4">
-      {links.map((link, index) => {
+      {links.map((link, index: number) => {
         if (link.type === 'separator') {
-          return <Separator key={`separator-${index}`} className="my-4" />;
+          return <Separator key={`separator-${String(index)}`} className="my-4" />;
         }
         return (
           <NavLink
             key={link.href}
-            href={link.href || ''}
+            href={link.href ?? ''}
             icon={link.icon ?? Home}
             isCollapsed={isCollapsed}
             comingSoon={link.comingSoon}

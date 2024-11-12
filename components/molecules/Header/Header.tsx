@@ -1,14 +1,13 @@
-import { Inbox as InboxIcon, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Inbox as InboxIcon, Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-import { Sidebar } from "@/components/molecules/Sidebar/Sidebar";
+import { Sidebar } from '@/components/molecules/Sidebar/Sidebar';
 
-import { UserMenu } from "@/components/molecules/UserMenu/UserMenu";
+import { UserMenu } from '@/components/molecules/UserMenu/UserMenu';
 
-import { BreadcrumbWithDropdown } from "@/components/molecules/BreadcrumbWithDropdown/BreadcrumbWithDropdown";
-import { Inbox } from "@/components/molecules/Inbox/Inbox";
-import { Logo } from "@/components/atoms/Logo/Logo";
+import { BreadcrumbWithDropdown } from '@/components/molecules/BreadcrumbWithDropdown/BreadcrumbWithDropdown';
+import { Inbox } from '@/components/molecules/Inbox/Inbox';
 
 export function Header() {
   return (
@@ -17,20 +16,17 @@ export function Header() {
         <div className="flex h-full items-center justify-between gap-4">
           <Sheet>
             <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="shrink-0 xl:hidden"
-              >
+              <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="flex w-fit flex-col border-none"
+              className="flex w-72 flex-col justify-start border-none p-0"
+              showClose={false}
             >
-              <Sidebar isCollapsed={false} sheetMode={true} />
+              <Sidebar isCollapsed={false} sheetMode />
             </SheetContent>
           </Sheet>
           <div className="hidden w-full flex-1 xl:block">
@@ -42,17 +38,17 @@ export function Header() {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="shrink-0 xl:hidden"
-              >
+              <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
                 <InboxIcon className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex w-fit flex-col">
-              <Inbox isCollapsed={false} toggleSidebar={() => {}} />
+            <SheetContent
+              side="right"
+              className="flex w-fit flex-col justify-end border-none p-0"
+              showClose={false}
+            >
+              <Inbox isCollapsed={false} sheetMode toggleSidebar={() => {}} />
             </SheetContent>
           </Sheet>
         </div>
