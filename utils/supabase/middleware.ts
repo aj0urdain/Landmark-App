@@ -1,5 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -15,9 +15,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({
             request,
           });
@@ -36,22 +34,21 @@ export async function updateSession(request: NextRequest) {
   // If user is authenticated and trying to access the root or sign-in page, redirect to dashboard
   if (
     user &&
-    (request.nextUrl.pathname === "/" ||
-      request.nextUrl.pathname === "/sign-in")
+    (request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/sign-in')
   ) {
     const dashboardUrl = request.nextUrl.clone();
-    dashboardUrl.pathname = "/dashboard";
+    dashboardUrl.pathname = '/dashboard';
     return NextResponse.redirect(dashboardUrl);
   }
 
   // If user is not authenticated and trying to access any page other than sign-in or auth routes, redirect to sign-in
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith("/sign-in") &&
-    !request.nextUrl.pathname.startsWith("/auth")
+    !request.nextUrl.pathname.startsWith('/sign-in') &&
+    !request.nextUrl.pathname.startsWith('/auth')
   ) {
     const signInUrl = request.nextUrl.clone();
-    signInUrl.pathname = "/sign-in";
+    signInUrl.pathname = '/sign-in';
     return NextResponse.redirect(signInUrl);
   }
 

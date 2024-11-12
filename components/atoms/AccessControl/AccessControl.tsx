@@ -1,30 +1,30 @@
-import { useRouter, usePathname } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { userProfileOptions } from "@/types/userProfileTypes";
-import React, { useEffect, useState } from "react";
+import { useRouter, usePathname } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { userProfileOptions } from '@/types/userProfileTypes';
+import React, { useEffect, useState } from 'react';
 
 const routeAccess = {
-  "/admin": ["Technology"],
-  "/create": ["Technology"],
-  "/sandbox": ["Technology"],
-  "/events": ["Technology"],
-  "/tasks": ["Technology"],
-  "/news": ["Technology"],
-  "/wiki": [],
-  "/properties": ["Technology"],
-  "/updates": ["Technology"],
+  '/admin': ['Technology'],
+  '/create': ['Technology'],
+  '/sandbox': ['Technology'],
+  '/events': ['Technology'],
+  '/tasks': ['Technology'],
+  '/news': ['Technology'],
+  '/wiki': [],
+  '/properties': ['Technology'],
+  '/updates': ['Technology'],
 };
 
 type Department =
-  | "Agency"
-  | "Data"
-  | "Design"
-  | "Finance"
-  | "Human Resources"
-  | "Marketing"
-  | "Operations"
-  | "Senior Leadership"
-  | "Technology";
+  | 'Agency'
+  | 'Data'
+  | 'Design'
+  | 'Finance'
+  | 'Human Resources'
+  | 'Marketing'
+  | 'Operations'
+  | 'Senior Leadership'
+  | 'Technology';
 
 export function AccessControl({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -34,9 +34,8 @@ export function AccessControl({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && userProfile) {
-      const requiredAccess =
-        routeAccess[pathname as keyof typeof routeAccess] || [];
-      const userDepartments = userProfile?.departments || [];
+      const requiredAccess = routeAccess[pathname as keyof typeof routeAccess] ?? [];
+      const userDepartments = userProfile.departments ?? [];
 
       const access =
         requiredAccess.length === 0 ||
@@ -47,7 +46,7 @@ export function AccessControl({ children }: { children: React.ReactNode }) {
       setHasAccess(access);
 
       if (!access) {
-        router.replace("/access-denied");
+        router.replace('/access-denied');
       }
     }
   }, [userProfile, isLoading, router, pathname]);
@@ -56,7 +55,7 @@ export function AccessControl({ children }: { children: React.ReactNode }) {
     return <></>;
   }
 
-  if (hasAccess === false) {
+  if (!hasAccess) {
     return null;
   }
 
