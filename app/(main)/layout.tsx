@@ -21,8 +21,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(true);
   const [isInboxCollapsed, setIsInboxCollapsed] = useState(true);
 
-  const toggleLeftSidebar = () => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed);
-  const toggleInbox = () => setIsInboxCollapsed(!isInboxCollapsed);
+  const toggleLeftSidebar = () => {
+    setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed);
+  };
+  const toggleInbox = () => {
+    setIsInboxCollapsed(!isInboxCollapsed);
+  };
 
   return (
     <TooltipProvider>
