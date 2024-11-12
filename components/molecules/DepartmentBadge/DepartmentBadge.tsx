@@ -11,6 +11,7 @@ interface DepartmentBadgeProps {
   size?: 'small' | 'medium' | 'large';
   className?: string;
   id?: boolean;
+  showDepartmentName?: boolean;
 }
 
 const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
@@ -19,6 +20,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   size = 'medium',
   className,
   id = false,
+  showDepartmentName = true,
 }) => {
   const [departmentName, setDepartmentName] = useState<string | null>(null);
   const supabase = createBrowserClient();
@@ -92,9 +94,11 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
         <div className={cn('flex items-center justify-center', sizeClasses[size].icon)}>
           <Icon className="h-full w-full" />
         </div>
-        <span className={cn('font-medium', sizeClasses[size].text)}>
-          {departmentName}
-        </span>
+        {showDepartmentName && (
+          <span className={cn('font-medium', sizeClasses[size].text)}>
+            {departmentName}
+          </span>
+        )}
       </Button>
     </Link>
   );

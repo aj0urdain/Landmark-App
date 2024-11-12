@@ -82,14 +82,19 @@ export default function WelcomeCard() {
       <div className="relative z-10 flex h-full w-3/5 animate-slide-down-fade-in flex-col justify-between">
         <div className="relative z-10 flex h-full flex-col justify-start gap-3">
           <div className="flex gap-2">
-            {userProfile?.departments?.map((department: string) => (
-              <DepartmentBadge
-                list
-                size="small"
-                key={department}
-                department={department}
-              />
-            ))}
+            {userProfile?.departments?.map((department: string) => {
+              if (department === 'Burgess Rawson') {
+                return null;
+              }
+              return (
+                <DepartmentBadge
+                  list
+                  size="small"
+                  key={department}
+                  department={department}
+                />
+              );
+            })}
           </div>
           <div className="flex flex-col gap-1">
             <p className="text-3xl">
