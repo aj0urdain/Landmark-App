@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Card } from "@/components/ui/card";
+import React from 'react';
+import { Card } from '@/components/ui/card';
 
-import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import DepartmentBadge from "@/components/molecules/DepartmentBadge/DepartmentBadge";
-import Image from "next/image";
-import BranchBadge from "@/components/molecules/BranchBadge/BranchBadge";
-import { Button } from "@/components/ui/button";
-import { IdCard } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
+import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
+import Image from 'next/image';
+import BranchBadge from '@/components/molecules/BranchBadge/BranchBadge';
+import { Button } from '@/components/ui/button';
+import { IdCard } from 'lucide-react';
 
-import EmailContact from "@/components/atoms/EmailContact/EmailContact";
-import PhoneContact from "@/components/atoms/PhoneContact/PhoneContact";
-import { getAllUsers } from "./_actions/getAllUsers";
+import EmailContact from '@/components/atoms/EmailContact/EmailContact';
+import PhoneContact from '@/components/atoms/PhoneContact/PhoneContact';
+import { getAllUsers } from './_actions/getAllUsers';
 
 // Filter by department
 // Filter by branch
@@ -50,14 +50,20 @@ export function UsersPage() {
 
             <div className="mt-10 flex w-full flex-col gap-4">
               <div className="flex gap-2">
-                {user?.departments?.map((department: string) => (
-                  <DepartmentBadge
-                    list
-                    size="small"
-                    key={department}
-                    department={department}
-                  />
-                ))}
+                {user?.departments?.map((department: string) => {
+                  if (department === 'Burgess Rawson') {
+                    return null;
+                  }
+
+                  return (
+                    <DepartmentBadge
+                      list
+                      size="small"
+                      key={department}
+                      department={department}
+                    />
+                  );
+                })}
               </div>
               <div className="flex w-full flex-col gap-1">
                 <p className="text-3xl font-bold">
@@ -76,10 +82,7 @@ export function UsersPage() {
               <div className="flex flex-col gap-2">
                 {user.email && <EmailContact email={user.email} size="small" />}
                 {user.business_number && (
-                  <PhoneContact
-                    phoneNumber={user.business_number}
-                    size="small"
-                  />
+                  <PhoneContact phoneNumber={user.business_number} size="small" />
                 )}
               </div>
             </div>

@@ -8,96 +8,71 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Building2,
-  Users,
-  Megaphone,
-  BarChart,
-  Briefcase,
-  Calculator,
-  Cog,
-  UserPlus,
-  Paintbrush,
-  Database,
-} from 'lucide-react';
+import { createBrowserClient } from '@/utils/supabase/client';
+import { getDepartmentInfo } from '@/utils/getDepartmentInfo';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/dist/client/components/navigation';
 
-const departments = [
-  {
-    name: 'Technology',
-    icon: <Cog className="h-6 w-6" />,
-    description: 'Driving innovation and digital transformation',
-  },
-  {
-    name: 'Senior Leadership',
-    icon: <Users className="h-6 w-6" />,
-    description: "Guiding our company's vision and strategy",
-  },
-  {
-    name: 'Agency',
-    icon: <Building2 className="h-6 w-6" />,
-    description: 'Representing clients in property transactions',
-  },
-  {
-    name: 'Marketing',
-    icon: <Megaphone className="h-6 w-6" />,
-    description: 'Promoting our properties and services',
-  },
-  {
-    name: 'Asset Management',
-    icon: <BarChart className="h-6 w-6" />,
-    description: 'Optimizing property performance and value',
-  },
-  {
-    name: 'Finance',
-    icon: <Calculator className="h-6 w-6" />,
-    description: 'Managing financial operations and investments',
-  },
-  {
-    name: 'Operations',
-    icon: <Briefcase className="h-6 w-6" />,
-    description: 'Ensuring smooth day-to-day business functions',
-  },
-  {
-    name: 'Human Resources',
-    icon: <UserPlus className="h-6 w-6" />,
-    description: 'Supporting and developing our workforce',
-  },
-  {
-    name: 'Design',
-    icon: <Paintbrush className="h-6 w-6" />,
-    description: 'Creating appealing spaces and visual assets',
-  },
-  {
-    name: 'Data',
-    icon: <Database className="h-6 w-6" />,
-    description: 'Leveraging data for informed decision-making',
-  },
-];
+interface Department {
+  id: number;
+  department_name: string;
+  icon?: React.ReactNode;
+  description?: string;
+}
 
 export default function DepartmentsPage() {
+  const supabase = createBrowserClient();
+
+  const router = useRouter();
+
+  const { data: departments, isLoading } = useQuery({
+    queryKey: ['departments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('departments')
+        .select('*')
+        .order('department_name');
+
+      if (error) {
+        console.error(error);
+        return [];
+      }
+
+      // Enrich departments with icons and descriptions from getDepartmentInfo
+      return data.map((dept) => {
+        const deptInfo = getDepartmentInfo(dept.department_name);
+        const Icon = deptInfo?.icon;
+
+        return {
+          ...dept,
+          icon: Icon ? <Icon className="h-6 w-6" /> : null,
+          description: deptInfo?.description || 'Department description not available',
+        };
+      });
+    },
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold text-primary">
-            Our Departments
-          </CardTitle>
-          <CardDescription className="text-lg text-muted-foreground">
-            Discover the diverse teams that drive our success in commercial real estate
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {departments.map((department) => (
+        {departments?.map((department) => (
           <Card
-            key={department.name}
-            className="transition-all hover:shadow-lg hover:-translate-y-1"
+            key={department.id}
+            className="transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+            onClick={() => {
+              router.push(
+                `/wiki/departments/${String(department.department_name).toLowerCase()}`,
+              );
+            }}
           >
             <CardHeader>
               <div className="flex items-center space-x-4">
                 <div className="bg-primary/10 p-3 rounded-full">{department.icon}</div>
-                <CardTitle>{department.name}</CardTitle>
+                <CardTitle>{department.department_name}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
