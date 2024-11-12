@@ -10,6 +10,7 @@ export const createArticle = async (type: string) => {
     .insert({
       article_type: type,
       reactions: [],
+      departments: [12],
       cover_image:
         'https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/user_uploads/e2570807-6d18-4f80-921c-f66fa4d8b76a/lmbg-e2570807-6d18-4f80-921c-f66fa4d8b76a.webp',
     })
