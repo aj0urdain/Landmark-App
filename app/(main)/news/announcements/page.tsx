@@ -38,6 +38,7 @@ const AnnouncementsNewsPage = () => {
       .from('articles')
       .select('*')
       .eq('article_type', 'announcement');
+    // .eq('public', true);
 
     console.log('announcements', data);
 
