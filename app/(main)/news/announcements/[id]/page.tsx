@@ -24,6 +24,9 @@ import { useToast } from '@/hooks/use-toast';
 import { debounce } from 'lodash';
 import { updateArticleContent } from '@/utils/use-cases/articles/updateArticleContent';
 import { LoaderCircle } from 'lucide-react';
+import ArticlePublic from '@/components/atoms/ArticlePublic/ArticlePublic';
+import ArticleAuthorisation from '@/components/atoms/ArticleAuthorisation/ArticleAuthorisation';
+import { Dot } from '@/components/atoms/Dot/Dot';
 
 const AnnouncementArticlePage = () => {
   const params = useParams();
@@ -159,8 +162,15 @@ const AnnouncementArticlePage = () => {
           <ArticleCoverImage article={article} editing={editing} />
         </div>
         <div className="flex flex-col gap-12 -mt-14 z-10">
-          <div className="animate-slide-left-fade-in opacity-0 [animation-delay:_0.75s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
+          <div className="animate-slide-left-fade-in opacity-0 flex items-center gap-2 justify-between [animation-delay:_0.75s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
             <ArticleDate article={article} editing={editing} />
+            {editing && (
+              <div className="flex flex-col items-end gap-4 mt-6">
+                <ArticlePublic article={article} editing={editing} />
+                {/* <Dot size="small" className="bg-muted-foreground animate-pulse" /> */}
+                <ArticleAuthorisation article={article} editing={editing} />
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-12">
             <div className="flex flex-col gap-12">
@@ -190,6 +200,7 @@ const AnnouncementArticlePage = () => {
                   editing={editing}
                   commentNumber={commentNumber}
                   commentSectionRef={commentSectionRef}
+                  editor={editor}
                 />
               </div>
             </div>

@@ -99,17 +99,18 @@ const CalendarPage = () => {
               const monthDate = new Date(currentYear, i, 1);
               const isCurrentMonth = i === currentMonth;
               const customClassNames = {
-                caption_label:
-                  isCurrentMonth && highlightState !== 'inactive'
+                caption_label: isCurrentMonth
+                  ? highlightState !== 'inactive'
                     ? 'text-warning-foreground text-sm font-medium transition-colors duration-500'
-                    : 'text-sm font-medium text-muted-foreground/50 transition-colors duration-500',
+                    : 'text-foreground text-sm font-medium transition-colors duration-500'
+                  : 'text-sm font-medium text-muted-foreground/50 transition-colors duration-500',
               };
 
               return (
                 <StaggeredAnimation baseDelay={0} incrementDelay={0.1} key={i} index={i}>
                   <div
                     className={cn(
-                      'duration-[2000ms] flex-shrink-0 flex-grow transition-all ease-in-out',
+                      'duration-2000 flex-shrink-0 flex-grow transition-all ease-in-out',
                       isCurrentMonth && highlightState === 'active' && 'scale-110',
                       isCurrentMonth && highlightState === 'fading' && 'scale-100',
                       isLoadingEvents ? 'opacity-40' : '',
@@ -163,84 +164,92 @@ const CalendarPage = () => {
     return filteredDateEvents;
   }, [selectedDate, filteredEvents]);
 
+  const eventsKey = selectedDate ? selectedDate.toISOString() : 'no-date';
+
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-6 w-full md:col-span-4">
           <div className="sticky top-24">
-            <Card className="h-full min-h-[400px] w-full bg-muted/10">
-              <CardTitle className="flex flex-col items-start justify-start gap-2 p-6 text-lg">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center text-muted-foreground">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-5 p-0"
-                      onClick={() => {
-                        handleYearChange(-1);
-                      }}
-                    >
-                      <ChevronLeft className="size-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-5 p-0"
-                      onClick={() => {
-                        handleYearChange(1);
-                      }}
-                    >
-                      <ChevronRight className="size-4" />
-                    </Button>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground">
-                    {selectedDate ? format(selectedDate, 'yyyy') : 'Select a date'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center text-muted-foreground">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-5 p-0"
-                      onClick={() => {
-                        handleDayChange(-1);
-                      }}
-                    >
-                      <ChevronLeft className="size-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-5 p-0"
-                      onClick={() => {
-                        handleDayChange(1);
-                      }}
-                    >
-                      <ChevronRight className="size-4" />
-                    </Button>
-                  </div>
-                  {selectedDate ? format(selectedDate, 'MMMM d') : 'Select a date'}
-                </div>
-              </CardTitle>
-              <CardContent>
+            <Card className="h-full min-h-[400px] w-full bg-muted/10 hover:border-foreground/20 transition-all duration-300">
+              <CardTitle className="flex flex-col items-start justify-start gap-6 p-6 text-lg">
                 <EventTypeFilter
                   onFilterChange={handleFilterChange}
                   initialSelectedTypes={selectedTypes}
                 />
+                <div className="flex flex-col items-start gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center text-muted-foreground">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-5 p-0"
+                        onClick={() => {
+                          handleYearChange(-1);
+                        }}
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-5 p-0"
+                        onClick={() => {
+                          handleYearChange(1);
+                        }}
+                      >
+                        <ChevronRight className="size-4" />
+                      </Button>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground">
+                      {selectedDate ? format(selectedDate, 'yyyy') : 'Select a date'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center text-muted-foreground">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-5 p-0"
+                        onClick={() => {
+                          handleDayChange(-1);
+                        }}
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-5 p-0"
+                        onClick={() => {
+                          handleDayChange(1);
+                        }}
+                      >
+                        <ChevronRight className="size-4" />
+                      </Button>
+                    </div>
+                    {selectedDate ? format(selectedDate, 'MMMM d') : 'Select a date'}
+                  </div>
+                </div>
+              </CardTitle>
+              <CardContent>
                 {selectedDate && (
-                  <div className="mt-4">
+                  <div className="">
                     <ScrollArea className="min-h-[400px]">
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-2" key={eventsKey}>
                         {selectedDateEvents.length > 0 ? (
                           selectedDateEvents.map((event, index) => (
                             <StaggeredAnimation
                               baseDelay={0}
-                              key={event.start_date + selectedDate.toISOString()}
+                              key={event.start_date + eventsKey + String(index)}
                               index={index}
                             >
-                              <EventCard event={event} variant="preview" />
+                              <EventCard
+                                key={event.start_date + eventsKey + String(index)}
+                                event={event}
+                                variant="preview"
+                              />
                             </StaggeredAnimation>
                           ))
                         ) : (
