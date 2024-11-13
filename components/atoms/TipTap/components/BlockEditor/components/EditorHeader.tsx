@@ -50,9 +50,9 @@ export const EditorHeader = ({
         <Button
           variant={editing ? 'destructive' : 'default'}
           onClick={toggleEditMode}
-          className="text-sm flex gap-2 items-center"
+          className={`text-sm flex gap-1 border items-center ${editing ? 'border-warning-foreground bg-warning-foreground/50 text-foreground hover:bg-warning-foreground/20 hover:text-warning-foreground' : 'border-muted-foreground/50 text-muted'}`}
         >
-          {editing ? <CircleX className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+          {editing ? <CircleX className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
           {editing ? 'Exit Editing' : 'Edit'}
         </Button>
       </div>
