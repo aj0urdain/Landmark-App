@@ -82,65 +82,59 @@ export default function BranchesPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <GenericHeader
-        title="Our Branches"
-        description="We have a number of branches across Australia and Internationally."
-      />
-      <div className="mt-12">
-        {groupedBranches &&
-          Object.entries(groupedBranches).map(([country, states]) => (
-            <div key={country} className="mb-12">
-              <h2 className="text-2xl font-bold mb-6">{country}</h2>
-              <div className="grid gap-8">
-                {Object.entries(states)
-                  .sort(([stateA], [stateB]) => {
-                    // Get the order for each state (default to 999 if not in stateOrder)
-                    const orderA = stateOrder[stateA as keyof typeof stateOrder] || 999;
-                    const orderB = stateOrder[stateB as keyof typeof stateOrder] || 999;
+    <div className="">
+      {groupedBranches &&
+        Object.entries(groupedBranches).map(([country, states]) => (
+          <div key={country} className="mb-12">
+            <h2 className="text-2xl font-bold mb-6">{country}</h2>
+            <div className="grid gap-8">
+              {Object.entries(states)
+                .sort(([stateA], [stateB]) => {
+                  // Get the order for each state (default to 999 if not in stateOrder)
+                  const orderA = stateOrder[stateA as keyof typeof stateOrder] || 999;
+                  const orderB = stateOrder[stateB as keyof typeof stateOrder] || 999;
 
-                    // Sort by the order first
-                    if (orderA !== orderB) {
-                      return orderA - orderB;
-                    }
+                  // Sort by the order first
+                  if (orderA !== orderB) {
+                    return orderA - orderB;
+                  }
 
-                    // If neither state has a specific order (or they're equal),
-                    // sort alphabetically
-                    return stateA.localeCompare(stateB);
-                  })
-                  .map(([state, locations]) => (
-                    <Card key={state} className="overflow-hidden">
-                      <CardHeader className="bg-primary/5">
-                        <CardTitle className="text-xl font-semibold">{state}</CardTitle>
-                        <CardDescription>
-                          {locations.length}{' '}
-                          {locations.length === 1 ? 'location' : 'locations'}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {locations.map((branch) => (
-                          <div
-                            key={branch.name}
-                            className="flex items-start gap-4 rounded-lg border p-4 transition-colors hover:bg-muted"
-                          >
-                            <div className="rounded-full bg-primary/10 p-2">
-                              <MapPin className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold">{branch.name}</h3>
-                              <p className="text-sm text-muted-foreground">
-                                {branch.address}
-                              </p>
-                            </div>
+                  // If neither state has a specific order (or they're equal),
+                  // sort alphabetically
+                  return stateA.localeCompare(stateB);
+                })
+                .map(([state, locations]) => (
+                  <Card key={state} className="overflow-hidden">
+                    <CardHeader className="bg-primary/5">
+                      <CardTitle className="text-xl font-semibold">{state}</CardTitle>
+                      <CardDescription>
+                        {locations.length}{' '}
+                        {locations.length === 1 ? 'location' : 'locations'}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {locations.map((branch) => (
+                        <div
+                          key={branch.name}
+                          className="flex items-start gap-4 rounded-lg border p-4 transition-colors hover:bg-muted"
+                        >
+                          <div className="rounded-full bg-primary/10 p-2">
+                            <MapPin className="h-5 w-5 text-primary" />
                           </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
+                          <div>
+                            <h3 className="font-semibold">{branch.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {branch.address}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
-          ))}
-      </div>
+          </div>
+        ))}
     </div>
   );
 }

@@ -46,6 +46,7 @@ import EmailContact from '@/components/atoms/EmailContact/EmailContact';
 import PhoneContact from '@/components/atoms/PhoneContact/PhoneContact';
 import { Separator } from '@/components/ui/separator';
 import BirthdayConfetti from '@/components/molecules/BirthdayConfetti/BirthdayConfetti';
+import { Dot } from '@/components/atoms/Dot/Dot';
 
 export function UserPage() {
   const params = useParams();
@@ -55,6 +56,8 @@ export function UserPage() {
     ...getUserProfilePage,
     queryKey: [...getUserProfilePage.queryKey, name],
   });
+
+  console.log(data);
 
   const [showBirthdayMessage, setShowBirthdayMessage] = useState(false);
 
@@ -171,7 +174,7 @@ export function UserPage() {
                   isBirthday && showBirthdayMessage ? 'mt-4' : ''
                 } animate-slide-left-fade-in text-7xl font-extrabold opacity-0 [animation-delay:_1s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]`}
               >
-                <span className="font-medium">{data.first_name}</span>{' '}
+                <span className="font-light">{data.first_name}</span>{' '}
                 <span className="font-black">{data.last_name}</span>
               </p>
 
@@ -180,20 +183,35 @@ export function UserPage() {
                   <IdCard />
                   {data?.roles?.map((role: string) => role).join(', ')}
                 </div>
-                <div className="flex animate-slide-right-fade-in gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
-                  {data.departments?.map((department: string) => (
-                    <DepartmentBadge
-                      key={department}
-                      size="medium"
-                      department={department}
-                      list
-                    />
-                  ))}
-                </div>
               </div>
               {data?.branches && (
-                <div className="ml-2 flex animate-slide-down-fade-in items-center gap-2 opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
-                  <BranchBadge state={data.branches[0]} list size="medium" />
+                <div className="flex items-center gap-3 mt-4">
+                  <div className="ml-2 flex animate-slide-down-fade-in items-center gap-2 opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                    <BranchBadge
+                      branchName={data.branches?.[0] as string}
+                      list
+                      size="medium"
+                    />
+                  </div>
+                  <div className="animate-slide-up-fade-in opacity-0 [animation-delay:_3s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                    <Dot size="small" className="bg-muted-foreground animate-pulse" />
+                  </div>
+                  <div className="flex animate-slide-right-fade-in gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                    {data.departments?.map((department: string) => {
+                      if (department === 'Burgess Rawson') {
+                        return null;
+                      }
+
+                      return (
+                        <DepartmentBadge
+                          key={department}
+                          size="medium"
+                          department={department}
+                          list
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>

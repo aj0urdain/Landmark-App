@@ -1,4 +1,4 @@
-"use server";
+'use server';
 
 import {
   Card,
@@ -6,21 +6,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { UsersPage } from "./users-page";
+} from '@/components/ui/card';
+import { UsersPage } from './users-page';
 
 export default async function PeoplePage() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>People</CardTitle>
-        <CardDescription>
-          The layout of this page is still under development!
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <UsersPage />
-      </CardContent>
+    <Card className="h-full p-6 w-full">
+      <UsersPage />
     </Card>
   );
 }
