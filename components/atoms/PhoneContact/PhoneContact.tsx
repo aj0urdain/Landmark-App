@@ -1,20 +1,20 @@
-import React from "react";
-import { Phone } from "lucide-react";
-import Link from "next/link";
+import React from 'react';
+import { Phone } from 'lucide-react';
+import Link from 'next/link';
 
 interface PhoneContactProps {
   phoneNumber: string;
-  size?: "small" | "medium" | "large";
+  size?: 'small' | 'medium' | 'large';
   label?: string;
 }
 
 const PhoneContact: React.FC<PhoneContactProps> = ({
   phoneNumber,
-  size = "medium",
+  size = 'medium',
   label,
 }) => {
   const formatPhoneNumber = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, "");
+    const cleaned = phone.replace(/\D/g, '');
     const match = cleaned.match(/^(\d{4})(\d{3})(\d{3})$/);
     if (match) {
       return `${match[1]} ${match[2]} ${match[3]}`;
@@ -23,26 +23,26 @@ const PhoneContact: React.FC<PhoneContactProps> = ({
   };
 
   const sizeClasses = {
-    small: "text-xs",
-    medium: "text-sm",
-    large: "text-base",
+    small: 'text-xs',
+    medium: 'text-sm',
+    large: 'text-base',
   };
 
   const iconSizeClasses = {
-    small: "h-3 w-3",
-    medium: "h-4 w-4",
-    large: "h-5 w-5",
+    small: 'h-3 w-3',
+    medium: 'h-4 w-4',
+    large: 'h-5 w-5',
   };
 
   return (
-    <div className="flex items-center justify-start gap-2">
-      <div className="flex items-center gap-2 text-muted-foreground">
+    <div className="flex items-center justify-start gap-2 text-muted-foreground transition-colors duration-300 hover:text-foreground">
+      <div className="flex items-center gap-2">
         <Phone className={iconSizeClasses[size]} />
         {label && <span className={sizeClasses[size]}>{label}</span>}
       </div>
       <Link
         href={`tel:${phoneNumber}`}
-        className={`${sizeClasses[size]} text-foreground hover:underline`}
+        className={`${sizeClasses[size]} hover:underline`}
       >
         {formatPhoneNumber(phoneNumber)}
       </Link>

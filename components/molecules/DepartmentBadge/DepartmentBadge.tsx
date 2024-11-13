@@ -78,24 +78,30 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   };
 
   return (
-    <Link href={`/wiki/departments/${link}`} passHref>
+    <Link href={`/wiki/departments/${link}`} passHref className="no-underline">
       <Button
-        variant={list ? 'link' : 'outline'}
+        variant={list ? 'ghost' : 'outline'}
         size="sm"
         className={cn(
-          'flex items-center gap-1',
+          'flex items-center gap-1 animated-underline-1 after:bottom-[-4px]',
           color,
           list ? 'h-auto p-0' : 'bg-transparent',
           'transition-colors',
           'p-0',
           className,
+          `hover:text-${color} hover:bg-transparent`,
         )}
       >
         <div className={cn('flex items-center justify-center', sizeClasses[size].icon)}>
           <Icon className="h-full w-full" />
         </div>
         {showDepartmentName && (
-          <span className={cn('font-medium', sizeClasses[size].text)}>
+          <span
+            className={cn(
+              'font-medium no-underline hover:text-inherit',
+              sizeClasses[size].text,
+            )}
+          >
             {departmentName}
           </span>
         )}
