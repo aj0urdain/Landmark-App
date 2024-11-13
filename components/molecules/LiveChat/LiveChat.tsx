@@ -21,6 +21,7 @@ import ReactTimeAgo from 'react-time-ago';
 
 import { UserHoverCard } from './UserHoverCard/UserHoverCard';
 import { Progress } from '@/components/ui/progress';
+import { getDepartmentInfo } from '@/utils/getDepartmentInfo';
 
 const MESSAGE_CHAR_LIMIT = 80;
 
@@ -309,8 +310,17 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
         <div className="flex items-center justify-start gap-2 text-muted-foreground">
           <Dot size="small" className="animate-pulse bg-green-400" />
           <div className="flex items-center gap-1">
-            <MessageSquare className="h-3 w-3" />
-            <h2 className="text-sm font-bold capitalize">{chatName} Chatroom</h2>
+            {(() => {
+              const departmentInfo = getDepartmentInfo(chatName);
+              const IconComponent = departmentInfo?.icon ?? MessageSquare;
+              return <IconComponent className="h-4 w-4 animate-slide-down-fade-in" />;
+            })()}
+            <h2 className="text-sm font-medium capitalize animate-slide-up-fade-in">
+              <span className="font-bold animate-slide-up-fade-in" key={chatName}>
+                {chatName}
+              </span>{' '}
+              Chatroom
+            </h2>
           </div>
         </div>
       </CardHeader>

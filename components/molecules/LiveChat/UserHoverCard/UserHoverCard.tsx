@@ -70,7 +70,7 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
       <Portal>
         <HoverCardContent
-          className="z-[9999] w-80 animate-slide-up-fade-in overflow-hidden p-0"
+          className="z-[9999] w-80 animate-slide-up-fade-in overflow-y-visible p-0"
           align="start"
           side="top"
           sideOffset={15}
@@ -79,38 +79,43 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
           <div className="relative flex flex-col gap-2">
             <div className="flex w-full flex-col gap-2 p-4">
               <div className="flex gap-2">
-                {user?.departments?.map((department: string) => (
-                  <DepartmentBadge
-                    list
-                    size="small"
-                    key={department}
-                    department={department}
-                  />
-                ))}
+                {user?.departments?.map((department: string) => {
+                  if (department !== 'Burgess Rawson') {
+                    return (
+                      <DepartmentBadge
+                        list
+                        size="small"
+                        key={department}
+                        department={department}
+                      />
+                    );
+                  }
+                })}
               </div>
-              <div className="flex w-full flex-col gap-1">
+              <div className="flex w-2/3 flex-col gap-1">
                 <Link
                   href={`/wiki/people/${user.first_name}-${user.last_name}`}
                   onClick={handleNameClick}
-                  className="cursor-pointer text-lg  hover:underline"
+                  className="cursor-pointer text-lg font-light animated-underline-1 w-fit after:bottom-[1px]"
                 >
                   {user.first_name} <span className="font-bold">{user.last_name}</span>
                 </Link>
                 {user?.roles?.map((role: string) => (
-                  <div
+                  <Link
+                    href={`/wiki/learn/roles/${role.toLowerCase().replace(/\s+/g, '-')}`}
                     key={role}
-                    className="flex w-2/3 items-start gap-1 text-xs text-muted-foreground"
+                    className="flex items-start justify-start gap-0.5 text-xs w-fit max-w-full text-muted-foreground animated-underline-1 after:bottom-[-1px]"
                   >
-                    <IdCard className="h-4 w-4" />
-                    {role}
-                  </div>
+                    <IdCard className="min-w-4 h-4" />
+                    <p className="truncate">{role}</p>
+                  </Link>
                 ))}
               </div>
             </div>
             <Link
               href={`/wiki/people/${user.first_name}-${user.last_name}`}
               onClick={handleNameClick}
-              className="absolute bottom-0 right-0 top-0 w-1/3 cursor-pointer hover:animate-pulse hover:[animation-duration:_4s]"
+              className="absolute bottom-0 right-0 w-1/3 cursor-pointer hover:animate-pulse hover:[animation-duration:_4s]"
             >
               {user?.profile_picture ? (
                 <Image
