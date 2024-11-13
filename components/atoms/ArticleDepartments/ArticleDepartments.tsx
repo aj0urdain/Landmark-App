@@ -163,11 +163,13 @@ const ArticleDepartments = ({
           Departments
           <PencilIcon className="hidden group-hover:block group-hover:animate-slide-right-fade-in w-4 h-4" />
         </Label>
-        <div className="flex flex-row gap-4 items-center">
+        <div className="flex flex-row gap-4 items-center" key={article.id}>
           <Button
             variant="secondary"
             className="flex flex-row gap-2"
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => {
+              setIsDialogOpen(true);
+            }}
           >
             <PlusIcon className="w-4 h-4" />
             Add Department
@@ -188,7 +190,7 @@ const ArticleDepartments = ({
               const { icon: Icon, color } = departmentInformation;
 
               return (
-                <TooltipProvider>
+                <TooltipProvider key={fullDepartment?.id}>
                   <Tooltip delayDuration={100}>
                     <TooltipTrigger asChild>
                       <Button
