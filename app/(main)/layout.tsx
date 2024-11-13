@@ -30,7 +30,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen overflow-hidden">
+      <div
+        className={`flex h-screen overflow-hidden bg-gradient-to-br from-transparent via-muted/15 to-transparent`}
+      >
         <UserProfileManager />
         <div
           className={`relative hidden flex-col transition-all duration-300 ease-in-out xl:flex ${
