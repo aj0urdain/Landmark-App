@@ -49,8 +49,6 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
 }) => {
   const supabase = createBrowserClient();
 
-  console.log(branchName);
-
   const {
     data: branchData,
     isLoading,
