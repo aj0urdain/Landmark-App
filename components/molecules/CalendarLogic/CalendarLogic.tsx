@@ -13,6 +13,7 @@ export type Event = {
 };
 
 interface CalendarLogicProps {
+  auctionsPreview?: boolean;
   events: CalendarEvent[];
   children: (
     modifiers: Record<string, Date[]>,
@@ -20,11 +21,11 @@ interface CalendarLogicProps {
   ) => React.ReactNode;
 }
 
-export function CalendarLogic({ events, children }: CalendarLogicProps) {
+export function CalendarLogic({ auctionsPreview, events, children }: CalendarLogicProps) {
   const modifiers = useMemo(() => {
     const eventMap: Record<string, CalendarEvent[]> = {};
 
-    events.forEach((event) => {
+    events?.forEach((event) => {
       const startDate = startOfDay(parseISO(event.start_date));
       const endDate = event.end_date ? startOfDay(parseISO(event.end_date)) : startDate;
 
@@ -62,7 +63,7 @@ export function CalendarLogic({ events, children }: CalendarLogicProps) {
   const modifiersStyles = useMemo(() => {
     const styles: Record<string, React.CSSProperties> = {};
 
-    events.forEach((event) => {
+    events?.forEach((event) => {
       const { bgColor, borderColor } = getEventColor(event as Event);
 
       styles[event.type] = {
@@ -129,6 +130,7 @@ export function CalendarLogic({ events, children }: CalendarLogicProps) {
           backgroundColor: hexToRGBA(bgColor, 0.3),
           borderRadius: '4px',
           color: 'hsl(var(--foreground))',
+          fontWeight: auctionsPreview ? 'bold' : 'normal',
         };
         if (!modifiers[`auction_${location}`]) {
           modifiers[`auction_${location}`] = [];

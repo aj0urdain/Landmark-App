@@ -1,19 +1,20 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 
-import { DayPicker } from "react-day-picker";
+import { DayPicker } from 'react-day-picker';
 
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
-import { ChevronRightIcon } from "lucide-react";
-import { ChevronLeftIcon } from "lucide-react";
-import { isSameWeek } from "date-fns";
-import { Dot } from "../atoms/Dot/Dot";
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+import { ChevronRightIcon } from 'lucide-react';
+import { ChevronLeftIcon } from 'lucide-react';
+import { isSameWeek } from 'date-fns';
+import { Dot } from '../atoms/Dot/Dot';
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   enableNavigation?: boolean;
   selected?: Date;
+  disabled?: Record<string, boolean> | undefined;
 };
 
 function Calendar({
@@ -21,51 +22,49 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   enableNavigation = true,
-
   ...props
 }: CalendarProps) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("relative p-3", className)}
+      className={cn('relative p-3', className)}
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
-        nav: enableNavigation ? "space-x-1 flex items-center" : "hidden",
+        months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
+        month: 'space-y-4',
+        caption: 'flex justify-center pt-1 relative items-center',
+        caption_label: 'text-sm font-medium',
+        nav: enableNavigation ? 'space-x-1 flex items-center' : 'hidden',
         nav_button: cn(
-          buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+          buttonVariants({ variant: 'outline' }),
+          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
         ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
+        nav_button_previous: 'absolute left-1',
+        nav_button_next: 'absolute right-1',
+        table: 'w-full border-collapse space-y-1',
+        head_row: 'flex',
         head_cell:
-          "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem] text-center",
-        row: "flex w-full mt-2",
+          'text-muted-foreground rounded-md w-8 font-normal text-[0.8rem] text-center',
+        row: 'flex w-full mt-2',
         cell: cn(
-          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md",
-          props.mode === "range"
-            ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
-            : "[&:has([aria-selected])]:rounded-md",
+          'relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md',
+          props.mode === 'range'
+            ? '[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md'
+            : '[&:has([aria-selected])]:rounded-md',
         ),
         day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-8 w-8 p-0 font-normal aria-selected:opacity-100",
+          buttonVariants({ variant: 'ghost' }),
+          'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
         ),
-        day_range_start: "day-range-start",
-        day_range_end: "day-range-end",
+        day_range_start: 'day-range-start',
+        day_range_end: 'day-range-end',
         day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
+          'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
+        day_today: 'bg-accent text-accent-foreground',
         day_outside:
-          "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
+          'day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30',
+        day_disabled: 'text-muted-foreground opacity-50',
+        day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',
+        day_hidden: 'invisible',
         ...classNames,
       }}
       components={{
@@ -82,10 +81,10 @@ function Calendar({
           return (
             <div
               className={cn(
-                "relative flex h-8 w-8 items-center justify-center text-xs transition-all duration-1000",
+                'relative flex h-8 w-8 items-center justify-center text-xs transition-all duration-1000',
                 isSelectedWeek
-                  ? "font-bold text-white"
-                  : "font-medium text-muted-foreground/25",
+                  ? 'font-bold text-white'
+                  : 'font-medium text-muted-foreground/25',
               )}
             >
               {isSelectedWeek && (
@@ -103,6 +102,6 @@ function Calendar({
     />
   );
 }
-Calendar.displayName = "Calendar";
+Calendar.displayName = 'Calendar';
 
 export { Calendar };

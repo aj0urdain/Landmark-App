@@ -1,14 +1,14 @@
-import React from "react";
-import { Calendar } from "@/components/ui/calendar";
+import React from 'react';
+import { Calendar } from '@/components/ui/calendar';
 
-export type CalendarEvent = {
+export interface CalendarEvent {
   type: string;
   start_date: string;
   end_date: string | null;
   details?: Record<string, unknown>;
   title?: string;
   portfolio_id?: number;
-};
+}
 
 interface EventCalendarProps {
   events: CalendarEvent[];
@@ -39,6 +39,7 @@ export function EventCalendar({
   month,
   onMonthChange,
   showWeekNumbers,
+  ...props
 }: EventCalendarProps) {
   return (
     <Calendar
@@ -56,6 +57,7 @@ export function EventCalendar({
       enableNavigation={enableNavigation}
       classNames={classNames}
       showWeekNumber={showWeekNumbers}
+      {...props}
     />
   );
 }
