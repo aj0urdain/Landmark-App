@@ -1,128 +1,40 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Link2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Link2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
+import { createBrowserClient } from '@/utils/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { userProfileOptions } from '@/types/userProfileTypes';
+import { Separator } from '@/components/ui/separator';
+import { Dot } from '@/components/atoms/Dot/Dot';
 
-// Define the link type
-type QuickLink = {
+// Types
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface LinkType {
   id: number;
   title: string;
   url: string;
-  icon: string;
-  access: string[];
-};
+  category_id: number;
+  departments: number[];
+  branches: number[];
+  teams: number[];
+}
 
-// Organize links by categories
-const QUICK_LINKS: Record<string, QuickLink[]> = {
-  general: [
-    { id: 1, title: 'Propertybase', url: '#', icon: '💼', access: ['ALL'] },
-    {
-      id: 2,
-      title: 'BR Website',
-      url: 'https://burgessrawson.com.au/',
-      icon: '📊',
-      access: ['ALL'],
-    },
-    { id: 3, title: 'Docusign', url: '#', icon: '✍️', access: ['ALL'] },
-    { id: 4, title: 'Formstack', url: '#', icon: '📝', access: ['ALL'] },
-    { id: 5, title: 'Central Station', url: '#', icon: '🚉', access: ['ALL'] },
-    { id: 6, title: 'RP Data', url: '#', icon: '📊', access: ['ALL'] },
-    { id: 7, title: 'LandChecker', url: '#', icon: '🗺️', access: ['ALL'] },
-    {
-      id: 8,
-      title: 'Supabase',
-      url: 'https://supabase.com/dashboard/project/dodfdwvvwmnnlntpnrec/editor',
-      icon: '🗺️',
-      access: ['ALL'],
-    },
-  ],
-  social: [
-    { id: 8, title: 'BR Facebook', url: '#', icon: '📱', access: ['ALL'] },
-    { id: 9, title: 'LinkedIn', url: '#', icon: '💼', access: ['ALL'] },
-    { id: 10, title: 'Instagram', url: '#', icon: '📸', access: ['ALL'] },
-  ],
-  sharepoint: [
-    { id: 11, title: 'Brisbane', url: '#', icon: '📁', access: ['BRISBANE'] },
-    { id: 12, title: 'Sydney', url: '#', icon: '📁', access: ['SYDNEY'] },
-    { id: 13, title: 'Supamac', url: '#', icon: '📁', access: ['SUPAMAC'] },
-    { id: 14, title: 'National', url: '#', icon: '📁', access: ['ALL'] },
-    { id: 15, title: 'Management', url: '#', icon: '📁', access: ['MANAGEMENT'] },
-  ],
-  news: [
-    { id: 16, title: 'AFR', url: 'https://www.afr.com/', icon: '📰', access: ['ALL'] },
-    {
-      id: 17,
-      title: 'Herald Sun',
-      url: 'https://www.heraldsun.com.au/',
-      icon: '📰',
-      access: ['ALL'],
-    },
-    {
-      id: 18,
-      title: 'Sydney Morning Herald',
-      url: 'https://www.smh.com.au/',
-      icon: '📰',
-      access: ['ALL'],
-    },
-    {
-      id: 19,
-      title: 'The Age',
-      url: 'https://www.theage.com.au/',
-      icon: '📰',
-      access: ['ALL'],
-    },
-    {
-      id: 20,
-      title: 'The Australian',
-      url: 'https://www.theaustralian.com.au/',
-      icon: '📰',
-      access: ['ALL'],
-    },
-  ],
-  department: [
-    { id: 21, title: 'MYOB', url: '#', icon: '📒', access: ['ACCOUNTS'] },
-    { id: 22, title: 'Deft', url: '#', icon: '💰', access: ['ACCOUNTS'] },
-    {
-      id: 23,
-      title: 'TM1',
-      url: '#',
-      icon: '📊',
-      access: ['ACCOUNTS', 'AGENCY', 'ADMIN'],
-    },
-    {
-      id: 24,
-      title: 'Cirrus8',
-      url: '#',
-      icon: '☁️',
-      access: ['ACCOUNTS', 'MANAGEMENT'],
-    },
-    { id: 25, title: 'PageProof', url: '#', icon: '🎨', access: ['DESIGN'] },
-    { id: 26, title: 'AuctionsLive', url: '#', icon: '🔨', access: ['ADMIN'] },
-    {
-      id: 27,
-      title: 'IT Support',
-      url: 'mailto:syfo@example.com',
-      icon: '🔧',
-      access: ['ALL'],
-    },
-  ],
-  advertising: [
-    { id: 28, title: 'RCA', url: '#', icon: '📢', access: ['ALL'] },
-    { id: 29, title: 'CRE', url: '#', icon: '📢', access: ['ALL'] },
-    { id: 30, title: 'CReady', url: '#', icon: '📢', access: ['ALL'] },
-    { id: 31, title: 'DevReady', url: '#', icon: '📢', access: ['ALL'] },
-    { id: 32, title: 'Real Estate', url: '#', icon: '📢', access: ['ALL'] },
-  ],
-};
-
-const LinkTile = ({ title, url, icon }: { title: string; url: string; icon: string }) => {
+// Link tile component
+const LinkTile = ({ title, url }: { title: string; url: string }) => {
   const getFaviconUrl = (url: string) => {
     try {
       const domain = new URL(url).hostname;
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
     } catch {
       return null;
     }
@@ -131,89 +43,219 @@ const LinkTile = ({ title, url, icon }: { title: string; url: string; icon: stri
   const faviconUrl = url.startsWith('http') ? getFaviconUrl(url) : null;
 
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center justify-start gap-1 rounded-lg text-muted-foreground truncate whitespace-nowrap hover:text-foreground border px-2 border-border hover:bg-accent transition-colors"
-    >
+    <div className="flex items-center justify-start gap-1 w-fit group">
       {faviconUrl ? (
         <img src={faviconUrl} alt="" className="w-4 h-4" />
       ) : (
-        <span className="">{icon}</span>
+        <span className="">🔗</span>
       )}
-      <span className="text-xs">{title}</span>
-    </a>
+      <Link
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="cursor-pointer w-full"
+      >
+        <p className="text-xs animated-underline-1 w-full truncate text-muted-foreground group-hover:text-foreground transition-colors">
+          {title}
+        </p>
+      </Link>
+    </div>
   );
 };
 
-// TODO: Get user's departments from auth context
-const userDepartments = ['ACCOUNTS']; // This should come from your auth system
+const getCategoryOrder = (name: string): number => {
+  const order = ['tools', 'sharepoint', 'advertising', 'news', 'social'];
+  const index = order.indexOf(name);
+  return index === -1 ? order.length : index;
+};
 
 const PersonalLinks = () => {
-  // Filter links based on user's department access
-  const filterLinksByAccess = (links: QuickLink[]) => {
-    return links.filter(
-      (link) =>
-        link.access.includes('ALL') ||
-        link.access.some((access) => userDepartments.includes(access)),
+  const supabase = createBrowserClient();
+  const { data: userProfile } = useQuery(userProfileOptions);
+
+  // Fetch categories and links
+  const {
+    data: categories = [],
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+  } = useQuery({
+    queryKey: ['linkCategories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('link_categories')
+        .select('id, name')
+        .order('name');
+
+      if (error) {
+        console.error(`Error fetching categories: ${error}`);
+        return [];
+      }
+
+      console.log(`Categories: ${data}`);
+      return data;
+    },
+  });
+
+  const {
+    data: links = [],
+    isLoading: linksLoading,
+    isError: linksError,
+  } = useQuery({
+    queryKey: ['links'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('links').select('*').order('title');
+
+      if (error) {
+        console.error(`Error fetching links: ${error}`);
+        return [];
+      }
+
+      console.log(`Links: ${data}`);
+      return data;
+    },
+  });
+
+  // Filter links based on user's access
+  const accessibleLinks = links.filter((link) => {
+    if (!userProfile) return false;
+
+    // If link has no restrictions, show it to everyone
+    if (
+      (!link.departments?.length || link.departments.length === 0) &&
+      (!link.branches?.length || link.branches.length === 0) &&
+      (!link.teams?.length || link.teams.length === 0)
+    ) {
+      return true;
+    }
+
+    // Check if user has access through departments or branches
+    const hasMatchingDepartment = link.departments?.some((deptId) =>
+      userProfile.department_ids?.includes(deptId),
     );
-  };
+    const hasMatchingBranch = link.branches?.some((branchId) =>
+      userProfile.branch_ids?.includes(branchId),
+    );
+    const hasMatchingTeam = link.teams?.some((teamId) =>
+      userProfile.team_ids?.includes(teamId),
+    );
+
+    return hasMatchingDepartment || hasMatchingBranch || hasMatchingTeam;
+  });
+
+  // Group all links by category (unfiltered)
+  const allLinksByCategory = links.reduce(
+    (acc, link) => {
+      const category = categories.find((c) => c.id === link.category_id);
+      if (category) {
+        if (!acc[category.name]) {
+          acc[category.name] = [];
+        }
+        acc[category.name].push(link);
+      }
+      return acc;
+    },
+    {} as Record<string, LinkType[]>,
+  );
 
   return (
-    <Card className="flex h-full w-full flex-col">
-      <div className="flex items-center justify-between pt-4 pl-4 ">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Link2 className="h-4 w-4" />
-          <h2 className="text-sm font-bold">Quick Links</h2>
+    <Card className="flex h-full w-full items-center flex-col overflow-hidden">
+      {categoriesLoading || linksLoading ? (
+        <div className="h-full w-full flex items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin" />
         </div>
-      </div>
-
-      <Tabs defaultValue="general">
-        <TabsList className="rounded-none flex justify-start p-2 py-6 gap-1 text-xs bg-transparent border-b border-muted/50 w-full">
-          <TabsTrigger value="general" className="text-xs">
-            General
-          </TabsTrigger>
-          <TabsTrigger value="social" className="text-xs">
-            Social
-          </TabsTrigger>
-          <TabsTrigger value="sharepoint" className="text-xs">
-            SharePoint
-          </TabsTrigger>
-          <TabsTrigger value="news" className="text-xs">
-            News
-          </TabsTrigger>
-          <TabsTrigger value="department" className="text-xs">
-            Department
-          </TabsTrigger>
-          <TabsTrigger value="advertising" className="text-xs">
-            Advertising
-          </TabsTrigger>
-        </TabsList>
-
-        <ScrollArea className="flex-1">
-          {Object.entries(QUICK_LINKS).map(([category, links]) => (
-            <TabsContent
-              key={category}
-              value={category}
-              className="p-4 animate-slide-down-fade-in"
-            >
-              <div className="grid grid-cols-3 gap-3">
-                {filterLinksByAccess(links).map((link, index) => (
+      ) : (
+        <Tabs defaultValue="all" className="h-full w-full">
+          <TabsList className="rounded-none flex justify-between gap-1 px-6 text-xs bg-transparent border-b border-muted/50 w-full h-16">
+            <div className="flex items-center gap-1 text-muted-foreground/80">
+              <Link2 className="h-4 w-4" />
+            </div>
+            <div className="flex items-center gap-1">
+              {categories.length > 0 && (
+                <StaggeredAnimation index={0} baseDelay={0.1} incrementDelay={0.05}>
+                  <TabsTrigger key="all" value="all" className="text-xs capitalize">
+                    Me
+                  </TabsTrigger>
+                </StaggeredAnimation>
+              )}
+              {categories
+                .sort((a, b) => getCategoryOrder(a.name) - getCategoryOrder(b.name))
+                .map((category, index) => (
                   <StaggeredAnimation
-                    key={link.id}
-                    index={index}
+                    key={category.id}
+                    index={index + 1}
                     baseDelay={0.1}
                     incrementDelay={0.05}
                   >
-                    <LinkTile key={link.id} {...link} />
+                    <TabsTrigger
+                      key={category.id}
+                      value={category.name}
+                      className="text-xs capitalize animate-slide-down-fade-in"
+                    >
+                      {category.name}
+                    </TabsTrigger>
                   </StaggeredAnimation>
                 ))}
-              </div>
+            </div>
+          </TabsList>
+
+          <ScrollArea className="h-[calc(100%-4rem)]">
+            <TabsContent value="all" className="m-0 p-6">
+              {categories
+                .sort((a, b) => getCategoryOrder(a.name) - getCategoryOrder(b.name))
+                .map((category) => {
+                  const categoryLinks = accessibleLinks.filter(
+                    (link) => link.category_id === category.id,
+                  );
+
+                  if (categoryLinks.length === 0) return null;
+
+                  return (
+                    <div key={category.id} className="mb-8 flex flex-col gap-1 last:mb-0">
+                      <div className="flex items-center gap-2 mb-3">
+                        <h3 className="text-xs font-bold text-muted-foreground/50 capitalize">
+                          {category.name}
+                        </h3>
+
+                        <Separator className="bg-muted/50" />
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        {categoryLinks.map((link, index) => (
+                          <StaggeredAnimation
+                            key={link.id}
+                            index={index}
+                            baseDelay={0.1}
+                            incrementDelay={0.05}
+                          >
+                            <LinkTile title={link.title} url={link.url} />
+                          </StaggeredAnimation>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
             </TabsContent>
-          ))}
-        </ScrollArea>
-      </Tabs>
+
+            {categories
+              .sort((a, b) => getCategoryOrder(a.name) - getCategoryOrder(b.name))
+              .map((category) => (
+                <TabsContent key={category.id} value={category.name} className="m-0 p-6">
+                  <div className="grid grid-cols-3 gap-4">
+                    {(allLinksByCategory[category.name] || []).map((link, index) => (
+                      <StaggeredAnimation
+                        key={link.id}
+                        index={index}
+                        baseDelay={0.1}
+                        incrementDelay={0.05}
+                      >
+                        <LinkTile title={link.title} url={link.url} />
+                      </StaggeredAnimation>
+                    ))}
+                  </div>
+                </TabsContent>
+              ))}
+          </ScrollArea>
+        </Tabs>
+      )}
     </Card>
   );
 };

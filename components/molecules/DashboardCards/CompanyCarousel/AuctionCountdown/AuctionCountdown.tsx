@@ -1,17 +1,21 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import Countdown from "react-countdown";
-import { Card } from "@/components/ui/card";
-import {
-  getUpcomingAuctions,
-  Auction,
-} from "@/utils/supabase/supabase-queries";
-import { ChevronsRight, Gavel } from "lucide-react";
+import React, { useMemo } from 'react';
+import Countdown from 'react-countdown';
+import { Card } from '@/components/ui/card';
+
+import { ChevronsRight, Gavel } from 'lucide-react';
 import {
   EventCalendar,
   CalendarEvent,
-} from "@/components/molecules/EventCalendar/EventCalendar";
+  MemoizedEventCalendar,
+} from '@/components/molecules/EventCalendar/EventCalendar';
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { createBrowserClient } from '@/utils/supabase/client';
+import { CalendarLogic } from '@/components/molecules/CalendarLogic/CalendarLogic';
+import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
+import { cn } from '@/lib/utils';
 
 const renderer = ({
   days,
@@ -40,97 +44,139 @@ const renderer = ({
 };
 
 export default function AuctionCountdown() {
-  const [isClient, setIsClient] = useState(false);
-  const [auctions, setAuctions] = useState<Auction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createBrowserClient();
 
-  useEffect(() => {
-    setIsClient(true);
-    fetchAuctions();
-  }, []);
+  const {
+    data: auctions,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['upcomingAuctions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('auctions')
+        .select(
+          'id, start_date, auction_locations(name), auction_venues(name), portfolio_id',
+        )
+        .gte('start_date', new Date().toISOString())
+        .order('start_date', { ascending: true })
+        .limit(3);
 
-  const fetchAuctions = async () => {
-    const upcomingAuctions = await getUpcomingAuctions();
-    setAuctions(upcomingAuctions);
-    setIsLoading(false);
-  };
+      if (error) {
+        console.error('Error fetching auctions:', error);
+        return [];
+      }
+
+      console.log(data);
+
+      return data;
+    },
+  });
+
+  if (isError) return null;
 
   const venueColors: Record<string, string> = {
-    Sydney: "#f89c28",
-    Melbourne: "#cd4f9d",
-    Brisbane: "#93d4eb",
+    Sydney: '#f89c28',
+    Melbourne: '#cd4f9d',
+    Brisbane: '#93d4eb',
   };
 
-  const calendarEvents: CalendarEvent[] = auctions.map((auction) => ({
-    type: "auction",
-    start_date: auction.start_date,
+  const calendarEvents = auctions?.map((auction) => ({
+    type: 'auction',
+    start_date: auction.start_date ?? '',
     end_date: null,
-    details: { auction_location: auction.auction_locations.name },
+    details: { auction_location: auction.auction_locations?.name },
   }));
 
+  const renderCalendarMonth = useMemo(() => {
+    return (
+      <CalendarLogic auctionsPreview={true} events={calendarEvents as CalendarEvent[]}>
+        {(modifiers, modifiersStyles) => {
+          const selectedDate = calendarEvents?.[0]?.start_date;
+          const monthDate = selectedDate ? new Date(selectedDate) : new Date();
+
+          const customClassNames = {
+            caption_label:
+              'text-foreground text-sm font-medium transition-colors duration-500',
+          };
+
+          return (
+            <MemoizedEventCalendar
+              events={calendarEvents ?? []}
+              className="w-fit"
+              numberOfMonths={1}
+              defaultMonth={monthDate}
+              enableNavigation={false}
+              modifiers={modifiers}
+              modifiersStyles={modifiersStyles}
+              classNames={customClassNames}
+            />
+          );
+        }}
+      </CalendarLogic>
+    );
+  }, [calendarEvents]);
+
   return (
-    <Card className="flex h-full w-full items-center justify-between">
+    <Card className="flex h-full w-full items-center justify-between select-none">
       <div className="flex h-full w-1/2 flex-col items-start justify-between p-6">
-        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-          <Gavel className="h-4 w-4" />
-          <h1 className="text-sm font-bold">Upcoming Auctions</h1>
-        </div>
+        <Link href="/events/auctions" className="group">
+          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <Gavel className="h-4 w-4" />
+            <h1 className="text-sm font-bold group-hover:animated-underline-1 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 group-hover:after:origin-bottom-left group-hover:after:scale-x-100">
+              Upcoming Auctions
+            </h1>
+          </div>
+        </Link>
 
         <div className="flex w-full flex-col gap-6">
-          {auctions.map((auction) => (
-            <div key={auction.id}>
-              <p className="flex items-center gap-1 text-lg font-bold">
-                {auction.auction_locations.name || "Location N/A"}{" "}
-                <span className="text-xs">
-                  <ChevronsRight className="h-3 w-3" />
-                </span>{" "}
-                <span
-                  className="text-xs"
-                  style={{
-                    color:
-                      venueColors[
-                        auction.auction_locations
-                          .name as keyof typeof venueColors
-                      ] || "inherit",
-                  }}
-                >
-                  {isClient && (
+          {auctions?.map((auction) => (
+            <Link
+              key={auction.id}
+              href={`/events/auctions/${String(auction.portfolio_id)}/${String(
+                auction.auction_locations?.name,
+              )}`}
+              className="group block w-full"
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1">
+                  <p className="text-lg font-bold group-hover:animated-underline-1 group-hover:after:bottom-[2px] relative after:absolute after:bottom-[2px] after:left-0 after:h-[1px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 group-hover:after:origin-bottom-left group-hover:after:scale-x-100">
+                    {auction.auction_locations?.name ?? 'Location N/A'}
+                  </p>
+                  <ChevronsRight className="h-3 w-3 text-muted-foreground/80" />
+                  <p
+                    className="text-xs font-bold"
+                    style={{
+                      color:
+                        venueColors[
+                          auction?.auction_locations?.name as keyof typeof venueColors
+                        ] || 'inherit',
+                    }}
+                  >
                     <Countdown
-                      date={new Date(auction.start_date)}
+                      date={new Date(auction.start_date ?? '')}
                       renderer={renderer}
                     />
-                  )}
-                </span>
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {new Date(auction.start_date).toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                })}{" "}
-                @{" "}
-                <span className="font-semibold">
-                  {auction.auction_venues.name || "Venue N/A"}
-                </span>
-              </p>
-            </div>
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+                  {new Date(auction.start_date ?? '').toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                  })}{' '}
+                  @{' '}
+                  <span className="font-semibold">
+                    {auction.auction_venues?.name ?? 'Venue N/A'}
+                  </span>
+                </p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
 
       <div className="flex h-full w-1/2 items-center justify-center p-4">
-        {isLoading ? (
-          <div className="flex items-center justify-center">
-            <EventCalendar
-              events={[]}
-              className="max-h-full max-w-full overflow-hidden rounded-md border shadow"
-            />
-          </div>
-        ) : (
-          <EventCalendar
-            events={calendarEvents}
-            className="max-h-full max-w-full overflow-hidden rounded-md border shadow"
-          />
-        )}
+        <div className="flex items-center justify-center">{renderCalendarMonth}</div>
       </div>
     </Card>
   );
