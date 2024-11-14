@@ -1,0 +1,75 @@
+# Social
+
+BR Facebook,https://www.facebook.com/burgessrawsonau/,departments [Burgess Rawson]
+
+BR LinkedIn,https://www.linkedin.com/company/burgess-rawson/,departments [Burgess Rawson]
+
+BR Instagram,https://www.instagram.com/burgessrawsonau/,departments [Burgess Rawson]
+
+LinkedIn,https://www.linkedin.com/,departments [Burgess Rawson]
+
+# Sharepoint
+
+Sharepoint NSW,https://burgessrawsonmelb.sharepoint.com/sites/BurgessRawsonSydney,branches [Sydney]
+
+Sharepoint QLD,https://burgessrawsonmelb.sharepoint.com/sites/burgessrawsonbrisbane,branches [Brisbane, Townsville]
+
+Sharepoint Asset Management,https://burgessrawsonmelb.sharepoint.com/sites/pm,departments [Asset Management]
+
+Sharepoint Supamac,https://burgessrawsonmelb.sharepoint.com/sites/SupamacMarketing,teams [Supamac]
+
+# News
+
+AFR,https://www.afr.com,departments [Burgess Rawson]
+
+Herald Sun,https://www.heraldsun.com.au,departments [Burgess Rawson]
+
+Sydney Morning Herald,https://www.smh.com.au,departments [Burgess Rawson]
+
+The Age,https://www.theage.com.au,departments [Burgess Rawson]
+
+The Australian,https://www.theaustralian.com.au,departments [Burgess Rawson]
+
+# Tools
+
+PropertyBase,https://burgessrawson-syd.lightning.force.com/lightning/page/home,departments [Agency, Finance, Marketing]
+
+CentralStation,https://central-station.wallst.com.au/,departments [Burgess Rawson]
+
+RP Data,https://www.corelogic.com.au/software-solutions/rp-data,departments [Agency]
+
+TM1,https://brvicprod.planning-analytics.cloud.ibm.com/tm1web/,departments [Agency, Finance, Data]
+
+PageProof,https://pageproof.com/,departments [Agency, Marketing]
+
+DocuSign,https://www.docusign.com/,departments [Agency]
+
+Request Schedule (NSW),https://supamacmarketing.formstack.com/forms/sydney_sales_marketing_schedule,departments [Agency],branches [Sydney]
+
+Request Schedule (VIC),https://supamacmarketing.formstack.com/forms/salesmarketing_order_form,departments [Agency],branches [Melbourne, Mildura]
+
+Request Schedule (QLD),https://supamacmarketing.formstack.com/forms/queensland_marketing_schedule,departments [Agency],branches [Brisbane, Townsville]
+
+AuctionsLive,https://auctionslive.com/,departments [Agency, Finance]
+
+MYOB,https://www.myob.com/au/,departments [Finance]
+
+Deft,https://www.deft.com.au/,departments [Finance]
+
+Cirrus8,https://cirrus8.com.au/,departments [Finance, Asset Management]
+
+Loomly,https://www.loomly.com/,departments [Marketing]
+
+Supabase,https://supabase.com/dashboard/project/dodfdwvvwmnnlntpnrec/editor,departments [Technology]
+
+# Advertising
+
+Real Commercial,https://www.realcommercial.com.au/,departments [Burgess Rawson]
+
+Commercial Real Estate,https://www.commercialrealestate.com.au/,departments [Burgess Rawson]
+
+Commercial Ready,https://www.commercialready.com.au/,departments [Burgess Rawson]
+
+Development Ready,https://www.developmentready.com.au/,departments [Burgess Rawson]
+
+RealEstate,https://www.realestate.com.au/,departments [Burgess Rawson]
