@@ -1,7 +1,6 @@
 'use client';
 
 import CompanyCarousel from '@/components/molecules/DashboardCards/CompanyCarousel/CompanyCarousel';
-import WelcomeCard from '@/components/molecules/DashboardCards/WelcomeCard/WelcomeCard';
 import { DashboardCardRow } from '@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow';
 import DashboardFilter from '@/components/molecules/DashboardFilter/DashboardFilter';
 import { Separator } from '@/components/ui/separator';
@@ -21,6 +20,7 @@ import DataDashboard from '@/components/molecules/DashboardCards/DepartmentDashb
 import AssetManagementDashboard from '@/components/molecules/DashboardCards/DepartmentDashboards/AssetManagementDashboard/AssetManagementDashboard';
 import { useState, useEffect } from 'react';
 import EmptyDashboard from '@/components/molecules/DashboardCards/DepartmentDashboards/EmptyDashboard/EmptyDashboard';
+import UserCard from '@/components/molecules/UserCard/UserCard';
 
 export default function DashboardPage() {
   const { data: userProfile, isLoading, isError } = useQuery(userProfileOptions);
@@ -82,7 +82,7 @@ export default function DashboardPage() {
       <div className="grid w-full gap-4 mt-6">
         <DashboardCardRow height={320}>
           <div className="col-span-5 h-full max-h-[320px]">
-            <WelcomeCard />
+            <UserCard userId={userProfile.id} isWelcome />
           </div>
           <div className="col-span-7 flex h-full max-h-[320px] items-center justify-center">
             <CompanyCarousel />
