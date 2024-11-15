@@ -25,7 +25,6 @@ export function GenericHeader() {
         className="absolute left-0 top-0 h-full w-full object-cover object-bottom opacity-40"
       />
       <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-b from-background via-background/90 to-background/50"></div>
-
       <div className="z-10 flex items-center p-6">
         <div>
           <div className="flex flex-col items-start justify-start gap-2">
