@@ -217,7 +217,7 @@ const UserCard = ({
             <div className="flex flex-col gap-0">
               {/* Today's Date */}
               <Link href={`/events`}>
-                <div className="flex items-center gap-1.5 animated-underline-1 w-fit after:bottom-[-1px]">
+                <div className="flex items-center gap-1.5 animated-underline-1 w-fit after:bottom-[0.5px]">
                   <p className="text-xs font-medium text-muted-foreground">
                     {currentTime.toLocaleDateString('en-US', {
                       weekday: 'long',

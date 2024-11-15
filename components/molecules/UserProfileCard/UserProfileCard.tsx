@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
 import { IdCard } from 'lucide-react';
 import { UserHoverCard } from '../LiveChat/UserHoverCard/UserHoverCard';
+import Link from 'next/link';
 
 interface UserProfileCardProps {
   id: string;
@@ -17,6 +18,8 @@ interface UserProfileCardProps {
   className?: string;
   avatarSize?: 'small' | 'medium' | 'large';
   showHoverCard?: boolean;
+  nameOnly?: boolean;
+  textSize?: 'xs' | 'sm' | 'base' | 'lg';
 }
 
 export function UserProfileCard({
@@ -29,6 +32,8 @@ export function UserProfileCard({
   className = '',
   avatarSize = 'medium',
   showHoverCard = true,
+  nameOnly = false,
+  textSize = 'base',
 }: UserProfileCardProps) {
   const supabase = createBrowserClient();
 
@@ -56,64 +61,84 @@ export function UserProfileCard({
 
   return (
     <UserHoverCard userId={id} visible={showHoverCard}>
-      <Card
-        className={`overflow-visible group cursor-pointer ${className} ${
-          variant == 'minimal' ? 'px-0 py-0 border-transparent' : ''
-        }`}
-      >
-        <CardContent
-          className={`${variant == 'minimal' ? 'px-0 py-0' : 'p-4'} border-none`}
+      {nameOnly ? (
+        <Link href={`/wiki/people/${String(user.first_name)}-${String(user.last_name)}`}>
+          <p className={`text-${textSize} font-light animated-underline-1`}>
+            {user.first_name} <span className="font-bold">{user.last_name}</span>
+          </p>
+        </Link>
+      ) : (
+        <Card
+          className={`overflow-visible group cursor-pointer ${className} ${
+            variant == 'minimal' ? 'px-0 py-0 border-transparent bg-transparent' : ''
+          }`}
         >
-          <div className="flex items-end space-x-4">
-            {showAvatar && (
-              <Avatar
-                className={`border border-muted bg-gradient-to-b transition-all from-transparent to-muted group-hover:border-muted-foreground/50 group-hover:to-muted-foreground/75 overflow-visible flex items-end justify-center ${
-                  avatarSize === 'small'
-                    ? 'w-8 h-8'
-                    : avatarSize === 'large'
-                      ? 'w-16 h-16'
-                      : 'w-14 h-14'
-                }`}
-              >
-                <AvatarImage
-                  src={user.profile_picture ?? ''}
-                  alt={`${user.first_name ?? ''} ${user.last_name ?? ''}`}
-                  className="object-cover rounded-b-full w-auto h-[120%]"
-                />
-                <AvatarFallback>
-                  {user.first_name?.[0] ?? ''}
-                  {user.last_name?.[0] ?? ''}
-                </AvatarFallback>
-              </Avatar>
-            )}
-            <div>
-              <h3 className="text-lg font-semibold">
-                <span className="text-base font-light text-muted-foreground group-hover:text-foreground group-hover:underline transition-all">
-                  {showName && (
-                    <>
-                      {user.first_name}{' '}
-                      <span className="font-bold">{user.last_name}</span>
-                    </>
-                  )}
-                </span>
-              </h3>
-              {showRoles && user.roles && (
-                <div className="flex items-center text-xs text-muted-foreground">
-                  {variant === 'compact' && <IdCard className="mr-1 h-4 w-4" />}
-                  {user.roles.join(', ')}
-                </div>
+          <CardContent
+            className={`${variant == 'minimal' ? 'px-0 py-0' : 'p-4'} border-none`}
+          >
+            <div
+              className={`flex items-end space-x-4 ${
+                variant === 'minimal' && !showAvatar ? 'items-center' : ''
+              }`}
+            >
+              {showAvatar && (
+                <Avatar
+                  className={`border border-muted bg-gradient-to-b transition-all from-transparent to-muted group-hover:border-muted-foreground/50 group-hover:to-muted-foreground/75 overflow-visible flex items-end justify-center ${
+                    avatarSize === 'small'
+                      ? 'w-8 h-8'
+                      : avatarSize === 'large'
+                        ? 'w-16 h-16'
+                        : 'w-14 h-14'
+                  }`}
+                >
+                  <AvatarImage
+                    src={user.profile_picture ?? ''}
+                    alt={`${user.first_name ?? ''} ${user.last_name ?? ''}`}
+                    className="object-cover rounded-b-full w-auto h-[120%]"
+                  />
+                  <AvatarFallback>
+                    {user.first_name?.[0] ?? ''}
+                    {user.last_name?.[0] ?? ''}
+                  </AvatarFallback>
+                </Avatar>
               )}
+              <div>
+                <h3 className="text-lg font-semibold">
+                  <span
+                    className={`text-${textSize} font-light text-muted-foreground group-hover:text-foreground group-hover:animated-underline-1 transition-all ${
+                      variant === 'minimal' && !showAvatar ? 'text-xs' : ''
+                    }`}
+                  >
+                    {showName && (
+                      <>
+                        {user.first_name}{' '}
+                        <span className="font-bold">{user.last_name}</span>
+                      </>
+                    )}
+                  </span>
+                </h3>
+                {showRoles && user.roles && (
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    {variant === 'compact' && <IdCard className="mr-1 h-4 w-4" />}
+                    {user.roles.join(', ')}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-          {showDepartments && user.departments && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {user.departments.map((department) => (
-                <DepartmentBadge key={department} department={department} size="small" />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            {showDepartments && user.departments && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {user.departments.map((department) => (
+                  <DepartmentBadge
+                    key={department}
+                    department={department}
+                    size="small"
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </UserHoverCard>
   );
 }
