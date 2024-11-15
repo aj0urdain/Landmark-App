@@ -32,7 +32,7 @@ export function DepartmentFilterBadge({
       variant="outline"
       size="sm"
       className={cn(
-        'flex items-center gap-2 rounded-full px-4 py-2',
+        'flex items-center gap-2 px-4 py-2',
         isSelected
           ? cn(
               departmentInfo?.color,

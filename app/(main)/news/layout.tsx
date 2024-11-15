@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Home, Calendar, Gavel } from 'lucide-react';
+import { Home, Speech, Building, Mailbox } from 'lucide-react';
 import SubNavigationMenu from '@/components/molecules/SubNavigationMenu/SubNavigationMenu';
 
 const newsLinks = [
@@ -12,17 +12,17 @@ const newsLinks = [
   },
   {
     name: 'Announcements',
-    icon: Calendar,
+    icon: Speech,
     href: '/news/announcements',
   },
   {
     name: 'Company',
-    icon: Gavel,
+    icon: Building,
     href: '/news/company',
   },
   {
     name: 'External',
-    icon: Gavel,
+    icon: Mailbox,
     href: '/news/external',
   },
 ];

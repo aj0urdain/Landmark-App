@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { getDepartmentInfo } from '@/utils/getDepartmentInfo';
 import { createBrowserClient } from '@/utils/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface DepartmentBadgeProps {
   department: string | number | null | undefined;
@@ -22,38 +25,52 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   id = false,
   showDepartmentName = true,
 }) => {
-  const [departmentName, setDepartmentName] = useState<string | null>(null);
   const supabase = createBrowserClient();
 
-  useEffect(() => {
-    const fetchDepartmentName = async () => {
-      if (id) {
-        const { data, error } = await supabase
-          .from('departments')
-          .select('department_name')
-          .eq('id', department)
-          .single();
+  // if department is given as an id, fetch the department name
+  const { data: departmentDataID } = useQuery({
+    enabled: id && typeof department === 'number',
+    queryKey: ['department', department],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('departments')
+        .select('id, department_name')
+        .eq('id', department as number)
+        .single();
 
-        if (error) {
-          console.error('Error fetching department name:', error);
-        }
-
-        if (data) {
-          setDepartmentName(data.department_name);
-        }
+      if (error) {
+        console.error('Error fetching department:', error);
+        return null;
       }
-    };
 
-    if (id) {
-      void fetchDepartmentName();
-    } else {
-      setDepartmentName(department as string);
-    }
-  }, [department, id]);
+      return data;
+    },
+  });
 
-  const departmentInformation = getDepartmentInfo(departmentName);
+  const { data: departmentDataName } = useQuery({
+    enabled: !id && typeof department === 'string',
+    queryKey: ['department', department],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('departments')
+        .select('id, department_name')
+        .eq('department_name', department as string)
+        .single();
 
-  if (!departmentInformation || !departmentName) {
+      if (error) {
+        console.error('Error fetching department:', error);
+        return null;
+      }
+
+      return data;
+    },
+  });
+
+  const departmentData = departmentDataID ?? departmentDataName;
+
+  const departmentInformation = getDepartmentInfo(departmentData?.department_name);
+
+  if (!departmentInformation || !departmentData?.department_name) {
     return null;
   }
 
@@ -90,6 +107,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
           'p-0',
           className,
           `hover:text-${color} hover:bg-transparent`,
+          size === 'small' ? 'after:bottom-[-1px]' : '',
         )}
       >
         <div className={cn('flex items-center justify-center', sizeClasses[size].icon)}>
@@ -102,7 +120,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
               sizeClasses[size].text,
             )}
           >
-            {departmentName}
+            {departmentData.department_name}
           </span>
         )}
       </Button>
