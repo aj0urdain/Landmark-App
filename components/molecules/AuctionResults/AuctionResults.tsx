@@ -178,8 +178,8 @@ const AuctionResults = () => {
       </div>
 
       <div className="flex-1">
-        <Tabs defaultValue="Total" className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="Total" className="h-full flex flex-col ">
+          <TabsList className="rounded-none flex justify-between gap-1 px-6 text-xs bg-transparent border-b border-muted/50 w-full h-16">
             {Object.keys(auctionData).map((location) => (
               <TabsTrigger key={location} value={location}>
                 {location}

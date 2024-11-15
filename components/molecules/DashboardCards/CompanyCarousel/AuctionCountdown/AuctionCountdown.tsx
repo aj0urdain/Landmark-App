@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Countdown from 'react-countdown';
 import { Card } from '@/components/ui/card';
 
@@ -75,6 +75,17 @@ export default function AuctionCountdown() {
 
   if (isError) return null;
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [monthDate, setMonthDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (auctions?.[0]?.start_date) {
+      const firstAuctionDate = new Date(auctions[0].start_date);
+      setSelectedDate(firstAuctionDate);
+      setMonthDate(firstAuctionDate);
+    }
+  }, [auctions]);
+
   const venueColors: Record<string, string> = {
     Sydney: '#f89c28',
     Melbourne: '#cd4f9d',
@@ -92,9 +103,6 @@ export default function AuctionCountdown() {
     return (
       <CalendarLogic auctionsPreview={true} events={calendarEvents as CalendarEvent[]}>
         {(modifiers, modifiersStyles) => {
-          const selectedDate = calendarEvents?.[0]?.start_date;
-          const monthDate = selectedDate ? new Date(selectedDate) : new Date();
-
           const customClassNames = {
             caption_label:
               'text-foreground text-sm font-medium transition-colors duration-500',
@@ -105,17 +113,24 @@ export default function AuctionCountdown() {
               events={calendarEvents ?? []}
               className="w-fit"
               numberOfMonths={1}
-              defaultMonth={monthDate}
+              defaultMonth={monthDate ?? new Date()}
               enableNavigation={false}
               modifiers={modifiers}
               modifiersStyles={modifiersStyles}
               classNames={customClassNames}
+              selectedDate={selectedDate ?? new Date()}
             />
           );
         }}
       </CalendarLogic>
     );
-  }, [calendarEvents]);
+  }, [calendarEvents, selectedDate, monthDate]);
+
+  const hoverChangeDate = (date: Date) => {
+    setSelectedDate(date);
+    setMonthDate(new Date(date));
+    console.log(selectedDate, monthDate);
+  };
 
   return (
     <Card className="flex h-full w-full items-center justify-between select-none">
@@ -137,6 +152,9 @@ export default function AuctionCountdown() {
                 auction.auction_locations?.name,
               )}`}
               className="group block w-full"
+              onMouseEnter={() => {
+                hoverChangeDate(new Date(auction.start_date ?? ''));
+              }}
             >
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
@@ -145,7 +163,11 @@ export default function AuctionCountdown() {
                   </p>
                   <ChevronsRight className="h-3 w-3 text-muted-foreground/80" />
                   <p
-                    className="text-xs font-bold"
+                    className={`text-xs font-bold ${
+                      selectedDate && selectedDate === new Date(auction.start_date ?? '')
+                        ? 'animate-pulse'
+                        : ''
+                    }`}
                     style={{
                       color:
                         venueColors[
@@ -176,7 +198,9 @@ export default function AuctionCountdown() {
       </div>
 
       <div className="flex h-full w-1/2 items-center justify-center p-4">
-        <div className="flex items-center justify-center">{renderCalendarMonth}</div>
+        <div className="flex items-center justify-center">
+          {!isLoading && selectedDate && monthDate && renderCalendarMonth}
+        </div>
       </div>
     </Card>
   );

@@ -1,23 +1,14 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Link2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import { userProfileOptions } from '@/types/userProfileTypes';
 import { Separator } from '@/components/ui/separator';
-import { Dot } from '@/components/atoms/Dot/Dot';
-
-// Types
-interface Category {
-  id: number;
-  name: string;
-}
 
 interface LinkType {
   id: number;
