@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { UserPage } from "./user-page";
+import { UserPage } from './user-page';
 
 export default async function UserProfilePage() {
   return (

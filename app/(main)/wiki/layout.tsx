@@ -44,9 +44,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col h-full">
       <SubNavigationMenu title="Wiki" links={wikiLinks} rootPath="/wiki" />
-      {pathname !== '/wiki' && (
-        <GenericHeader title="Wiki" description="Welcome to the Wiki" />
-      )}
+      {pathname !== '/wiki' && !pathname.startsWith('/wiki/people/') && <GenericHeader />}
       {children}
     </div>
   );

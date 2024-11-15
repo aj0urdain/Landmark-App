@@ -47,6 +47,7 @@ import PhoneContact from '@/components/atoms/PhoneContact/PhoneContact';
 import { Separator } from '@/components/ui/separator';
 import BirthdayConfetti from '@/components/molecules/BirthdayConfetti/BirthdayConfetti';
 import { Dot } from '@/components/atoms/Dot/Dot';
+import Link from 'next/link';
 
 export function UserPage() {
   const params = useParams();
@@ -99,9 +100,21 @@ export function UserPage() {
     const today = new Date();
     const years = differenceInYears(today, start);
     const months = differenceInMonths(today, start) % 12;
-    return `${years.toFixed(0)} year${years !== 1 ? 's' : ''}, ${months.toFixed(
-      0,
-    )} month${months !== 1 ? 's' : ''}`;
+
+    if (years === 0 && months === 0) {
+      return 'Just started';
+    }
+
+    const yearsPart =
+      years > 0 ? `${years.toFixed(0)} year${years !== 1 ? 's' : ''}` : '';
+    const monthsPart =
+      months > 0 ? `${months.toFixed(0)} month${months !== 1 ? 's' : ''}` : '';
+
+    if (yearsPart && monthsPart) {
+      return `${yearsPart}, ${monthsPart}`;
+    }
+
+    return yearsPart || monthsPart;
   };
 
   const formatBirthday = (birthday: string) => {
@@ -179,10 +192,14 @@ export function UserPage() {
               </p>
 
               <div className="ml-2 flex animate-slide-up-fade-in items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
-                <div className="flex items-center gap-2">
-                  <IdCard />
-                  {data?.roles?.map((role: string) => role).join(', ')}
-                </div>
+                <Link
+                  href={`/wiki/learn/roles/${data?.roles?.map((role: string) => role).join('-')}`}
+                >
+                  <div className="flex items-center gap-2 animated-underline-1">
+                    <IdCard />
+                    {data?.roles?.map((role: string) => role).join(', ')}
+                  </div>
+                </Link>
               </div>
               {data?.branches && (
                 <div className="flex items-center gap-3 mt-4">
