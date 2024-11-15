@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
-import { Card, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList } from '@/components/ui/tabs';
 import { Speech, Building, Calendar } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
 import { UserProfileCard } from '@/components/molecules/UserProfileCard/UserProfileCard';
 import { useQuery } from '@tanstack/react-query';
 import { createBrowserClient } from '@/utils/supabase/client';
-import { Button } from '@/components/ui/button';
 import { Dot } from '@/components/atoms/Dot/Dot';
 import Link from 'next/link';
 import Image from 'next/image';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 
-const GenericDepartmentNewsCard = ({
-  departmentID,
-  departmentName,
-}: {
-  departmentID: number;
-  departmentName: string;
-}) => {
+const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) => {
+  const [activeTab, setActiveTab] = useState<'announcement' | 'news'>('announcement');
+
   const { data: latestAnnouncement } = useQuery({
     queryKey: ['latest-department-announcement', departmentID],
     enabled: !!departmentID,
@@ -48,26 +50,53 @@ const GenericDepartmentNewsCard = ({
   if (!latestAnnouncement) return null;
 
   return (
-    <Card className="row-span-1 flex h-1/2 flex-col relative p-6 overflow-hidden group">
-      <div className="absolute top-0 left-0 w-full h-full z-10 rounded-lg">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-background group-hover:opacity-90 opacity-100 transition-opacity duration-300 via-background/95 to-background/90 z-10 rounded-lg" />
+    <Card className="row-span-1 flex h-1/2 flex-col relative p-6 group overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full z-10 rounded-xl overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-background group-hover:opacity-90 opacity-100 transition-opacity duration-300 via-background/95 to-background/90 z-10" />
         <Image
           src={latestAnnouncement.cover_image ?? ''}
           alt="Department News"
           fill
-          className="object-cover"
+          className="object-cover rounded-xl"
         />
       </div>
 
-      <Tabs defaultValue="announcement" className="w-full h-full z-20">
-        <div className="absolute right-0 top-0 p-6 z-20">
-          <TabsList className="rounded-none flex justify-between gap-1 p-0 h-fit text-xs bg-transparent w-full">
-            <TabsTrigger value="announcement">
-              <Speech className="h-3 w-3" />
-            </TabsTrigger>
-            <TabsTrigger value="news">
-              <Building className="h-3 w-3" />
-            </TabsTrigger>
+      <Tabs value={activeTab} className="w-full h-full z-20">
+        <div className="absolute right-0 top-0 p-4 z-20">
+          <TabsList className="bg-transparent">
+            <TooltipProvider>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      setActiveTab(
+                        activeTab === 'announcement' ? 'news' : 'announcement',
+                      );
+                    }}
+                    className="hover:bg-background hover:border-muted-foreground"
+                  >
+                    {activeTab !== 'announcement' ? (
+                      <Speech className="h-4 w-4 animate-slide-down-fade-in" />
+                    ) : (
+                      <Building className="h-4 w-4 animate-slide-up-fade-in" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="text-xs z-40 flex gap-1 bg-background text-foreground"
+                  side="left"
+                >
+                  <p>
+                    Switch to{' '}
+                    <span className="font-bold">
+                      {activeTab === 'announcement' ? 'News' : 'Announcements'}
+                    </span>
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </TabsList>
         </div>
 
@@ -76,7 +105,7 @@ const GenericDepartmentNewsCard = ({
           className="w-full flex flex-col justify-between h-full mt-0 z-20"
         >
           <Link
-            href={`/news/announcements/${latestAnnouncement.id}`}
+            href={`/news/announcements/${String(latestAnnouncement.id)}`}
             className="w-full h-full"
           >
             <div className="flex flex-col justify-between w-full h-full z-20">
@@ -94,7 +123,7 @@ const GenericDepartmentNewsCard = ({
                 <Dot size="tiny" className="bg-muted-foreground animate-pulse" />
                 <div className="flex gap-2 items-center h-fit">
                   {/* Author */}
-                  {latestAnnouncement?.author_id && (
+                  {latestAnnouncement.author_id && (
                     <UserProfileCard
                       id={latestAnnouncement.author_id}
                       variant="minimal"
@@ -102,7 +131,7 @@ const GenericDepartmentNewsCard = ({
                       textSize="xs"
                     />
                   )}
-                  {latestAnnouncement?.author_id_secondary && (
+                  {latestAnnouncement.author_id_secondary && (
                     <UserProfileCard
                       id={latestAnnouncement.author_id_secondary}
                       variant="minimal"
@@ -110,7 +139,7 @@ const GenericDepartmentNewsCard = ({
                       textSize="xs"
                     />
                   )}
-                  {latestAnnouncement?.author_id_tertiary && (
+                  {latestAnnouncement.author_id_tertiary && (
                     <UserProfileCard
                       id={latestAnnouncement.author_id_tertiary}
                       variant="minimal"
@@ -148,6 +177,13 @@ const GenericDepartmentNewsCard = ({
               </div>
             </div>
           </Link>
+        </TabsContent>
+
+        <TabsContent
+          value="news"
+          className="w-full flex flex-col justify-between h-full mt-0 z-20"
+        >
+          {/* Your news content */}
         </TabsContent>
       </Tabs>
     </Card>

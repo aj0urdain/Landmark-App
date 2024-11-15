@@ -32,10 +32,7 @@ export function GenericDepartmentRow({ department }: { department: string }) {
   return (
     <>
       <div className="col-span-6 flex h-full flex-col gap-4">
-        <GenericDepartmentNewsCard
-          departmentID={departmentData.id}
-          departmentName={departmentData.department_name}
-        />
+        <GenericDepartmentNewsCard departmentID={departmentData.id} />
 
         <GenericDepartmentEventsCard
           departmentID={departmentData.id}

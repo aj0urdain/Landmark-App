@@ -30,12 +30,12 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   // if department is given as an id, fetch the department name
   const { data: departmentDataID } = useQuery({
     enabled: id && typeof department === 'number',
-    queryKey: ['department', department],
+    queryKey: ['departmentID', department],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('departments')
         .select('id, department_name')
-        .eq('id', department as number)
+        .eq('id', department as string)
         .single();
 
       if (error) {
