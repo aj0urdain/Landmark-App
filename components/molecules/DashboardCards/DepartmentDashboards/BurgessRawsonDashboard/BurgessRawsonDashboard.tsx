@@ -1,10 +1,8 @@
 import React from 'react';
 import { DashboardCardRow } from '@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-
 import DashboardContainer from '@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer';
-import LiveChat from '@/components/molecules/LiveChat/LiveChat';
-import { Bell, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import AuctionResults from '@/components/molecules/AuctionResults/AuctionResults';
 import { GenericDepartmentRow } from '@/components/molecules/GenericDepartmentRow/GenericDepartmentRow';
 
