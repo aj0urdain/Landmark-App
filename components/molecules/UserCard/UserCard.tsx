@@ -120,7 +120,7 @@ const UserCard = ({
   return (
     <Card
       key={user?.id}
-      className="relative flex h-full min-h-[300px] flex-col items-start justify-between gap-4 p-6 w-full group transition-all duration-300 overflow-hidden"
+      className="relative flex h-full min-h-[300px] select-none flex-col items-start justify-between gap-4 p-6 w-full group transition-all duration-300 overflow-hidden"
     >
       <div className="absolute left-0 top-0 z-10 flex h-full transition-all duration-300 w-full flex-col items-start justify-between bg-gradient-to-br from-muted/50 to-transparent p-0" />
       <div className="group-hover:flex hidden group-hover:opacity-100 opacity-0 absolute left-0 top-0 z-10 h-full animate-slide-up-fade-in group-hover:animate-pulse transition-all duration-300 w-full flex-col items-start justify-between bg-gradient-to-br from-muted/75 to-transparent p-0 animation-fill-forwards group-hover:animation-fill-forwards group-hover:animation-delay-1000" />
