@@ -196,9 +196,11 @@ const UserCard = ({
           {!isWelcome && (
             <div className="flex flex-col gap-2 text-muted-foreground/50">
               {user?.email && <EmailContact email={user.email} size="small" />}
-              {user?.business_number && (
+              {user?.business_number ? (
                 <PhoneContact phoneNumber={user.business_number} size="small" />
-              )}
+              ) : user?.mobile_number ? (
+                <PhoneContact phoneNumber={user.mobile_number} size="small" />
+              ) : null}
             </div>
           )}
         </div>
