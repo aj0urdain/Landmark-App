@@ -35,7 +35,6 @@ const stateIcons: Record<string, StateInfo> = {
 interface BranchBadgeProps {
   branchName?: string;
   list?: boolean;
-  onClick?: () => void;
   size?: 'small' | 'medium' | 'large';
   colored?: boolean;
 }
@@ -43,7 +42,6 @@ interface BranchBadgeProps {
 const BranchBadge: React.FC<BranchBadgeProps> = ({
   branchName,
   list = false,
-  onClick,
   size = 'medium',
   colored = true,
 }) => {
@@ -54,15 +52,19 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
     isLoading,
     isError,
   } = useQuery({
+    enabled: !!branchName,
     queryKey: ['branch', branchName],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('branches')
         .select('branch_name, states(short_name)')
-        .eq('branch_name', branchName)
+        .eq('branch_name', branchName ?? '')
         .single();
 
-      console.log(data);
+      if (error) {
+        console.error('Error fetching branch', error);
+        return null;
+      }
 
       return data;
     },
@@ -97,6 +99,10 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
   };
 
   if (isLoading) {
+    return null;
+  }
+
+  if (isError) {
     return null;
   }
 

@@ -92,7 +92,7 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
                   }
                 })}
               </div>
-              <div className="flex w-2/3 flex-col gap-1">
+              <div className="flex w-2/3 flex-col gap-0.5">
                 <Link
                   href={`/wiki/people/${user.first_name}-${user.last_name}`}
                   onClick={handleNameClick}
@@ -115,7 +115,7 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
             <Link
               href={`/wiki/people/${user.first_name}-${user.last_name}`}
               onClick={handleNameClick}
-              className="absolute bottom-0 right-0 w-1/3 cursor-pointer hover:animate-pulse hover:[animation-duration:_4s]"
+              className="absolute bottom-0 right-0 w-1/3 cursor-pointer"
             >
               {user?.profile_picture ? (
                 <Image

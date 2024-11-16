@@ -94,8 +94,6 @@ const UserCard = ({
         console.error(error);
       }
 
-      console.log(data);
-
       return data;
     },
   });
@@ -149,17 +147,22 @@ const UserCard = ({
                 );
               })}
             </div>
-            <div className="flex w-fit flex-col gap-1">
+            <div className="flex w-fit flex-col gap-0.5">
               <Link
                 href={`/wiki/people/${String(user?.first_name)}-${String(user?.last_name)}`}
                 key={String(user?.id)}
                 onMouseEnter={() => debouncedSetHoveredUserId(true)}
                 onMouseLeave={() => debouncedSetHoveredUserId(false)}
+                className={`flex gap-1
+                  ${(user?.first_name + user?.last_name).length > 13 && isWelcome ? '' : ''}
+                  `}
               >
                 <p
-                  className={`text-3xl w-fit font-light relative animated-underline-1 ${
+                  className={`w-fit font-light relative animated-underline-1 animate-slide-left-fade-in ${
                     hoveredUserId ? 'animated-underline-1-active' : ''
-                  }`}
+                  }
+                  ${(user?.first_name + user?.last_name).length > 13 ? 'text-2xl' : 'text-3xl'}
+                  `}
                 >
                   {user?.first_name} <span className="font-bold">{user?.last_name}</span>
                 </p>
@@ -168,11 +171,13 @@ const UserCard = ({
                 <Link href={`/wiki/learn/roles/${role.split(' ').join('-')}`} key={role}>
                   <div
                     key={role}
-                    className="flex max-w-60 w-fit items-start gap-1.5 font-semibold  text-muted-foreground"
+                    className={`flex max-w-60 text-[0.85rem] w-fit items-start gap-1.5 font-normal text-muted-foreground
+                      ${role.length > 20 ? 'items-start' : 'items-center'}
+                      `}
                   >
                     <IdCard
                       className={`w-full ${
-                        role.length > 20 ? 'min-w-4 max-w-4 pb-1' : 'min-w-5 max-w-5'
+                        role.length > 20 ? 'min-w-4 max-w-4 pb-1' : 'min-w-4 max-w-4'
                       }`}
                     />
                     <p
@@ -214,41 +219,45 @@ const UserCard = ({
         ) : (
           <div className="w-2/5">
             <Separator className="my-4 w-full" />
-            <div className="flex flex-col gap-0">
-              {/* Today's Date */}
-              <Link href={`/events`}>
-                <div className="flex items-center gap-1.5 animated-underline-1 w-fit after:bottom-[0.5px]">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {currentTime.toLocaleDateString('en-US', {
-                      weekday: 'long',
-                    })}
-                  </p>
-                  <Dot size="tiny" className="bg-muted-foreground animate-pulse" />
-                  <p className="text-xs text-muted-foreground">
-                    {currentTime.toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </Link>
+            <div className="flex flex-col justify-end">
+              <div className="flex flex-col gap-1">
+                {/* Today's Date */}
+                <Link href={`/events`}>
+                  <div className="flex items-center gap-1.5 animated-underline-1 w-fit after:bottom-[0.5px]">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {currentTime.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                      })}
+                    </p>
+                    <Dot size="tiny" className="bg-muted-foreground animate-pulse" />
+                    <p className="text-xs text-muted-foreground">
+                      {currentTime.toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                </Link>
 
-              {/* Alarm Clock Style Time */}
-              <div className="flex items-center gap-2">
-                <div className="font-lexia font-bold">
-                  <AnimatedDigit digit={time.hours[0]} prevDigit={prevTime.hours[0]} />
-                  <AnimatedDigit digit={time.hours[1]} prevDigit={prevTime.hours[1]} />
-                  <span className="text-sm text-muted-foreground">:</span>
-                  <AnimatedDigit
-                    digit={time.minutes[0]}
-                    prevDigit={prevTime.minutes[0]}
-                  />
-                  <AnimatedDigit
-                    digit={time.minutes[1]}
-                    prevDigit={prevTime.minutes[1]}
-                  />
+                {/* Alarm Clock Style Time */}
+                <div className="flex items-center gap-2.5">
+                  <div className="font-lexia font-bold">
+                    <AnimatedDigit digit={time.hours[0]} prevDigit={prevTime.hours[0]} />
+                    <AnimatedDigit digit={time.hours[1]} prevDigit={prevTime.hours[1]} />
+                    <span className="text-sm text-muted-foreground">:</span>
+                    <AnimatedDigit
+                      digit={time.minutes[0]}
+                      prevDigit={prevTime.minutes[0]}
+                    />
+                    <AnimatedDigit
+                      digit={time.minutes[1]}
+                      prevDigit={prevTime.minutes[1]}
+                    />
 
-                  <span className="ml-1 text-xs text-muted-foreground">{time.ampm}</span>
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      {time.ampm}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -266,8 +275,9 @@ const UserCard = ({
       </div>
       <div
         className={`absolute h-full flex items-end z-20 ${
-          isWelcome ? 'right-0 top-2' : 'right-4 top-4'
-        }`}
+          isWelcome ? '-right-4 top-4' : 'right-4 top-4'
+        }
+        ${(user?.first_name + user?.last_name).length > 16 && isWelcome ? '-right-2' : ''}`}
       >
         {user?.profile_picture ? (
           <Link
@@ -280,10 +290,10 @@ const UserCard = ({
             <Image
               src={user.profile_picture}
               alt={user.first_name ?? 'User Profile Picture'}
-              sizes="250px"
+              sizes="300px"
               width={1382}
               height={1632}
-              className="h-full w-auto object-cover rounded-r-xl transition-all duration-500 group-hover:drop-shadow-[-75px_-100px_200px_rgba(255,255,255,0.35)] animate-slide-up-fade-in animation-delay-1000 animation-fill-forwards"
+              className="h-full w-auto object-cover rounded-r-xl transition-all duration-500 group-hover:drop-shadow-[-75px_-100px_200px_rgba(255,255,255,0.35)] animate-slide-right-fade-in animation-delay-1000 animation-fill-forwards"
             />
           </Link>
         ) : (

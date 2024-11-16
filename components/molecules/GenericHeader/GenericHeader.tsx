@@ -15,6 +15,8 @@ export function GenericHeader() {
 
   const icon = wikiLinks.find((link) => link.href === pathname)?.icon;
 
+  const description = wikiLinks.find((link) => link.href === pathname)?.description;
+
   return (
     <div className="relative flex min-h-48 items-end justify-start overflow-hidden rounded-b-3xl">
       <Image
@@ -36,7 +38,7 @@ export function GenericHeader() {
               <h1 className="text-4xl font-black animate-slide-right-fade-in">{title}</h1>
             </div>
             <div>
-              <p className="text-lg text-muted-foreground">description</p>
+              <p className="text-muted-foreground">{description}</p>
             </div>
           </div>
         </div>
