@@ -41,3 +41,6 @@ next-env.d.ts
 
 # tiptap
 .npmrc
+
+# Ignore temp API folder
+/app/api/temp/
