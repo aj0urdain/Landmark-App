@@ -41,8 +41,6 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
         return null;
       }
 
-      console.log(data);
-
       return data;
     },
   });
@@ -57,6 +55,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
           src={latestAnnouncement.cover_image ?? ''}
           alt="Department News"
           fill
+          sizes="250px"
           className="object-cover rounded-xl"
         />
       </div>
@@ -154,7 +153,6 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
                 {/* Department Badges */}
                 <div className="flex gap-2 items-center">
                   {latestAnnouncement.departments?.map((department) => {
-                    console.log(department);
                     return (
                       <DepartmentBadge
                         key={String(department)}
@@ -166,8 +164,8 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
                     );
                   })}
                 </div>
-                <div className="flex flex-col items-start h-full">
-                  <h3 className="text-2xl truncate font-bold">
+                <div className="flex flex-col items-start h-full w-full">
+                  <h3 className="text-2xl font-bold line-clamp-2 w-full">
                     {latestAnnouncement.title}
                   </h3>
                   <p className="text-muted-foreground line-clamp-2 text-sm">

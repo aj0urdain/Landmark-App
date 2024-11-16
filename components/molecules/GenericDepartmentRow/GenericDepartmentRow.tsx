@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createBrowserClient } from '@/utils/supabase/client';
 
 import GenericDepartmentNewsCard from '@/components/molecules/GenericDepartmentNewsCard/GenericDepartmentNewsCard';
-import GenericDepartmentEventsCard from '@/components/molecules/GenericDepartmentEventsCard/GenericDepartmentEventsCard';
+import GenericDepartmentStaffEventsCard from '@/components/molecules/GenericDepartmentStaffEventsCard/GenericDepartmentStaffEventsCard';
 
 export function GenericDepartmentRow({ department }: { department: string }) {
   const { data: departmentData } = useQuery({
@@ -34,7 +34,7 @@ export function GenericDepartmentRow({ department }: { department: string }) {
       <div className="col-span-6 flex h-full flex-col gap-4">
         <GenericDepartmentNewsCard departmentID={departmentData.id} />
 
-        <GenericDepartmentEventsCard
+        <GenericDepartmentStaffEventsCard
           departmentID={departmentData.id}
           departmentName={departmentData.department_name}
         />
