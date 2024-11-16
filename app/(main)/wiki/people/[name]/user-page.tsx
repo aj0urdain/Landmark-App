@@ -58,8 +58,6 @@ export function UserPage() {
     queryKey: [...getUserProfilePage.queryKey, name],
   });
 
-  console.log(data);
-
   const [showBirthdayMessage, setShowBirthdayMessage] = useState(false);
 
   const isBirthday = data?.birthday
@@ -210,7 +208,7 @@ export function UserPage() {
                       size="medium"
                     />
                   </div>
-                  <div className="animate-slide-up-fade-in opacity-0 [animation-delay:_3s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
+                  <div className="animate-slide-down-fade-in opacity-0 [animation-delay:_2.5s] [animation-duration:_2s] [animation-fill-mode:_forwards]">
                     <Dot size="small" className="bg-muted-foreground animate-pulse" />
                   </div>
                   <div className="flex animate-slide-right-fade-in gap-2 opacity-0 [animation-delay:_2.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
@@ -296,7 +294,7 @@ export function UserPage() {
           <div />
         </div>
         {data.profile_picture && (
-          <div className="absolute flex h-full w-full items-center justify-end overflow-y-hidden">
+          <div className="absolute flex h-[90%] bottom-0 right-8 w-full items-center justify-end overflow-y-hidden">
             <Image
               src={data.profile_picture}
               alt="Profile Picture"

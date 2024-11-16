@@ -80,49 +80,39 @@ export default function LibraryPage() {
   return (
     <div className="w-full h-full ">
       <Card className="w-full h-full">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold">
-            Burgess Rawson Resource Library
-          </CardTitle>
-          <CardDescription>
-            Access a comprehensive collection of resources for Burgess Rawson.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full">
-            {categories.map((category, index) => (
-              <AccordionItem value={`item-${index}`} key={index}>
-                <AccordionTrigger>
-                  <div className="flex items-center">
-                    {category.icon}
-                    <span>{category.title}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-                    {category.items.map((item, itemIndex) => (
-                      <Card key={itemIndex} className="flex flex-col justify-between">
-                        <CardHeader>
-                          <CardTitle className="text-lg">{item}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Access and manage {item.toLowerCase()} for your commercial
-                            real estate projects.
-                          </p>
-                          <div className="flex justify-between items-center">
-                            <Badge variant="secondary">0 items</Badge>
-                            <Button size="sm">View</Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </CardContent>
+        <Accordion type="single" collapsible className="w-full">
+          {categories.map((category, index) => (
+            <AccordionItem value={`item-${index}`} key={index}>
+              <AccordionTrigger>
+                <div className="flex items-center">
+                  {category.icon}
+                  <span>{category.title}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                  {category.items.map((item, itemIndex) => (
+                    <Card key={itemIndex} className="flex flex-col justify-between">
+                      <CardHeader>
+                        <CardTitle className="text-lg">{item}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Access and manage {item.toLowerCase()} for your commercial real
+                          estate projects.
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <Badge variant="secondary">0 items</Badge>
+                          <Button size="sm">View</Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </Card>
     </div>
   );

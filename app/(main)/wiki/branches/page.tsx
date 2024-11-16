@@ -8,11 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge, MapPin, Waypoints } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { createBrowserClient } from '@/utils/supabase/client';
-import Image from 'next/image';
-import { GenericHeader } from '@/components/molecules/GenericHeader/GenericHeader';
+import Link from 'next/link';
 
 // Add state order configuration
 const stateOrder = {
@@ -87,7 +86,7 @@ export default function BranchesPage() {
         Object.entries(groupedBranches).map(([country, states]) => (
           <div key={country} className="mb-12">
             <h2 className="text-2xl font-bold mb-6">{country}</h2>
-            <div className="grid gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {Object.entries(states)
                 .sort(([stateA], [stateB]) => {
                   // Get the order for each state (default to 999 if not in stateOrder)
@@ -112,22 +111,27 @@ export default function BranchesPage() {
                         {locations.length === 1 ? 'location' : 'locations'}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <CardContent className="grid gap-6 p-6">
                       {locations.map((branch) => (
-                        <div
+                        <Link
+                          href={`/wiki/branches/${String(branch.name).toLowerCase()}`}
                           key={branch.name}
-                          className="flex items-start gap-4 rounded-lg border p-4 transition-colors hover:bg-muted"
                         >
-                          <div className="rounded-full bg-primary/10 p-2">
-                            <MapPin className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">{branch.name}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {branch.address}
-                            </p>
-                          </div>
-                        </div>
+                          <Card
+                            key={branch.name}
+                            className="flex items-start gap-4 rounded-xl border p-4 transition-colors hover:bg-muted"
+                          >
+                            <div className="rounded-full bg-primary/10 p-2">
+                              <MapPin className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">{branch.name}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {branch.address}
+                              </p>
+                            </div>
+                          </Card>
+                        </Link>
                       ))}
                     </CardContent>
                   </Card>
