@@ -16,21 +16,6 @@ const nextConfig = {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // Add this section to ignore temp routes
-  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  webpack: (config, { dev, isServer }) => {
-    // Ignore temp API routes in production
-    if (!dev) {
-      config.plugins = config.plugins || [];
-      config.plugins.push(
-        new config.webpack.IgnorePlugin({
-          resourceRegExp: /^\.\/temp\/.*$/,
-          contextRegExp: /api$/,
-        }),
-      );
-    }
-    return config;
-  },
   images: {
     remotePatterns: [
       {
