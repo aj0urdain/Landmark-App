@@ -82,7 +82,6 @@ const PersonalLinks = () => {
         return [];
       }
 
-      console.log(`Categories: ${data}`);
       return data;
     },
   });
@@ -101,7 +100,6 @@ const PersonalLinks = () => {
         return [];
       }
 
-      console.log(`Links: ${data}`);
       return data;
     },
   });

@@ -67,8 +67,6 @@ export default function AuctionCountdown() {
         return [];
       }
 
-      console.log(data);
-
       return data;
     },
   });
@@ -129,7 +127,6 @@ export default function AuctionCountdown() {
   const hoverChangeDate = (date: Date) => {
     setSelectedDate(date);
     setMonthDate(new Date(date));
-    console.log(selectedDate, monthDate);
   };
 
   return (

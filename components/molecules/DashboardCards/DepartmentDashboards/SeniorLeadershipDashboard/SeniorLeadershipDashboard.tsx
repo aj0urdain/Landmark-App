@@ -9,7 +9,7 @@ const SeniorLeadershipDashboard = ({ isLast }: { isLast: boolean }) => {
 
   return (
     <DashboardContainer department={department} isLast={isLast}>
-      <DashboardCardRow>
+      <DashboardCardRow height={420}>
         <GenericDepartmentRow department={department} />
       </DashboardCardRow>
     </DashboardContainer>

@@ -1,24 +1,13 @@
-import React from "react";
-import { DashboardCardRow } from "@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import DashboardContainer from "@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer";
+import React from 'react';
+import { DashboardCardRow } from '@/components/molecules/DashboardCards/DashboardCardRow/DashboardCardRow';
+
+import DashboardContainer from '@/components/molecules/DashboardCards/DashboardContainer/DashboardContainer';
+import { GenericDepartmentRow } from '@/components/molecules/GenericDepartmentRow/GenericDepartmentRow';
 const DesignDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
     <DashboardContainer department="Design" isLast={isLast}>
-      <DashboardCardRow>
-        <div className="col-span-12">
-          <Card>
-            <CardHeader>
-              <CardTitle>Design</CardTitle>
-              <CardDescription>Design dashboard!</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
+      <DashboardCardRow height={420}>
+        <GenericDepartmentRow department="Design" />
       </DashboardCardRow>
     </DashboardContainer>
   );

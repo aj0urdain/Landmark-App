@@ -21,11 +21,56 @@ import AssetManagementDashboard from '@/components/molecules/DashboardCards/Depa
 import { useState, useEffect } from 'react';
 import EmptyDashboard from '@/components/molecules/DashboardCards/DepartmentDashboards/EmptyDashboard/EmptyDashboard';
 import UserCard from '@/components/molecules/UserCard/UserCard';
+// import { createBrowserClient } from '@/utils/supabase/client';
 
 export default function DashboardPage() {
   const { data: userProfile, isLoading, isError } = useQuery(userProfileOptions);
 
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+
+  // const [testID, setTestID] = useState<string>('');
+  // const [testIndex, setTestIndex] = useState<number>(0);
+
+  // const supabase = createBrowserClient();
+
+  // const { data: testUsers } = useQuery({
+  //   queryKey: ['testUsers'],
+  //   queryFn: async () => {
+  //     const { data, error } = await supabase
+  //       .from('user_profile_complete')
+  //       .select('id')
+  //       .order('last_name', { ascending: true });
+  //     if (error) {
+  //       console.error(error);
+  //     }
+
+  //     console.log(data);
+  //     return data;
+  //   },
+  // });
+
+  // useEffect(() => {
+  //   if (testUsers && testUsers.length > 0) {
+  //     setTestID(testUsers[0].id);
+  //   }
+  // }, [testUsers]);
+
+  // useEffect(() => {
+  //   if (!testUsers || testUsers.length === 0) return;
+
+  //   setTestID(testUsers[testIndex].id);
+
+  //   const interval = setInterval(() => {
+  //     const nextIndex = (testIndex + 1) % testUsers.length;
+  //     setTestID(testUsers[nextIndex].id);
+  //     setTestIndex(nextIndex);
+  //     console.log(testUsers[nextIndex].id);
+  //   }, 250);
+
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [testUsers, testIndex]);
 
   useEffect(() => {
     if (userProfile?.departments) {
