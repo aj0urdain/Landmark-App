@@ -32,9 +32,9 @@ export default function CompanyCarousel() {
           <CarouselItem className="flex h-full items-center justify-center">
             <AuctionCountdown />
           </CarouselItem>
-          <CarouselItem className="flex h-full items-center justify-center">
+          {/* <CarouselItem className="flex h-full items-center justify-center">
             <IndustryNews />
-          </CarouselItem>
+          </CarouselItem> */}
         </CarouselContent>
         <CarouselPrevious variant="outline" size="icon" />
         <CarouselNext variant="outline" size="icon" />

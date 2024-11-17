@@ -9,10 +9,8 @@ const BurgessRawsonDashboard = ({ isLast }: { isLast: boolean }) => {
   return (
     <DashboardContainer department="Burgess Rawson" isLast={isLast}>
       <DashboardCardRow height={360}>
-        <div className="col-span-12 grid grid-cols-5 h-full flex-col gap-4">
-          <DashboardEventsPreview />
-          <AuctionResults />
-        </div>
+        <DashboardEventsPreview />
+        <AuctionResults />
       </DashboardCardRow>
       <DashboardCardRow height={420}>
         <GenericDepartmentRow department="Burgess Rawson" />

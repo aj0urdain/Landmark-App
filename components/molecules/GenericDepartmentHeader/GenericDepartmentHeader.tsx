@@ -15,20 +15,21 @@ export function GenericDepartmentHeader() {
     .filter((segment) => segment !== 'wiki' && segment !== 'departments')
     .join('');
 
+  console.log(departmentSlug);
+
   // Find the department info by matching the link property
   const departmentInfo = departmentInfoArray.find((dept) => dept.link === departmentSlug);
 
-  if (!departmentInfo) return null;
-
-  const { name, icon: Icon, color } = departmentInfo;
+  const { icon: Icon } = departmentInfo ?? {};
 
   const { data: departmentData, isLoading } = useQuery({
-    queryKey: ['department', name],
+    enabled: !!departmentInfo,
+    queryKey: ['department', departmentInfo?.name],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('departments')
         .select('*')
-        .eq('department_name', name)
+        .eq('department_name', departmentInfo?.name ?? '')
         .single();
 
       if (error) {
@@ -42,6 +43,7 @@ export function GenericDepartmentHeader() {
 
   if (isLoading) return <div>Loading...</div>;
   if (!departmentData) return null;
+  if (!departmentInfo) return null;
 
   return (
     <div className="relative flex min-h-48 items-end justify-start overflow-hidden rounded-b-3xl">
@@ -58,7 +60,7 @@ export function GenericDepartmentHeader() {
           <div className="flex flex-col items-start justify-start gap-2">
             <div className="flex items-center gap-2">
               {React.createElement(Icon, {
-                className: `h-6 w-6 animate-slide-left-fade-in ${color}`,
+                className: `h-6 w-6 animate-slide-left-fade-in ${departmentInfo?.color}`,
               })}
               <h1 className="text-4xl font-black animate-slide-right-fade-in">
                 {departmentData.department_name}

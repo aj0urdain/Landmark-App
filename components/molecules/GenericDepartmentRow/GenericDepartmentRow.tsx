@@ -31,7 +31,7 @@ export function GenericDepartmentRow({ department }: { department: string }) {
 
   return (
     <>
-      <div className="col-span-6 flex h-full flex-col gap-4">
+      <div className="col-span-6 flex h-full max-h-[420px] flex-col gap-4">
         <GenericDepartmentNewsCard departmentID={departmentData.id} />
 
         <GenericDepartmentStaffEventsCard
@@ -40,7 +40,11 @@ export function GenericDepartmentRow({ department }: { department: string }) {
         />
       </div>
       <div className="col-span-6 h-full overflow-visible">
-        <LiveChat chatName={departmentData.department_name} height={420} />
+        <LiveChat
+          chatName={departmentData.department_name}
+          height={420}
+          key={departmentData.department_name}
+        />
       </div>
     </>
   );

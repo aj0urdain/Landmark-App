@@ -72,12 +72,6 @@ export default function DashboardPage() {
   //   };
   // }, [testUsers, testIndex]);
 
-  useEffect(() => {
-    if (userProfile?.departments) {
-      setSelectedDepartments(userProfile.departments);
-    }
-  }, [userProfile?.departments]);
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -86,6 +80,12 @@ export default function DashboardPage() {
     return <div>Error loading user profile</div>;
   }
 
+  useEffect(() => {
+    if (userProfile?.departments) {
+      setSelectedDepartments(userProfile.departments);
+    }
+  }, [userProfile?.departments]);
+
   const handleFilterChange = (departments: string[]) => {
     setSelectedDepartments(departments);
   };
@@ -93,29 +93,31 @@ export default function DashboardPage() {
   const renderDashboards = () => {
     return selectedDepartments.map((department, index) => {
       const isLast = index === selectedDepartments.length - 1;
+      const uniqueKey = String(department) + String(index);
+
       switch (department) {
         case 'Burgess Rawson':
-          return <BurgessRawsonDashboard key={department} isLast={isLast} />;
+          return <BurgessRawsonDashboard key={uniqueKey} isLast={isLast} />;
         case 'Senior Leadership':
-          return <SeniorLeadershipDashboard key={department} isLast={isLast} />;
+          return <SeniorLeadershipDashboard key={uniqueKey} isLast={isLast} />;
         case 'Technology':
-          return <TechnologyDashboard key={department} isLast={isLast} />;
+          return <TechnologyDashboard key={uniqueKey} isLast={isLast} />;
         case 'Agency':
-          return <AgencyDashboard key={department} isLast={isLast} />;
+          return <AgencyDashboard key={uniqueKey} isLast={isLast} />;
         case 'Finance':
-          return <FinanceDashboard key={department} isLast={isLast} />;
+          return <FinanceDashboard key={uniqueKey} isLast={isLast} />;
         case 'Human Resources':
-          return <HumanResourcesDashboard key={department} isLast={isLast} />;
+          return <HumanResourcesDashboard key={uniqueKey} isLast={isLast} />;
         case 'Asset Management':
-          return <AssetManagementDashboard key={department} isLast={isLast} />;
+          return <AssetManagementDashboard key={uniqueKey} isLast={isLast} />;
         case 'Design':
-          return <DesignDashboard key={department} isLast={isLast} />;
+          return <DesignDashboard key={uniqueKey} isLast={isLast} />;
         case 'Marketing':
-          return <MarketingDashboard key={department} isLast={isLast} />;
+          return <MarketingDashboard key={uniqueKey} isLast={isLast} />;
         case 'Operations':
-          return <OperationsDashboard key={department} isLast={isLast} />;
+          return <OperationsDashboard key={uniqueKey} isLast={isLast} />;
         case 'Data':
-          return <DataDashboard key={department} isLast={isLast} />;
+          return <DataDashboard key={uniqueKey} isLast={isLast} />;
         default:
           return null;
       }

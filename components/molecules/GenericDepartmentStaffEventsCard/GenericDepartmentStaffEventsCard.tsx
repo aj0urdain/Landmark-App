@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, CakeIcon, BriefcaseIcon, Cake } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Card } from '@/components/ui/card';
+import { CakeIcon, BriefcaseIcon, Cake } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList } from '@/components/ui/tabs';
 import {
   Tooltip,
   TooltipContent,
@@ -14,28 +13,36 @@ import {
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, isSameDay } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import BirthdayConfetti from '../BirthdayConfetti/BirthdayConfetti';
 
 const getUpcomingEvents = (data: any[], eventType: string, limit = 3) => {
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const currentYear = today.getFullYear();
 
   return data
     .map((user: any) => {
       const date = new Date(user[eventType]);
-      const nextOccurrence = new Date(currentYear, date.getMonth(), date.getDate());
+      let nextOccurrence = new Date(currentYear, date.getMonth(), date.getDate());
 
-      // If the date has already passed this year, set to next year
       if (nextOccurrence < today) {
-        nextOccurrence.setFullYear(currentYear + 1);
+        nextOccurrence = new Date(currentYear + 1, date.getMonth(), date.getDate());
       }
 
-      // Calculate days until next occurrence
       const daysUntil = differenceInDays(nextOccurrence, today);
+      const isTodayEvent = isSameDay(nextOccurrence, today);
 
-      return { ...user, nextOccurrence, daysUntil };
+      return { ...user, nextOccurrence, daysUntil, isTodayEvent };
     })
-    .sort((a: any, b: any) => a.nextOccurrence.getTime() - b.nextOccurrence.getTime())
+    .sort((a, b) => {
+      if (a.isTodayEvent && !b.isTodayEvent) return -1;
+      if (!a.isTodayEvent && b.isTodayEvent) return 1;
+
+      return a.nextOccurrence.getTime() - b.nextOccurrence.getTime();
+    })
     .slice(0, limit);
 };
 
@@ -46,13 +53,13 @@ const GenericDepartmentStaffEventsCard = ({
   departmentID: number;
   departmentName: string;
 }) => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'birthdays' | 'anniversaries'>('birthdays');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(5);
+  const [isHovered, setIsHovered] = useState(false);
   const supabase = createBrowserClient();
-
-  const { data: departmentData } = useQuery({
-    queryKey: ['department', departmentName],
-  });
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const { data: staffEvents, isLoading: isLoadingStaffEvents } = useQuery({
     queryKey: ['staff-events', departmentID],
@@ -76,209 +83,250 @@ const GenericDepartmentStaffEventsCard = ({
     },
   });
 
-  // Auto-rotate every 5 seconds
+  // Auto-rotate every 5 seconds if not hovering
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (staffEvents?.[activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries']) {
-        setCurrentIndex(
-          (prev) =>
-            (prev + 1) %
-            staffEvents[activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries']
-              .length,
-        );
-      }
-    }, 5000);
+    if (!staffEvents || isHovered) return;
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [staffEvents, activeTab]);
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          setCurrentIndex(
+            (prev) =>
+              (prev + 1) %
+              staffEvents[activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries']
+                .length,
+          );
+          return 5; // Reset timer
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [staffEvents, activeTab, isHovered]);
 
   // Reset index when switching tabs
   useEffect(() => {
     setCurrentIndex(0);
+    setTimeLeft(5);
   }, [activeTab]);
 
+  if (isLoadingStaffEvents) return <p>Loading events...</p>;
+
+  const currentEvent =
+    staffEvents?.[activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries']?.[
+      currentIndex
+    ];
+
+  const handleCardClick = () => {
+    if (currentEvent) {
+      router.push(`/wiki/people/${currentEvent.first_name}-${currentEvent.last_name}`);
+    }
+  };
+
+  const handleButtonClick = (e: React.MouseEvent, idx: number) => {
+    e.stopPropagation();
+    setCurrentIndex(idx);
+    setTimeLeft(5);
+  };
+
+  const handleToggleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveTab(activeTab === 'birthdays' ? 'anniversaries' : 'birthdays');
+  };
+
   return (
-    <Card className="row-span-1 flex h-1/2 flex-col relative">
-      <div className="flex flex-col gap-4 text-sm w-full h-full">
-        {isLoadingStaffEvents ? (
-          <p>Loading events...</p>
-        ) : (
-          <Tabs value={activeTab} className="w-full h-full">
-            <div className="absolute left-0 top-0 w-full h-16 flex items-center z-50">
-              <div className="w-full flex items-center relative">
-                <div className="w-16 flex items-center justify-center">
-                  <TabsList className="bg-transparent relative z-50">
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                              setActiveTab(
-                                activeTab === 'birthdays' ? 'anniversaries' : 'birthdays',
-                              );
-                            }}
-                            className="hover:bg-background hover:border-muted-foreground relative z-50"
-                          >
-                            {activeTab !== 'birthdays' ? (
-                              <CakeIcon className="h-4 w-4 animate-slide-down-fade-in" />
-                            ) : (
-                              <BriefcaseIcon className="h-4 w-4 animate-slide-up-fade-in" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent
-                          className="text-xs z-50 flex gap-1 bg-background text-foreground"
-                          side="right"
-                        >
-                          <p>
-                            Switch to{' '}
-                            <span className="font-bold">
-                              {activeTab === 'birthdays'
-                                ? 'Work Anniversaries'
-                                : 'Birthdays'}
-                            </span>
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TabsList>
-                </div>
+    <>
+      {currentEvent?.isTodayEvent && activeTab === 'birthdays' && isHovered && (
+        <BirthdayConfetti />
+      )}
 
-                <div className="flex-1 flex justify-center gap-2 relative z-40">
-                  {staffEvents?.[
-                    activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries'
-                  ]?.map((event, idx) => (
-                    <button
-                      key={String(event.id)}
-                      onClick={() => {
-                        setCurrentIndex(idx);
-                      }}
-                      className={`relative h-8 w-8 rounded-full overflow-hidden transition-all z-20 ${
-                        currentIndex === idx
-                          ? 'ring-2 ring-primary'
-                          : 'opacity-50 hover:opacity-100'
-                      }`}
-                    >
-                      {event.profile_picture ? (
-                        <Image
-                          src={event.profile_picture}
-                          alt={`${event.first_name} ${event.last_name}`}
-                          fill
-                          sizes="20px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-muted flex items-center justify-center text-xs">
-                          {event.first_name[0]}
-                          {event.last_name[0]}
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="w-16" />
-              </div>
-            </div>
-
-            <TabsContent value="birthdays" className="mt-0 h-full w-full">
-              {staffEvents?.birthdays[currentIndex] && (
-                <Link
-                  href={`/wiki/people/${staffEvents.birthdays[currentIndex].first_name}-${staffEvents.birthdays[currentIndex].last_name}`}
-                  key={staffEvents.birthdays[currentIndex].id}
-                  className="group relative flex h-full w-full items-center justify-between overflow-hidden rounded-lg hover:bg-muted/50 transition-all p-4"
-                >
-                  <div className="flex items-end h-full gap-4">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-3xl">
-                        <span className="font-light">
-                          {staffEvents.birthdays[currentIndex].first_name}
-                        </span>{' '}
-                        <span className="font-bold">
-                          {staffEvents.birthdays[currentIndex].last_name}
-                        </span>
-                      </p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Cake className="h-4 w-4" />
-                        <p>
-                          {format(
-                            staffEvents.birthdays[currentIndex].nextOccurrence,
-                            'MMM d',
-                          )}
-                        </p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Make sure to wish {staffEvents.birthdays[currentIndex].first_name}{' '}
-                        a happy birthday{' '}
-                        {staffEvents.birthdays[currentIndex].daysUntil === 0
-                          ? 'Today!'
-                          : staffEvents.birthdays[currentIndex].daysUntil === 1
-                            ? 'Tomorrow!'
-                            : `in ${staffEvents.birthdays[currentIndex].daysUntil} days!`}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="absolute right-4 top-4 h-full">
-                    {staffEvents.birthdays[currentIndex].profile_picture ? (
-                      <Image
-                        src={staffEvents.birthdays[currentIndex].profile_picture}
-                        alt={`${staffEvents.birthdays[currentIndex].first_name} ${staffEvents.birthdays[currentIndex].last_name}`}
-                        width={250}
-                        height={250}
-                        className="h-full w-auto object-cover rounded-r-lg transition-all duration-500"
-                      />
-                    ) : (
-                      <div className="h-full w-32 bg-muted flex items-center justify-center rounded-r-lg">
-                        <div className="text-2xl">
-                          {staffEvents.birthdays[currentIndex].first_name[0]}
-                          {staffEvents.birthdays[currentIndex].last_name[0]}
-                        </div>
+      <Card
+        ref={cardRef}
+        className={cn(
+          'row-span-1 flex h-1/2 flex-col relative p-4 cursor-pointer overflow-hidden transition-colors',
+          isHovered && activeTab === 'birthdays' && 'border-pink-500/50',
+          isHovered && activeTab === 'anniversaries' && 'border-orange-500/50',
+        )}
+        onClick={handleCardClick}
+        onMouseEnter={() => {
+          setIsHovered(true);
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false);
+        }}
+      >
+        <div className="flex flex-col h-full">
+          {/* Header section with fixed height */}
+          <div className="h-12 flex items-center gap-3">
+            <TooltipProvider>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleToggleClick}
+                    className="hover:bg-background hover:border-muted-foreground relative z-50"
+                  >
+                    {timeLeft && !isHovered && (
+                      <div className="absolute -top-2 -right-2 bg-muted text-foreground-muted rounded-full w-4 h-4 flex items-center justify-center text-[8px]">
+                        {timeLeft}
                       </div>
                     )}
-                  </div>
-                </Link>
-              )}
-            </TabsContent>
-
-            <TabsContent value="anniversaries" className="mt-0 h-full w-full p-4">
-              {staffEvents?.workAnniversaries[currentIndex] && (
-                <Link
-                  href={`/wiki/people/${staffEvents.workAnniversaries[currentIndex].first_name}-${staffEvents.workAnniversaries[currentIndex].last_name}`}
-                  key={staffEvents.workAnniversaries[currentIndex].id}
-                  className="group relative flex h-24 w-full items-center justify-between overflow-hidden rounded-lg p-4 hover:bg-muted/50 transition-all"
+                    {activeTab === 'birthdays' ? (
+                      <CakeIcon className="h-4 w-4 animate-slide-down-fade-in text-pink-500" />
+                    ) : (
+                      <BriefcaseIcon className="h-4 w-4 animate-slide-up-fade-in text-orange-500" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="text-xs z-50 flex gap-1 bg-background text-foreground"
+                  side="right"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-xl">
-                        <span className="font-light">
-                          {staffEvents.workAnniversaries[currentIndex].first_name}
-                        </span>{' '}
-                        <span className="font-bold">
-                          {staffEvents.workAnniversaries[currentIndex].last_name}
-                        </span>
+                  <p>
+                    Switch to{' '}
+                    <span className="font-bold">
+                      {activeTab === 'birthdays' ? 'Work Anniversaries' : 'Birthdays'}
+                    </span>
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <p
+              className={cn(
+                'text-xs text-muted-foreground font-bold animate-slide-left-fade-in',
+                activeTab === 'birthdays' && 'text-pink-300/75',
+                activeTab === 'anniversaries' && 'text-orange-300/75',
+              )}
+            >
+              Upcoming Staff{' '}
+              {activeTab === 'birthdays' ? 'Birthdays' : 'Work Anniversaries'}
+            </p>
+          </div>
+
+          {/* Main content with fixed layout */}
+          <div className="flex-1 flex gap-2 mt-4">
+            {/* Navigation buttons in fixed width column */}
+            <div className="w-10 flex flex-col gap-2">
+              {staffEvents?.[
+                activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries'
+              ]?.map((event, idx) => (
+                <Button
+                  key={String(event.id)}
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => handleButtonClick(e, idx)}
+                  className={cn(
+                    'h-8 w-8 p-0 relative rounded-full',
+                    currentIndex === idx
+                      ? 'ring-1 ring-muted-foreground'
+                      : 'opacity-50 hover:opacity-100',
+                  )}
+                >
+                  {event.profile_picture ? (
+                    <Image
+                      src={event.profile_picture}
+                      alt={`${event.first_name} ${event.last_name}`}
+                      width={32}
+                      height={32}
+                      className="object-contain w-8 h-8 absolute bottom-0 rounded-full"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-muted flex items-center justify-center text-xs rounded-full">
+                      {event.first_name[0]}
+                      {event.last_name[0]}
+                    </div>
+                  )}
+                </Button>
+              ))}
+            </div>
+
+            {/* Content section with fixed proportions */}
+            <div className="">
+              {currentEvent && (
+                <div className="h-full flex flex-col justify-center">
+                  <div className="flex flex-col justify-between h-full">
+                    <div className="flex flex-col gap-0">
+                      <p
+                        className={cn(
+                          'text-3xl',
+                          currentEvent.isTodayEvent &&
+                            (activeTab === 'birthdays'
+                              ? 'text-pink-500'
+                              : 'text-orange-500'),
+                        )}
+                      >
+                        <span className="font-light">{currentEvent.first_name}</span>{' '}
+                        <span className="font-bold">{currentEvent.last_name}</span>
                       </p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Cake className="h-4 w-4" />
-                        <p>
-                          {format(
-                            staffEvents.workAnniversaries[currentIndex].nextOccurrence,
-                            'MMM d',
-                          )}
-                        </p>
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        {activeTab === 'birthdays' && <Cake className="h-4 w-4" />}
+                        {activeTab === 'anniversaries' && (
+                          <BriefcaseIcon className="h-3.5 w-3.5" />
+                        )}
+                        <p>{format(currentEvent.nextOccurrence, 'MMMM d')}</p>
                       </div>
                     </div>
+                    <p className="text-sm text-muted-foreground w-4/5">
+                      {activeTab === 'birthdays' ? (
+                        <>
+                          {currentEvent.isTodayEvent ? (
+                            <>Today is {currentEvent.first_name}'s birthday!</>
+                          ) : currentEvent.daysUntil === 0 ? (
+                            <>
+                              Make sure to wish{' '}
+                              <span className="font-bold">{currentEvent.first_name}</span>{' '}
+                              a happy birthday tomorrow!
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-bold">{currentEvent.first_name}</span>{' '}
+                              is going to be celebrating a birthday in{' '}
+                              <span className="font-bold">
+                                {currentEvent.daysUntil} days!
+                              </span>
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          Celebrate {currentEvent.first_name}'s work anniversary{' '}
+                          {currentEvent.isTodayEvent
+                            ? 'Today!'
+                            : currentEvent.daysUntil === 0
+                              ? 'Tomorrow!'
+                              : `in ${currentEvent.daysUntil} days!`}
+                        </>
+                      )}
+                    </p>
                   </div>
-                </Link>
+                </div>
               )}
-            </TabsContent>
-          </Tabs>
-        )}
-      </div>
-    </Card>
+              <div className="absolute right-4 bottom-0 h-[90%]">
+                {currentEvent.profile_picture ? (
+                  <Image
+                    src={currentEvent.profile_picture}
+                    alt={`${currentEvent.first_name} ${currentEvent.last_name}`}
+                    width={250}
+                    height={250}
+                    key={currentEvent.profile_picture}
+                    className="h-full w-auto object-cover rounded-r-lg transition-all duration-500 animate-slide-up-fade-in"
+                  />
+                ) : (
+                  <div className="h-full w-32 bg-muted flex items-center justify-center rounded-r-lg">
+                    <div className="text-2xl">
+                      {currentEvent.first_name[0]}
+                      {currentEvent.last_name[0]}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </>
   );
 };
 

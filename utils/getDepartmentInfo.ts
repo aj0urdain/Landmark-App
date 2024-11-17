@@ -136,9 +136,6 @@ export function getDepartmentInfo(
 export async function getDepartmentName(department: number): Promise<string | undefined> {
   const supabase = createBrowserClient();
 
-  console.log('department');
-  console.log(department);
-
   const { data, error } = await supabase
     .from('departments')
     .select('department_name')
