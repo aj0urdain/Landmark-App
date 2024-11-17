@@ -1,12 +1,15 @@
-import React, { useEffect } from "react";
-import confetti from "canvas-confetti";
+import React, { useEffect } from 'react';
+import confetti from 'canvas-confetti';
 
 interface BirthdayConfettiProps {
   delay?: number;
+  reset?: () => void;
 }
 
-const BirthdayConfetti: React.FC<BirthdayConfettiProps> = ({ delay = 0 }) => {
+const BirthdayConfetti: React.FC<BirthdayConfettiProps> = ({ delay = 0, reset }) => {
   useEffect(() => {
+    if (!reset) confetti.reset();
+
     const timer = setTimeout(() => {
       const duration = 15 * 1000;
       const animationEnd = Date.now() + duration;
@@ -20,27 +23,31 @@ const BirthdayConfetti: React.FC<BirthdayConfettiProps> = ({ delay = 0 }) => {
         const timeLeft = animationEnd - Date.now();
 
         if (timeLeft <= 0) {
-          return clearInterval(interval);
+          clearInterval(interval);
         }
 
         const particleCount = 50 * (timeLeft / duration);
-        confetti({
+        void confetti({
           ...defaults,
           particleCount,
           origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
         });
-        confetti({
+        void confetti({
           ...defaults,
           particleCount,
           origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
         });
       }, 250);
 
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+      };
     }, delay);
 
-    return () => clearTimeout(timer);
-  }, [delay]);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [delay, reset]);
 
   return null;
 };

@@ -54,7 +54,7 @@ export function BreadcrumbWithDropdown() {
   const middleSegments = pathSegments.slice(1, -2);
 
   return (
-    <Breadcrumb>
+    <Breadcrumb className="select-none">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>
@@ -70,7 +70,7 @@ export function BreadcrumbWithDropdown() {
                 <DropdownMenuTrigger className="flex items-center gap-1">
                   <BreadcrumbEllipsis />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
+                <DropdownMenuContent align="center">
                   {middleSegments.map((segment) => {
                     const href = `/${pathSegments.slice(0, pathSegments.indexOf(segment) + 1).join('/')}`;
                     return (
@@ -107,7 +107,7 @@ export function BreadcrumbWithDropdown() {
                           Sandbox
                           <ChevronDownIcon className="h-4 w-4" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
+                        <DropdownMenuContent align="center">
                           {sandboxOptions.map((option) => (
                             <DropdownMenuItem key={option.href} asChild>
                               <Link
@@ -152,7 +152,7 @@ export function BreadcrumbWithDropdown() {
                         Sandbox
                         <ChevronDownIcon className="h-4 w-4" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start">
+                      <DropdownMenuContent align="center">
                         {sandboxOptions.map((option) => (
                           <DropdownMenuItem key={option.href} asChild>
                             <Link
