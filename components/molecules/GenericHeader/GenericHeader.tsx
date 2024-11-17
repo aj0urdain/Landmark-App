@@ -4,6 +4,8 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 
 export function GenericHeader() {
+  console.log('GenericHeader');
+
   const pathname = usePathname();
 
   const title = pathname
