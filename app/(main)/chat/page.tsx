@@ -346,7 +346,10 @@ const ChatPage = () => {
             </p>
           </div>
         ) : (
-          <LiveChat chatName={selectedSubRoom?.name ?? selectedDepartment?.name ?? ''} />
+          <LiveChat
+            chatName={selectedSubRoom?.name ?? selectedDepartment?.name}
+            key={selectedSubRoom?.name ?? selectedDepartment?.name}
+          />
         )}
       </Card>
     </div>

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, Send } from 'lucide-react';
+import { useRef, useEffect } from 'react';
+import { Loader2, MessageSquare, Send } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dot } from '@/components/atoms/Dot/Dot';
 import { Database } from '@/types/supabaseTypes';
 import { createBrowserClient } from '@/utils/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import {
   Tooltip,
@@ -48,109 +50,125 @@ const EmptyStateMessage = () => (
 );
 
 export default function LiveChat({ height, chatName }: LiveChatProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [charCount, setCharCount] = useState(0);
+  const [isSending, setIsSending] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const supabase = createBrowserClient();
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [isSending, setIsSending] = useState(false);
-  const [floatingMessage, setFloatingMessage] = useState<string | null>(null);
-  const [charCount, setCharCount] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
+  // Get current user
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      setCurrentUser(user?.id ?? null);
-    };
-    void fetchCurrentUser();
-  }, [supabase]);
+      return user?.id ?? null;
+    },
+  });
 
-  const fetchMessages = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select(
-        '*, chat_room_id!inner(id, name), user_id!inner(id, first_name, last_name, profile_picture)',
-      )
-      .eq('chat_room_id.name', chatName)
-      .order('created_at', { ascending: false }) // Change to descending order
-      .limit(100) // Limit to 100 messages
-      .then((result) => ({
-        ...result,
-        data: result.data?.reverse(), // Reverse the array to maintain chronological order
-      }));
+  // get chat room data
+  // Fetch chat room details
+  const { data: chatRoomData } = useQuery({
+    enabled: !!chatName && !!currentUser,
+    queryKey: ['chat-room', chatName],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('chat_rooms')
+        .select(
+          `
+          name, 
+          id, 
+          parent_room, 
+          team_id,
+          departments(id, department_name)
+        `,
+        )
+        .eq('name', chatName)
+        .single();
 
-    if (error) {
-      console.error('Error fetching messages:', error);
-    } else {
-      setMessages(data as unknown as Message[]);
-    }
-  }, [chatName, supabase]);
+      if (error) throw new Error('Error fetching chat room');
+      return data;
+    },
+  });
 
+  // Get messages
+  const { data: messages = [], isLoading: isFetchingMessages } = useQuery({
+    enabled: !!chatRoomData,
+    queryKey: ['chat-messages', chatName],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select(
+          '*, chat_room_id!inner(id, name), user_id!inner(id, first_name, last_name, profile_picture)',
+        )
+        .eq('chat_room_id.name', chatName)
+        .order('created_at', { ascending: false })
+        .limit(100)
+        .then((result) => ({
+          ...result,
+          data: result.data?.reverse(),
+        }));
+
+      if (error) throw new Error('Error fetching messages');
+
+      return data as unknown as Message[];
+    },
+  });
+
+  // Send message mutation
+  const { mutate: sendMessage } = useMutation({
+    mutationFn: async (messageContent: string) => {
+      setIsSending(true);
+
+      const { error } = await supabase.from('chat_messages').insert({
+        content: messageContent,
+        chat_room_id: chatRoomData?.id as number,
+      });
+
+      if (error) {
+        console.error('Error sending message:', error);
+      }
+    },
+    onSuccess: () => {
+      setInput('');
+      setCharCount(0);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+      setIsSending(false);
+    },
+  });
+
+  // Setup realtime subscription
   useEffect(() => {
-    void fetchMessages();
-    const channel = supabase
-      .channel('chat_messages')
+    if (!chatRoomData) return;
+
+    const channels = supabase
+      .channel(`chat-room-messages-${chatName}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'chat_messages',
+          filter: `chat_room_id=eq.${String(chatRoomData.id)}`,
         },
-        () => {
-          void fetchMessages();
-          // Clear the floating message when new messages are received
-          setFloatingMessage(null);
+        (payload) => {
+          console.log('Change received!', payload);
+          void queryClient.invalidateQueries({ queryKey: ['chat-messages', chatName] });
         },
       )
       .subscribe();
 
     return () => {
-      void supabase.removeChannel(channel);
+      void supabase.removeChannel(channels);
     };
-  }, [chatName, supabase, fetchMessages]);
+  }, [supabase, chatName, queryClient, chatRoomData]);
 
-  const handleSend = useCallback(async () => {
-    if (input.trim() && !isSending && charCount <= MESSAGE_CHAR_LIMIT) {
-      setIsSending(true);
-      const messageContent = input.trim();
-      setInput('');
-      setCharCount(0);
-      setFloatingMessage(messageContent);
-
-      try {
-        const { data: chatRoomData, error: chatRoomError } = await supabase
-          .from('chat_rooms')
-          .select('id')
-          .eq('name', chatName)
-          .single();
-
-        if (chatRoomError) throw new Error('Error fetching chat room');
-
-        const { error } = await supabase.from('chat_messages').insert({
-          content: messageContent,
-          chat_room_id: chatRoomData.id,
-        });
-
-        if (error) throw new Error('Error sending message');
-
-        // Don't call fetchMessages here, let the subscription handle it
-      } catch (error) {
-        console.error('Error:', error);
-        // Optionally, show an error message to the user
-      } finally {
-        setIsSending(false);
-        // Refocus on the input field
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }
-    }
-  }, [input, isSending, supabase, chatName, charCount]);
-
+  // Scroll to bottom effect
   useEffect(() => {
     const scrollContainer = scrollAreaRef.current?.querySelector(
       '[data-radix-scroll-area-viewport]',
@@ -160,7 +178,21 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
     }
   }, [messages]);
 
-  const renderMessageGroups = useCallback(() => {
+  const handleSend = () => {
+    if (input.trim() && !isSending && charCount <= MESSAGE_CHAR_LIMIT) {
+      sendMessage(input.trim());
+    }
+  };
+
+  const renderMessageGroups = () => {
+    if (isFetchingMessages) {
+      return (
+        <div className="flex h-full w-full items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </div>
+      );
+    }
+
     if (messages.length === 0) {
       return <EmptyStateMessage />;
     }
@@ -197,7 +229,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
 
       return (
         <div
-          key={`group-${groupIndex}`}
+          key={`group-${String(groupIndex)}`}
           className={`mb-4 flex animate-slide-up-fade-in items-start space-x-2 ${
             isCurrentUser ? 'justify-end' : 'justify-start'
           }`}
@@ -211,11 +243,11 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
               >
                 <AvatarImage
                   className="h-auto w-full object-contain object-top"
-                  src={group[0].user_id.profile_picture || undefined}
+                  src={group[0].user_id.profile_picture ?? undefined}
                 />
                 <AvatarFallback>
-                  {group[0].user_id.first_name?.[0] ||
-                    group[0].user_id.last_name?.[0] ||
+                  {group[0].user_id.first_name?.[0] ??
+                    group[0].user_id.last_name?.[0] ??
                     'U'}
                 </AvatarFallback>
               </Avatar>
@@ -267,11 +299,11 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
               >
                 <AvatarImage
                   className="h-auto w-full object-contain object-top"
-                  src={group[0].user_id.profile_picture || undefined}
+                  src={group[0].user_id.profile_picture ?? undefined}
                 />
                 <AvatarFallback>
-                  {group[0].user_id.first_name?.[0] ||
-                    group[0].user_id.last_name?.[0] ||
+                  {group[0].user_id.first_name?.[0] ??
+                    group[0].user_id.last_name?.[0] ??
                     'U'}
                 </AvatarFallback>
               </Avatar>
@@ -280,26 +312,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
         </div>
       );
     });
-  }, [messages, currentUser]);
-
-  const FloatingMessage = useCallback(() => {
-    if (!floatingMessage) return null;
-
-    return (
-      <div className="absolute bottom-full left-0 mb-2 animate-float-up-fade-out">
-        <div className="mx-auto w-full rounded-lg border border-muted-foreground bg-transparent p-2 text-xs text-primary">
-          {floatingMessage}
-        </div>
-      </div>
-    );
-  }, [floatingMessage]);
-
-  useEffect(() => {
-    if (floatingMessage) {
-      const timer = setTimeout(() => setFloatingMessage(null), 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [floatingMessage]);
+  };
 
   return (
     <Card
@@ -324,14 +337,13 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
           </div>
         </div>
       </CardHeader>
-      <ScrollArea ref={scrollAreaRef} className="relative flex-grow">
+      <ScrollArea ref={scrollAreaRef} className="relative flex-grow h-[400px]">
         <CardContent className="overflow-visible">
           {messages.length === 0 ? <EmptyStateMessage /> : renderMessageGroups()}
         </CardContent>
       </ScrollArea>
       <CardFooter className="flex-none">
         <div className="relative w-full">
-          <FloatingMessage />
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -350,7 +362,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
                     setInput(e.target.value);
                     setCharCount(e.target.value.length);
                   }}
-                  // disabled={isSending}
+                  disabled={isSending || isFetchingMessages}
                   className={charCount > MESSAGE_CHAR_LIMIT ? 'border-red-500' : ''}
                 />
                 <Button
