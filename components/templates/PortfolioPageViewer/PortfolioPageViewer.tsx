@@ -241,9 +241,11 @@ const PortfolioPageViewer: React.FC = () => {
 
           <AddressSection />
 
-          <FinanceCopySection />
+          <div className="group/finance">
+            <FinanceCopySection />
 
-          <FinanceAmountSection />
+            <FinanceAmountSection />
+          </div>
 
           <PropertyCopySection />
 

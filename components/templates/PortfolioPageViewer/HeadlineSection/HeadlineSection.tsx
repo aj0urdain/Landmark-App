@@ -1,6 +1,5 @@
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { textAlgorithm } from '@/utils/sandbox/document-generator/portfolio-page/textAlgorithm';
-import { logoDataOptions } from '@/utils/sandbox/document-generator/portfolio-page/portfolio-queries';
 import { SectionName } from '@/types/portfolioControlsTypes';
 import { useSearchParams } from 'next/navigation';
 
@@ -43,7 +42,7 @@ const HeadlineSection = () => {
       }}
     >
       <p
-        className={`${textProps.getTailwind()} line-clamp-2 group-hover:text-warning-foreground`}
+        className={`${textProps.getTailwind()} line-clamp-2 group-hover:text-warning-foreground overflow-hidden text-ellipsis w-full`}
         style={textProps.getStyle()}
       >
         {(draftHeadline as string) ||

@@ -42,7 +42,7 @@ const FinanceCopySection = () => {
     <div
       className={`absolute left-[4.75%] top-[83%] flex h-[8.5%] w-[30.5%] flex-col 
         items-start justify-start gap-[11%] font-medium 
-        group cursor-pointer hover:scale-[1.01] transition-all duration-300 z-10`}
+        group cursor-pointer group-hover/finance:scale-[1.01] transition-all duration-300 z-10`}
       onClick={() => {
         updateSelectedSection('Finance' as SectionName);
       }}
@@ -52,7 +52,7 @@ const FinanceCopySection = () => {
           key={index}
           className={`${textProps.getTailwind()} w-full ${
             financeLines.length === 0 ? 'text-gray-400' : ''
-          } group-hover:text-warning-foreground`}
+          } group-hover/finance:text-warning-foreground`}
           style={textProps.getStyle()}
         >
           {line}

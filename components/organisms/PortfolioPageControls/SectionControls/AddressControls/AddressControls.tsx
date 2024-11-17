@@ -170,7 +170,7 @@ const AddressControls: React.FC = () => {
   }, [databaseMessage]);
 
   return (
-    <div className="flex flex-col h-full gap-16 animate-slide-down-fade-in">
+    <div className="flex flex-col h-full gap-12 animate-slide-down-fade-in">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <Label className="text-sm font-medium">
@@ -260,7 +260,7 @@ const AddressControls: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        <Label className="text-sm font-medium">Generated Address</Label>
+        {/* <Label className="text-sm font-medium">Generated Address</Label> */}
         <div className="space-y-0.5">
           <Label htmlFor="addressLine1" className="text-xs text-muted-foreground">
             Address Line 1

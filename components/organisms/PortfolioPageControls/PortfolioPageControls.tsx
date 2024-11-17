@@ -47,7 +47,7 @@ const PortfolioPageControls = ({
   }, [currentSection]);
 
   return (
-    <Card className="h-full w-full p-4">
+    <Card className="h-full w-full p-4 overflow-y-scroll">
       {!isDisabled && canEdit && (
         <div className="mb-4">
           <div className="flex flex-col gap-4">
@@ -61,7 +61,7 @@ const PortfolioPageControls = ({
           </div>
           <Separator className="my-8" />
           {selectedSection && (
-            <div className="mt-4">
+            <div className="">
               <SectionControls selectedSection={currentSection ?? 'Headline'} />
             </div>
           )}

@@ -55,13 +55,13 @@ const FinanceAmountSection = () => {
   return (
     <div
       className={`absolute bottom-[5.8%] left-[4.75%] flex h-[5%] w-[30%] flex-col items-end justify-end
-        group cursor-pointer hover:scale-[1.01] transition-all duration-300 z-10`}
+        group cursor-pointer group-hover/finance:scale-[1.01] transition-all duration-300 z-10`}
       onClick={() => {
         updateSelectedSection('Finance' as SectionName);
       }}
     >
       <p
-        className={`${textProps.getTailwind()} w-full group-hover:text-warning-foreground`}
+        className={`${textProps.getTailwind()} w-full group-hover/finance:text-warning-foreground`}
         style={textProps.getStyle()}
       >
         {`${getFinanceTypeLabel()}: ${getFormattedAmount()} pa* + GST`}
