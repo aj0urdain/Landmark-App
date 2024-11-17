@@ -14,7 +14,7 @@ import { Book, Video, FileText, Lightbulb, Users, Calendar } from 'lucide-react'
 const resources = [
   {
     category: 'Articles',
-    icon: <FileText className="h-6 w-6" />,
+    icon: <FileText className="h-5 w-5" />,
     items: [
       { title: 'Understanding Commercial Real Estate Trends', link: '#' },
       { title: 'Top 10 Factors in Property Valuation', link: '#' },
@@ -23,7 +23,7 @@ const resources = [
   },
   {
     category: 'Video Tutorials',
-    icon: <Video className="h-6 w-6" />,
+    icon: <Video className="h-5 w-5" />,
     items: [
       { title: 'Introduction to Commercial Property Management', link: '#' },
       { title: 'Mastering Lease Negotiations', link: '#' },
@@ -32,7 +32,7 @@ const resources = [
   },
   {
     category: 'E-Books',
-    icon: <Book className="h-6 w-6" />,
+    icon: <Book className="h-5 w-5" />,
     items: [
       { title: 'The Complete Guide to Commercial Real Estate Investing', link: '#' },
       { title: 'Sustainable Building Practices in Modern Real Estate', link: '#' },
@@ -41,7 +41,7 @@ const resources = [
   },
   {
     category: 'Webinars',
-    icon: <Users className="h-6 w-6" />,
+    icon: <Users className="h-5 w-5" />,
     items: [
       { title: 'Upcoming: Market Analysis Techniques for 2024', link: '#' },
       { title: 'Recorded: Effective Client Relationship Management', link: '#' },
@@ -88,102 +88,115 @@ const events = [
 
 export default function LearnPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold text-primary">
-            Learning Resources
-          </CardTitle>
-          <CardDescription className="text-lg text-muted-foreground">
-            Expand your knowledge and skills in commercial real estate
-          </CardDescription>
-        </CardHeader>
-      </Card>
+    <div className="container mx-auto flex h-[calc(100vh-8rem)] flex-col gap-8 px-4 py-8">
+      <Card className="flex-1 animate-slide-up-fade-in [animation-delay:200ms]">
+        <CardContent className="p-6">
+          <Tabs defaultValue="resources" className="h-full">
+            <TabsList className="w-fit flex items-center gap-2 bg-transparent">
+              <TabsTrigger value="resources" className="flex items-center gap-2">
+                <Book className="h-4 w-4" />
+                Learning Materials
+              </TabsTrigger>
+              <TabsTrigger value="certifications" className="flex items-center gap-2">
+                <Lightbulb className="h-4 w-4" />
+                Certifications
+              </TabsTrigger>
+              <TabsTrigger value="events" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Events
+              </TabsTrigger>
+            </TabsList>
 
-      <Tabs defaultValue="resources" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="resources">Learning Materials</TabsTrigger>
-          <TabsTrigger value="certifications">Certifications</TabsTrigger>
-          <TabsTrigger value="events">Events</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="resources" className="space-y-4">
-          {resources.map((resource) => (
-            <Card key={resource.category}>
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  {resource.icon}
-                  <CardTitle>{resource.category}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {resource.items.map((item) => (
-                    <li key={item.title}>
-                      <a href={item.link} className="text-primary hover:underline">
-                        {item.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="certifications">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <Lightbulb className="h-6 w-6" />
-                <CardTitle>Professional Certifications</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {certifications.map((cert) => (
-                  <li key={cert.name} className="border-b pb-4 last:border-b-0 last:pb-0">
-                    <h3 className="font-semibold">{cert.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Provider: {cert.provider}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Estimated Duration: {cert.duration}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="events">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-6 w-6" />
-                <CardTitle>Upcoming Events</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {events.map((event) => (
-                  <li
-                    key={event.name}
-                    className="border-b pb-4 last:border-b-0 last:pb-0"
+            <TabsContent value="resources" className="mt-6 space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                {resources.map((resource, idx) => (
+                  <Card
+                    key={resource.category}
+                    className="animate-slide-up-fade-in overflow-hidden"
+                    style={{ animationDelay: `${(idx + 1) * 100}ms` }}
                   >
-                    <h3 className="font-semibold">{event.name}</h3>
-                    <p className="text-sm text-muted-foreground">Date: {event.date}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Location: {event.location}
-                    </p>
-                  </li>
+                    <CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
+                      {resource.icon}
+                      <CardTitle className="text-xl">{resource.category}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {resource.items.map((item) => (
+                          <li key={item.title}>
+                            <a href={item.link} className="text-primary hover:underline">
+                              {item.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
                 ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="certifications" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5" />
+                    <CardTitle>Professional Certifications</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {certifications.map((cert) => (
+                      <Card key={cert.name} className="overflow-hidden">
+                        <CardHeader className="space-y-0 pb-2">
+                          <CardTitle className="text-lg">{cert.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <p className="text-sm text-muted-foreground">
+                            Provider: {cert.provider}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Duration: {cert.duration}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="events" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    <CardTitle>Upcoming Events</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {events.map((event) => (
+                      <Card key={event.name} className="overflow-hidden">
+                        <CardHeader className="space-y-0 pb-2">
+                          <CardTitle className="text-lg">{event.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <p className="text-sm text-muted-foreground">
+                            Date: {event.date}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Location: {event.location}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 }

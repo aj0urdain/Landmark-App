@@ -1,7 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { GenericHeader } from '@/components/molecules/GenericHeader/GenericHeader';
 import SubNavigationMenu from '@/components/molecules/SubNavigationMenu/SubNavigationMenu';
 import { Home, LibraryBig, Component, MapPin, GraduationCap, Users } from 'lucide-react';
 
@@ -40,15 +38,9 @@ export const wikiLinks = [
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
   return (
     <div className="flex flex-col h-full">
       <SubNavigationMenu title="Wiki" links={wikiLinks} rootPath="/wiki" />
-      {pathname !== '/wiki' &&
-        !pathname.startsWith('/wiki/people/') &&
-        !pathname.startsWith('/wiki/departments/') &&
-        !pathname.startsWith('/wiki/branches/') && <GenericHeader />}
       {children}
     </div>
   );

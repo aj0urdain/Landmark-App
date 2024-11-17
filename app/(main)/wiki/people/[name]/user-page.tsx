@@ -48,14 +48,39 @@ import { Separator } from '@/components/ui/separator';
 import BirthdayConfetti from '@/components/molecules/BirthdayConfetti/BirthdayConfetti';
 import { Dot } from '@/components/atoms/Dot/Dot';
 import Link from 'next/link';
+import { createBrowserClient } from '@/utils/supabase/client';
 
 export function UserPage() {
   const params = useParams();
   const name = params.name as string;
+  const supabase = createBrowserClient();
 
   const { data, isLoading, isError } = useQuery({
     ...getUserProfilePage,
     queryKey: [...getUserProfilePage.queryKey, name],
+  });
+
+  const { data: branchDetails } = useQuery({
+    queryKey: ['branchDetails', data?.branches?.[0]],
+    enabled: !!data?.branches?.[0],
+    queryFn: async () => {
+      const { data: branch, error } = await supabase
+        .from('branches')
+        .select(
+          `
+          *,
+          states (state_name, short_name),
+          streets (street_name),
+          suburbs (suburb_name, postcode),
+          contact_number
+        `,
+        )
+        .eq('branch_name', data.branches[0])
+        .single();
+
+      if (error) throw error;
+      return branch;
+    },
   });
 
   const [showBirthdayMessage, setShowBirthdayMessage] = useState(false);
@@ -119,16 +144,23 @@ export function UserPage() {
     const birthdayDate = new Date(birthday);
     const formattedDate = format(birthdayDate, 'd MMMM');
     const today = new Date();
+
+    const isTodayBirthday =
+      birthdayDate.getMonth() === today.getMonth() &&
+      birthdayDate.getDate() === today.getDate();
+
     let nextBirthday = new Date(
       today.getFullYear(),
       birthdayDate.getMonth(),
       birthdayDate.getDate(),
     );
+
     if (nextBirthday < today) {
       nextBirthday = addYears(nextBirthday, 1);
     }
+
     const daysUntilBirthday = differenceInDays(nextBirthday, today);
-    return { formattedDate, daysUntilBirthday };
+    return { formattedDate, daysUntilBirthday, isTodayBirthday };
   };
 
   const tenure = calculateTenure(data.work_anniversary);
@@ -281,8 +313,10 @@ export function UserPage() {
                         className="bg-transparent text-xs text-muted-foreground"
                       >
                         <p>
-                          {formatBirthday(data?.birthday).daysUntilBirthday} days until
-                          birthday
+                          {formatBirthday(data?.birthday).daysUntilBirthday === 0 &&
+                          !isBirthday
+                            ? `${data.first_name}'s birthday is tomorrow!`
+                            : `${formatBirthday(data?.birthday).daysUntilBirthday} days until birthday`}
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -310,42 +344,49 @@ export function UserPage() {
         defaultValue="overview"
         className="w-full animate-slide-down-fade-in opacity-0 [animation-delay:_2s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]"
       >
-        <TabsList className="h-14 w-full">
-          <TabsTrigger className="flex h-full w-full items-center gap-2" value="overview">
+        <TabsList className="w-fit flex gap-2 bg-transparent">
+          <TabsTrigger
+            className="flex h-full w-full items-center gap-1.5"
+            value="overview"
+          >
             <BookUser className="h-4 w-4" />
-            Overview
+            <p className="text-sm font-medium animated-underline-1">Overview</p>
           </TabsTrigger>
-          <TabsTrigger className="flex h-full w-full items-center gap-2" value="comments">
+          <TabsTrigger
+            className="flex h-full w-full items-center gap-1.5 cursor-not-allowed"
+            value="comments"
+            disabled={true}
+          >
             <MessageCircle className="h-4 w-4" />
-            Comments
+            <p className="text-sm font-medium animated-underline-1">Comments</p>
           </TabsTrigger>
           <TabsTrigger
             disabled={true}
-            className="flex h-full w-full cursor-not-allowed items-center gap-2"
+            className="flex h-full w-full cursor-not-allowed items-center gap-1.5"
             value="achievements"
           >
             <Trophy className="h-4 w-4" />
-            Achievements
+            <p className="text-sm font-medium animated-underline-1">Achievements</p>
           </TabsTrigger>
           <TabsTrigger
             disabled={true}
-            className="flex h-full w-full cursor-not-allowed items-center gap-2"
+            className="flex h-full w-full cursor-not-allowed items-center gap-1.5"
             value="performance"
           >
             <TrendingUp className="h-4 w-4" />
-            Performance
+            <p className="text-sm font-medium animated-underline-1">Performance</p>
           </TabsTrigger>
           <TabsTrigger
             disabled={true}
-            className="flex h-full w-full cursor-not-allowed items-center gap-2"
+            className="flex h-full w-full cursor-not-allowed items-center gap-1.5"
             value="org chart"
           >
             <Network className="h-4 w-4" />
-            Org Chart
+            <p className="text-sm font-medium animated-underline-1">Org Chart</p>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
-          <div className="flex w-full animate-slide-down-fade-in gap-4 py-6">
+          <div className="flex w-full animate-slide-down-fade-in gap-4 mt-4">
             <Card className="h-fit max-h-full w-2/3 overflow-y-scroll py-4">
               <CardHeader className="flex flex-col gap-6">
                 <CardTitle className="italicf border-l-2 border-l-muted pl-4 text-4xl">
@@ -385,21 +426,53 @@ export function UserPage() {
 
               <Card className="h-fit w-full">
                 <CardHeader className="space-y-4">
-                  <CardTitle className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground/80">
-                    <Building2 className="h-3 w-3" />
-                    Office
+                  <CardTitle className="flex flex-col items-start justify-start gap-4 text-xs font-medium text-muted-foreground/80">
+                    {/* <Dot size="small" className="bg-muted-foreground animate-pulse" /> */}
+                    <div className="flex items-center gap-1.5">
+                      <Building2 className="h-3 w-3" />
+                      Office
+                    </div>
                   </CardTitle>
                   <div className="whitespace-pre-line leading-snug">
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                      <BranchBadge
+                        branchName={data.branches?.[0] as string}
+                        size="large"
+                        list
+                        colored={false}
+                        showIcon={false}
+                        className="font-bold"
+                      />
                       <div className="flex flex-col items-start justify-start gap-0.5">
-                        <p className="text-sm font-medium text-foreground/80">
-                          Level 20, 150 Lonsdale Street
-                          {/* hardcoded values TODO: create branch_location table */}
-                        </p>
-                        <p className="text-xs text-muted-foreground/80">
-                          Melbourne VIC 3000
-                          {/* hardcoded values TODO: create branch_location table */}
-                        </p>
+                        {data.branches?.[0] ? (
+                          <div className="flex flex-col gap-4">
+                            <div className="flex flex-col items-start justify-start gap-0.5">
+                              <p className="text-sm font-medium text-foreground/80">
+                                {branchDetails?.level_number &&
+                                  `Level ${branchDetails.level_number}, `}
+                                {branchDetails?.street_number}{' '}
+                                {branchDetails?.streets?.street_name}
+                              </p>
+                              <p className="text-xs text-muted-foreground/80">
+                                {branchDetails?.suburbs?.suburb_name}{' '}
+                                {branchDetails?.states?.short_name}{' '}
+                                {branchDetails?.suburbs?.postcode}
+                              </p>
+                            </div>
+                            <p className="mt-2 text-xs text-muted-foreground/80">
+                              {branchDetails?.contact_number && (
+                                <PhoneContact
+                                  phoneNumber={branchDetails.contact_number}
+                                  size="small"
+                                />
+                              )}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            No office location assigned
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

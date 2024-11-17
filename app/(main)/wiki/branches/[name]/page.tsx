@@ -19,6 +19,7 @@ import UserCard from '@/components/molecules/UserCard/UserCard';
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
 import BranchBadge from '@/components/molecules/BranchBadge/BranchBadge';
 import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
+import { Dot } from '@/components/atoms/Dot/Dot';
 
 interface BranchDetails {
   branch_name: string;
@@ -97,6 +98,47 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
       return data;
     },
     enabled: !!branch,
+  });
+
+  const { data: branchDetails } = useQuery({
+    queryKey: ['branchDetails', branch?.branch_name],
+    queryFn: async () => {
+      if (!branch?.branch_name) return null;
+
+      const { data: branchData, error } = await supabase
+        .from('branches')
+        .select(
+          `
+          branch_name,
+          level_number,
+          suite_number,
+          street_number,
+          phone,
+          email,
+          states (
+            state_name,
+            short_name
+          ),
+          streets (
+            street_name
+          ),
+          suburbs (
+            suburb_name,
+            postcode
+          )
+        `,
+        )
+        .eq('branch_name', branch.branch_name)
+        .single();
+
+      if (error) {
+        console.error('Error fetching branch details:', error);
+        return null;
+      }
+
+      return branchData;
+    },
+    enabled: !!branch?.branch_name,
   });
 
   if (isLoading) {
@@ -212,13 +254,18 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
             {Object.entries(staffByDepartment).map(([deptId, { name, staff }]) => {
               return (
                 <div key={deptId} className="space-y-4">
-                  <h2 className="text-xl font-semibold">
-                    <DepartmentBadge department={name} list size="large" />
-                  </h2>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-semibold">
+                      <DepartmentBadge department={name} list size="large" />
+                    </h2>
 
-                  <p className="text-sm text-muted-foreground">
-                    {staff?.length} staff members
-                  </p>
+                    <Dot size="tiny" className="bg-muted-foreground" />
+
+                    <p className="text-sm text-muted-foreground font-medium flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      {staff?.length}
+                    </p>
+                  </div>
 
                   <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                     {staff?.map((member, index) => (
