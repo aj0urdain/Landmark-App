@@ -27,7 +27,7 @@ import { LoaderCircle } from 'lucide-react';
 import ArticlePublic from '@/components/atoms/ArticlePublic/ArticlePublic';
 import ArticleAuthorisation from '@/components/atoms/ArticleAuthorisation/ArticleAuthorisation';
 
-const AnnouncementArticlePage = () => {
+const CompanyArticlePage = () => {
   const params = useParams();
   const articleId = params.id as string;
 
@@ -228,4 +228,4 @@ const AnnouncementArticlePage = () => {
   );
 };
 
-export default AnnouncementArticlePage;
+export default CompanyArticlePage;

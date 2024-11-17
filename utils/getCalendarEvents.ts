@@ -1,7 +1,7 @@
-import { createBrowserClient } from "@/utils/supabase/client";
-import { parseISO, addDays, addHours } from "date-fns";
-import { useQuery } from "@tanstack/react-query";
-import { eventTypeInfo } from "@/utils/eventTypeInfo";
+import { createBrowserClient } from '@/utils/supabase/client';
+import { parseISO, addDays, addHours } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
+import { eventTypeInfo } from '@/utils/eventTypeInfo';
 
 export type PortfolioEvent = {
   auctions: Auction[] | null;
@@ -61,40 +61,37 @@ const createEvent = (
   };
 };
 
-const createAFREvents = (
-  originalDate: string,
-  portfolioId: number,
-): Event[] => {
+const createAFREvents = (originalDate: string, portfolioId: number): Event[] => {
   const events: Event[] = [];
   const baseDate = parseISO(originalDate);
 
-  const newEvent = createEvent("afr", originalDate, portfolioId, null, "AFR");
+  const newEvent = createEvent('afr', originalDate, portfolioId, null, 'AFR');
   if (newEvent) events.push(newEvent);
 
   const anotherEvent = createEvent(
-    "afr",
+    'afr',
     addHours(baseDate, 24).toISOString(),
     portfolioId,
     null,
-    "AFR",
+    'AFR',
   );
   if (anotherEvent) events.push(anotherEvent);
 
   const anotherEvent2 = createEvent(
-    "afr",
+    'afr',
     addDays(baseDate, 7).toISOString(),
     portfolioId,
     null,
-    "AFR",
+    'AFR',
   );
   if (anotherEvent2) events.push(anotherEvent2);
 
   const anotherEvent3 = createEvent(
-    "afr",
+    'afr',
     addDays(baseDate, 8).toISOString(),
     portfolioId,
     null,
-    "AFR",
+    'AFR',
   );
   if (anotherEvent3) events.push(anotherEvent3);
 
@@ -114,14 +111,10 @@ const generateRecurringEvents = (
 
       if (userEvent.birthday) {
         const originalDate = parseISO(userEvent.birthday);
-        const eventDate = new Date(
-          year,
-          originalDate.getMonth(),
-          originalDate.getDate(),
-        );
+        const eventDate = new Date(year, originalDate.getMonth(), originalDate.getDate());
 
         recurringEvents.push({
-          type: "birthday",
+          type: 'birthday',
           title: `${userEvent.first_name} ${userEvent.last_name}'s Birthday`,
           start_date: eventDate.toISOString(),
           end_date: null,
@@ -132,14 +125,10 @@ const generateRecurringEvents = (
 
       if (userEvent.work_anniversary) {
         const originalDate = parseISO(userEvent.work_anniversary);
-        const eventDate = new Date(
-          year,
-          originalDate.getMonth(),
-          originalDate.getDate(),
-        );
+        const eventDate = new Date(year, originalDate.getMonth(), originalDate.getDate());
 
         recurringEvents.push({
-          type: "work_anniversary",
+          type: 'work_anniversary',
           title: `${userEvent.first_name} ${userEvent.last_name}'s Work Anniversary`,
           start_date: eventDate.toISOString(),
           end_date: null,
@@ -153,30 +142,103 @@ const generateRecurringEvents = (
   return recurringEvents;
 };
 
-export const useCalendarEvents = () => {
+export const useCalendarEvents = (eventType?: 'portfolio' | 'staff') => {
   const supabase = createBrowserClient();
   const currentYear = new Date().getFullYear();
 
   const fetchPortfolioEvents = async () => {
-    const { data, error } = await supabase.rpc("get_all_portfolio_data");
+    const { data, error } = await supabase.rpc('get_all_portfolio_data');
     if (error) throw error;
     return data as PortfolioEvent[];
   };
 
   const fetchUserProfileEvents = async () => {
     const { data, error } = await supabase
-      .from("user_profile_complete")
-      .select("id, first_name, last_name, birthday, work_anniversary")
-      .not("birthday", "is", null)
-      .not("work_anniversary", "is", null);
+      .from('user_profile_complete')
+      .select('id, first_name, last_name, birthday, work_anniversary')
+      .not('birthday', 'is', null)
+      .not('work_anniversary', 'is', null);
 
     if (error) throw error;
     return generateRecurringEvents(data as UserProfileEvent[], currentYear);
   };
 
   return useQuery({
-    queryKey: ["calendarEvents"],
+    queryKey: ['calendarEvents', eventType],
     queryFn: async () => {
+      // If eventType is 'staff', only fetch user profile events
+      if (eventType === 'staff') {
+        const userProfileEvents = await fetchUserProfileEvents();
+        return userProfileEvents;
+      }
+
+      // If eventType is 'portfolio', only fetch portfolio events
+      if (eventType === 'portfolio') {
+        const portfolioEvents = await fetchPortfolioEvents();
+        const allEvents: Event[] = [];
+
+        portfolioEvents.forEach((portfolioEvent) => {
+          if (portfolioEvent.auctions) {
+            portfolioEvent.auctions.forEach((auction) => {
+              const event = createEvent(
+                'auction',
+                auction.start_date,
+                portfolioEvent.portfolio_id,
+                auction,
+                auction.auction_location + ' Auction',
+              );
+              if (event) allEvents.push(event);
+            });
+          }
+
+          (Object.keys(eventTypeInfo) as Array<keyof typeof eventTypeInfo>).forEach(
+            (eventType) => {
+              if (
+                eventType !== 'auction' &&
+                eventType !== 'default' &&
+                eventType !== 'afr' &&
+                portfolioEvent[eventType as keyof PortfolioEvent]
+              ) {
+                const event = createEvent(
+                  eventType,
+                  portfolioEvent[eventType as keyof PortfolioEvent] as string,
+                  portfolioEvent.portfolio_id,
+                );
+                if (event) allEvents.push(event);
+              }
+            },
+          );
+
+          if (portfolioEvent.afr) {
+            const afrEvents = createAFREvents(
+              portfolioEvent.afr,
+              portfolioEvent.portfolio_id,
+            );
+            allEvents.push(...afrEvents);
+          }
+
+          if (
+            portfolioEvent.advertising_period_start &&
+            portfolioEvent.advertising_period_end
+          ) {
+            const event = createEvent(
+              'advertising_period',
+              portfolioEvent.advertising_period_start,
+              portfolioEvent.portfolio_id,
+            );
+            if (event) {
+              allEvents.push({
+                ...event,
+                end_date: portfolioEvent.advertising_period_end,
+              });
+            }
+          }
+        });
+
+        return allEvents;
+      }
+
+      // If no eventType specified, fetch both
       const [portfolioEvents, userProfileEvents] = await Promise.all([
         fetchPortfolioEvents(),
         fetchUserProfileEvents(),
@@ -184,37 +246,38 @@ export const useCalendarEvents = () => {
 
       const allEvents: Event[] = [];
 
+      // Process portfolio events
       portfolioEvents.forEach((portfolioEvent) => {
         if (portfolioEvent.auctions) {
           portfolioEvent.auctions.forEach((auction) => {
             const event = createEvent(
-              "auction",
+              'auction',
               auction.start_date,
               portfolioEvent.portfolio_id,
               auction,
-              auction.auction_location + " Auction",
+              auction.auction_location + ' Auction',
             );
             if (event) allEvents.push(event);
           });
         }
 
-        (
-          Object.keys(eventTypeInfo) as Array<keyof typeof eventTypeInfo>
-        ).forEach((eventType) => {
-          if (
-            eventType !== "auction" &&
-            eventType !== "default" &&
-            eventType !== "afr" &&
-            portfolioEvent[eventType as keyof PortfolioEvent]
-          ) {
-            const event = createEvent(
-              eventType,
-              portfolioEvent[eventType as keyof PortfolioEvent] as string,
-              portfolioEvent.portfolio_id,
-            );
-            if (event) allEvents.push(event);
-          }
-        });
+        (Object.keys(eventTypeInfo) as Array<keyof typeof eventTypeInfo>).forEach(
+          (eventType) => {
+            if (
+              eventType !== 'auction' &&
+              eventType !== 'default' &&
+              eventType !== 'afr' &&
+              portfolioEvent[eventType as keyof PortfolioEvent]
+            ) {
+              const event = createEvent(
+                eventType,
+                portfolioEvent[eventType as keyof PortfolioEvent] as string,
+                portfolioEvent.portfolio_id,
+              );
+              if (event) allEvents.push(event);
+            }
+          },
+        );
 
         if (portfolioEvent.afr) {
           const afrEvents = createAFREvents(
@@ -229,7 +292,7 @@ export const useCalendarEvents = () => {
           portfolioEvent.advertising_period_end
         ) {
           const event = createEvent(
-            "advertising_period",
+            'advertising_period',
             portfolioEvent.advertising_period_start,
             portfolioEvent.portfolio_id,
           );
@@ -242,6 +305,7 @@ export const useCalendarEvents = () => {
         }
       });
 
+      // Add user profile events
       allEvents.push(...userProfileEvents);
 
       return allEvents;

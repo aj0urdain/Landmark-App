@@ -72,8 +72,8 @@ const AuctionsPage = () => {
     },
   });
 
-  const { data: upcomingAuctions } = useQuery({
-    queryKey: ['upcomingAuctions'],
+  const { data: futureAuctions } = useQuery({
+    queryKey: ['futureAuctions'],
     queryFn: async () => {
       const supabase = createBrowserClient();
       const { data, error } = await supabase
@@ -143,7 +143,7 @@ const AuctionsPage = () => {
 
         <TabsContent value="upcoming" className="mt-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {upcomingAuctions?.map((auction) => (
+            {futureAuctions?.map((auction) => (
               <Link
                 key={auction.id}
                 href={`/events/auctions/${auction.portfolio_id}/${auction.auction_locations.name}`}

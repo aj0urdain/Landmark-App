@@ -12,6 +12,7 @@ import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
+import { Article } from '@/types/articleTypes';
 
 const AnnouncementsNewsPage = () => {
   const router = useRouter();
@@ -20,8 +21,8 @@ const AnnouncementsNewsPage = () => {
 
   const createAnnouncementMutation = useMutation({
     mutationFn: () => createArticle('announcement'),
-    onSuccess: (newArticle) => {
-      router.push(`/news/announcements/${newArticle.id.toString()}`);
+    onSuccess: (newArticle: Article) => {
+      router.push(`/news/announcements/${String(newArticle.id)}`);
     },
     onError: (error) => {
       console.error('Error creating announcement:', error);
@@ -53,6 +54,10 @@ const AnnouncementsNewsPage = () => {
     queryKey: ['announcements'],
     queryFn: getAnnouncements,
   });
+
+  if (isLoading) return null;
+
+  if (error) return null;
 
   return (
     <div className="">

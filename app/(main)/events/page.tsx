@@ -289,7 +289,7 @@ const EventsPage = () => {
                     ? 'border-2 border-primary bg-primary'
                     : isSameDay(day, new Date())
                       ? 'border-2 border-muted bg-muted/50 hover:bg-primary/5'
-                      : 'hover:bg-primary/5'
+                      : 'hover:border-muted-foreground hover:scale-105'
                 }`}
                 onClick={() => {
                   handleDateSelect(day);
