@@ -54,7 +54,11 @@ export function UserProfileCard({
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      }
+
       return data;
     },
   });
@@ -82,7 +86,7 @@ export function UserProfileCard({
             {user.profile_picture ? (
               <div className="relative bottom-0 rounded-full h-full w-full pt-4">
                 <Image
-                  src={user.profile_picture ?? ''}
+                  src={user.profile_picture}
                   alt={`${user.first_name ?? ''} ${user.last_name ?? ''}`}
                   fill
                   sizes="25px"
@@ -105,9 +109,7 @@ export function UserProfileCard({
     <UserHoverCard userId={id} visible={showHoverCard}>
       {nameOnly ? (
         <Link href={`/wiki/people/${String(user.first_name)}-${String(user.last_name)}`}>
-          <p
-            className={`text-${textSize} font-light animated-underline-1 animate-slide-left-fade-in`}
-          >
+          <p className={`text-${textSize} font-light animated-underline-1 ${className}`}>
             {user.first_name} <span className="font-bold">{user.last_name}</span>
           </p>
         </Link>

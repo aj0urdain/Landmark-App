@@ -60,7 +60,7 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex gap-4">
-          <Logo className="h-3 w-auto" />
+          <Logo className="h-3.5 w-auto" />
 
           <div className="flex items-center justify-start gap-1">
             <p className="font-bold sm:font-light">{userProfile.first_name}</p>

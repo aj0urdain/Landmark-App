@@ -118,7 +118,7 @@ const UserCard = ({
   return (
     <Card
       key={user?.id}
-      className="relative flex h-full min-h-[300px] select-none flex-col items-start justify-between gap-4 p-6 w-full group transition-all duration-300 overflow-hidden"
+      className="relative flex h-full min-h-[300px] select-none flex-col items-start justify-between gap-4 p-6 w-full max-w-3xl group transition-all duration-300 overflow-hidden"
     >
       <div className="absolute left-0 top-0 z-10 flex h-full transition-all duration-300 w-full flex-col items-start justify-between bg-gradient-to-br from-muted/50 to-transparent p-0" />
       <div className="group-hover:flex hidden group-hover:opacity-100 opacity-0 absolute left-0 top-0 z-10 h-full animate-slide-up-fade-in group-hover:animate-pulse transition-all duration-300 w-full flex-col items-start justify-between bg-gradient-to-br from-muted/75 to-transparent p-0 animation-fill-forwards group-hover:animation-fill-forwards group-hover:animation-delay-1000" />
@@ -154,14 +154,23 @@ const UserCard = ({
                 onMouseEnter={() => debouncedSetHoveredUserId(true)}
                 onMouseLeave={() => debouncedSetHoveredUserId(false)}
                 className={`flex gap-1
-                  ${(user?.first_name + user?.last_name).length > 13 && isWelcome ? '' : ''}
+                  ${
+                    (String(user?.first_name) + String(user?.last_name)).length > 13 &&
+                    isWelcome
+                      ? ''
+                      : ''
+                  }
                   `}
               >
                 <p
                   className={`w-fit font-light relative animated-underline-1 animate-slide-left-fade-in ${
                     hoveredUserId ? 'animated-underline-1-active' : ''
                   }
-                  ${(user?.first_name + user?.last_name).length > 13 ? 'text-2xl' : 'text-3xl'}
+                  ${
+                    (String(user?.first_name) + String(user?.last_name)).length > 13
+                      ? 'text-2xl'
+                      : 'text-3xl'
+                  }
                   `}
                 >
                   {user?.first_name} <span className="font-bold">{user?.last_name}</span>
@@ -279,7 +288,11 @@ const UserCard = ({
         className={`absolute h-full flex items-end z-20 ${
           isWelcome ? '-right-4 top-4' : 'right-4 top-4'
         }
-        ${(user?.first_name + user?.last_name).length > 16 && isWelcome ? '-right-2' : ''}`}
+        ${
+          (String(user?.first_name) + String(user?.last_name)).length > 16 && isWelcome
+            ? '-right-2'
+            : ''
+        }`}
       >
         {user?.profile_picture ? (
           <Link
