@@ -32,7 +32,7 @@ export function Header() {
           <div className="hidden w-full flex-1 xl:block">
             <BreadcrumbWithDropdown />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 h-full">
             <UserMenu />
           </div>
 

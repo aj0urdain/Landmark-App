@@ -44,7 +44,7 @@ const SubNavigationMenu: React.FC<SubNavigationMenuProps> = ({
   };
 
   return (
-    <div className="sticky top-0 z-30 bg-gradient-to-b from-transparent via-background/50 to-background backdrop-blur-3xl">
+    <div className="sticky top-0 z-30 bg-gradient-to-b from-transparent via-background/50 to-background backdrop-blur-3xl rounded-b-xl">
       <CardHeader>
         <CardTitle className="flex items-center justify-between gap-4">
           <div className="flex items-center justify-center gap-4">

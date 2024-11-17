@@ -15,6 +15,7 @@ interface DepartmentBadgeProps {
   className?: string;
   id?: boolean;
   showDepartmentName?: boolean;
+  onAnimationEnd?: () => void;
 }
 
 const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
@@ -24,6 +25,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   className,
   id = false,
   showDepartmentName = true,
+  onAnimationEnd,
 }) => {
   const supabase = createBrowserClient();
 
@@ -99,6 +101,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
       <Button
         variant={list ? 'ghost' : 'outline'}
         size="sm"
+        onAnimationEnd={onAnimationEnd}
         className={cn(
           'flex items-center gap-1 animated-underline-1 after:bottom-[-4px]',
           color,

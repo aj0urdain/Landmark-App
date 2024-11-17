@@ -32,7 +32,7 @@ export function DepartmentFilterBadge({
       variant="outline"
       size="sm"
       className={cn(
-        'flex items-center gap-2 px-4 py-2',
+        'flex items-center gap-1 px-4 py-2',
         isSelected
           ? cn(
               departmentInfo?.color,
@@ -44,7 +44,7 @@ export function DepartmentFilterBadge({
       )}
       onClick={onClick}
     >
-      {Icon && <Icon className="h-4 w-4" />}
+      {Icon && <Icon className="h-3.5 w-3.5" />}
       {department}
     </Button>
   );

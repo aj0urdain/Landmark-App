@@ -27,31 +27,31 @@ interface NavigationProps {
 }
 
 const links = [
-  {
-    href: '/admin',
-    icon: ShieldCheck,
-    label: 'Admin',
-    access: ['Technology, Senior Leadership'],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/create',
-    icon: WandSparkles,
-    label: 'Create',
-    access: ['Technology'],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/sandbox',
-    icon: Box,
-    label: 'Sandbox',
-    access: ['Technology'],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  { type: 'separator' },
+  // {
+  //   href: '/admin',
+  //   icon: ShieldCheck,
+  //   label: 'Admin',
+  //   access: ['Technology, Senior Leadership'],
+  //   comingSoon: true,
+  //   requiredAccess: ['Technology'],
+  // },
+  // {
+  //   href: '/create',
+  //   icon: WandSparkles,
+  //   label: 'Create',
+  //   access: ['Technology'],
+  //   comingSoon: true,
+  //   requiredAccess: ['Technology'],
+  // },
+  // {
+  //   href: '/sandbox',
+  //   icon: Box,
+  //   label: 'Sandbox',
+  //   access: ['Technology'],
+  //   comingSoon: true,
+  //   requiredAccess: ['Technology'],
+  // },
+  // { type: 'separator' },
 
   {
     href: '/dashboard',
@@ -62,25 +62,17 @@ const links = [
     requiredAccess: ['Technology'],
   },
   {
-    href: '/events',
-    icon: CalendarRange,
-    label: 'Events',
-    access: [],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/tasks',
-    icon: CheckSquare,
-    label: 'Tasks',
-    access: [],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
     href: '/news',
     icon: Newspaper,
     label: 'News',
+    access: [],
+    comingSoon: true,
+    requiredAccess: ['Technology'],
+  },
+  {
+    href: '/events',
+    icon: CalendarRange,
+    label: 'Events',
     access: [],
     comingSoon: true,
     requiredAccess: ['Technology'],
@@ -94,13 +86,29 @@ const links = [
     requiredAccess: ['Technology'],
   },
   {
-    href: '/properties',
-    icon: HousePlus,
-    label: 'Properties',
-    access: [],
+    href: '/sandbox',
+    icon: Box,
+    label: 'Sandbox',
+    access: ['Technology'],
     comingSoon: true,
     requiredAccess: ['Technology'],
   },
+  {
+    href: '/tasks',
+    icon: CheckSquare,
+    label: 'Tasks',
+    access: [],
+    comingSoon: true,
+    requiredAccess: [''],
+  },
+  // {
+  //   href: '/properties',
+  //   icon: HousePlus,
+  //   label: 'Properties',
+  //   access: [],
+  //   comingSoon: true,
+  //   requiredAccess: ['Technology'],
+  // },
   { type: 'separator' },
 
   {
@@ -116,7 +124,14 @@ const links = [
       { name: 'Departments', href: '/wiki/departments', icon: Component },
       { name: 'Branches', href: '/wiki/branches', icon: MapPin },
       { name: 'People', href: '/wiki/people', icon: Users },
-      { name: 'Learn', href: '/wiki/learn', icon: GraduationCap },
+      {
+        name: 'Learn',
+        href: '/wiki/learn',
+        icon: GraduationCap,
+        access: [],
+        comingSoon: true,
+        requiredAccess: [''],
+      },
     ],
   },
   { type: 'separator' },
@@ -153,7 +168,7 @@ export const Navigation = React.memo(function Navigation({
           </NavLink>
         );
       })}
-      <Separator className="my-4" />
+      {/* <Separator className="my-4" /> */}
       <FeedbackButton isCollapsed={isCollapsed} />
     </nav>
   );

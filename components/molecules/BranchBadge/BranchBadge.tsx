@@ -37,6 +37,8 @@ interface BranchBadgeProps {
   list?: boolean;
   size?: 'small' | 'medium' | 'large';
   colored?: boolean;
+  showIcon?: boolean;
+  className?: string;
 }
 
 const BranchBadge: React.FC<BranchBadgeProps> = ({
@@ -44,6 +46,8 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
   list = false,
   size = 'medium',
   colored = true,
+  showIcon = true,
+  className,
 }) => {
   const supabase = createBrowserClient();
 
@@ -123,13 +127,16 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
           sizeClasses[size].button,
         )}
       >
-        <div className={cn('flex items-center justify-center', sizeClasses[size].icon)}>
-          <Icon className="h-full w-full" fill="currentColor" />
-        </div>
+        {showIcon && (
+          <div className={cn('flex items-center justify-center', sizeClasses[size].icon)}>
+            <Icon className="h-full w-full" fill="currentColor" />
+          </div>
+        )}
         <span
           className={cn(
             'font-light animated-underline-1 after:bottom-[-2px]',
             sizeClasses[size].text,
+            className,
           )}
         >
           {branchData?.branch_name}
