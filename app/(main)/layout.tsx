@@ -18,8 +18,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 TimeAgo.addDefaultLocale(en);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(true);
-  const [isInboxCollapsed, setIsInboxCollapsed] = useState(true);
+  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
+  const [isInboxCollapsed, setIsInboxCollapsed] = useState(false);
 
   const toggleLeftSidebar = () => {
     setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed);
