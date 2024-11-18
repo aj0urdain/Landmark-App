@@ -66,7 +66,7 @@ export default function DashboardEventsPreview() {
   }, [selectedDate, events]);
 
   const { data: activePortfolio, isLoading: activePortfolioLoading } = useQuery({
-    queryKey: ['activePortfolio'],
+    queryKey: ['activePortfolioPreview'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_active_portfolio_with_auctions');
 

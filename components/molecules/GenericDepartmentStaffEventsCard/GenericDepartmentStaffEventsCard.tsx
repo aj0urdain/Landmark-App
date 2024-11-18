@@ -253,8 +253,8 @@ const GenericDepartmentStaffEventsCard = ({
                           'text-3xl',
                           currentEvent.isTodayEvent &&
                             (activeTab === 'birthdays'
-                              ? 'text-pink-500'
-                              : 'text-orange-500'),
+                              ? 'text-pink-300 animate-pulse'
+                              : 'text-orange-300 animate-pulse'),
                         )}
                       >
                         <span className="font-light">{currentEvent.first_name}</span>{' '}

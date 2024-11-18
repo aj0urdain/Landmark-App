@@ -329,7 +329,7 @@ const AuctionResults = () => {
 
   return (
     <Card
-      className="col-span-4 flex h-[360px] flex-col opacity-80 hover:opacity-100 transition-all duration-150 ease-linear"
+      className="col-span-4 flex h-[360px] flex-col opacity-80 hover:opacity-100 transition-all duration-150 px-0  ease-linear"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -397,8 +397,8 @@ const AuctionResults = () => {
         </div>
       </div>
 
-      <CardContent className="flex-1 min-h-0 pb-0">
-        <div className="flex flex-col justify-between h-full">
+      <CardContent className="flex-1 min-h-0 pb-0 px-0 mx-0">
+        <div className="flex flex-col justify-between h-full relative">
           <div className="flex flex-col justify-center items-center mb-8">
             <div className="flex items-center gap-2">
               <div className="flex flex-col items-center h-full">
@@ -433,17 +433,17 @@ const AuctionResults = () => {
             </div>
           </div>
 
-          <div className="h-[180px]">
+          <div className="h-[180px] absolute bottom-0 left-0 right-0">
             <ChartContainer config={chartConfig}>
               <AreaChart
                 accessibilityLayer
                 data={getChartData(currentMetric.key)}
                 height={180}
                 margin={{
-                  left: 10,
-                  right: 10,
-                  top: 12,
-                  bottom: 6,
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: -2,
                 }}
                 animationDuration={2500}
                 animationBegin={0}
@@ -451,9 +451,9 @@ const AuctionResults = () => {
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="portfolio"
-                  tickLine={true}
-                  axisLine={true}
-                  tickMargin={8}
+                  // tickLine={true}
+                  // axisLine={true}
+                  // tickMargin={8}
                 />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                 {Object.entries(chartConfig).map(([key, config]) => (
