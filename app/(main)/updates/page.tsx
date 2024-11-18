@@ -104,7 +104,7 @@ export default function UpdatesPage() {
           className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-slide-down-fade-in"
         >
           {filteredFeatures.map((feature) => (
-            <StaggeredAnimation index={feature.id} baseDelay={0}>
+            <StaggeredAnimation index={feature.id} baseDelay={0} key={feature.id}>
               <Card
                 key={feature.id}
                 className="group/card relative flex flex-col h-full items-start justify-start min-h-[250px] transition-all duration-300 select-none cursor-pointer"
