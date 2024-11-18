@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronsRight, HomeIcon } from 'lucide-react';
 import { SlashIcon } from '@radix-ui/react-icons';
 import {
   Breadcrumb,
@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Logo } from '@/components/atoms/Logo/Logo';
 
 const sandboxOptions = [
   { title: 'Document Generator', href: '/sandbox/document-generator' },
@@ -57,13 +58,15 @@ export function BreadcrumbWithDropdown() {
     <Breadcrumb className="select-none">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          <BreadcrumbLink href="/" className="flex items-center gap-1">
+            <Logo className="h-3.5 w-3.5" />
+          </BreadcrumbLink>
         </BreadcrumbItem>
 
         {shouldCollapse ? (
           <>
             <BreadcrumbSeparator>
-              <SlashIcon />
+              <ChevronsRight className="h-2.5 w-2.5" />
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <DropdownMenu open={ellipsisOpen} onOpenChange={setEllipsisOpen}>
@@ -98,7 +101,7 @@ export function BreadcrumbWithDropdown() {
               return (
                 <React.Fragment key={segment}>
                   <BreadcrumbSeparator>
-                    <SlashIcon />
+                    <ChevronsRight className="h-2.5 w-2.5" />
                   </BreadcrumbSeparator>
                   <BreadcrumbItem>
                     {segment === 'sandbox' ? (
@@ -143,7 +146,7 @@ export function BreadcrumbWithDropdown() {
             return (
               <React.Fragment key={segment}>
                 <BreadcrumbSeparator>
-                  <SlashIcon />
+                  <ChevronsRight className="h-2.5 w-2.5" />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
                   {segment === 'sandbox' ? (

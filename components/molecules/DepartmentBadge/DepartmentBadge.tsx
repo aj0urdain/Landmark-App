@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 interface DepartmentBadgeProps {
   department: string | number | null | undefined;
   list?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
   className?: string;
   id?: boolean;
   showDepartmentName?: boolean;
@@ -93,6 +93,11 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
       button: 'px-4 py-2',
       icon: 'h-5 w-5',
       text: 'text-base',
+    },
+    xlarge: {
+      button: 'px-4 py-2',
+      icon: 'h-6 w-6',
+      text: 'text-lg',
     },
   };
 
