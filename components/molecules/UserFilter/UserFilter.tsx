@@ -11,12 +11,13 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getDepartmentInfo } from '@/utils/getDepartmentInfo';
 
 interface UserFilterProps {
   type: 'departments' | 'branches';
   options: string[];
-  selectedOptions: string[];
-  onFilterChange: (selected: string[]) => void;
+  selectedOptions: string[] | string;
+  onFilterChange: (selected: string[] | string) => void;
 }
 
 export function UserFilter({
@@ -25,47 +26,77 @@ export function UserFilter({
   selectedOptions,
   onFilterChange,
 }: UserFilterProps) {
-  const [open, setOpen] = React.useState(false);
-
-  const toggleOption = (value: string) => {
-    const updated = selectedOptions.includes(value)
-      ? selectedOptions.filter((item) => item !== value)
-      : [...selectedOptions, value];
-    onFilterChange(updated);
+  const handleSelect = (value: string) => {
+    if (type === 'branches') {
+      onFilterChange(value === selectedOptions ? '' : value);
+    } else {
+      const selected = selectedOptions as string[];
+      const newSelected = selected.includes(value)
+        ? selected.filter((v) => v !== value)
+        : [...selected, value];
+      onFilterChange(newSelected);
+    }
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[250px] justify-between"
-        >
-          {selectedOptions.length > 0
-            ? `${selectedOptions.length} ${type} selected`
-            : `Filter by ${type}`}
+        <Button variant="outline" className="justify-between w-full">
+          {type === 'branches'
+            ? selectedOptions
+              ? (selectedOptions as string)
+              : `Select ${type}`
+            : (selectedOptions as string[]).length > 0
+              ? `${(selectedOptions as string[]).length} selected`
+              : `Select ${type}`}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0">
+      <PopoverContent
+        className="p-0"
+        style={{ width: 'var(--radix-popover-trigger-width)' }}
+      >
         <Command>
           <CommandInput placeholder={`Search ${type}...`} />
           <CommandList>
             <CommandEmpty>No {type} found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
-                <CommandItem key={option} onSelect={() => toggleOption(option)}>
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      selectedOptions.includes(option) ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                  {option}
-                </CommandItem>
-              ))}
+              {options.map((option) => {
+                const departmentInfo =
+                  type === 'departments' ? getDepartmentInfo(option) : null;
+                const Icon = departmentInfo?.icon;
+
+                return (
+                  <CommandItem
+                    key={option}
+                    onSelect={() => {
+                      handleSelect(option);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <div className="flex items-center gap-2">
+                        {Icon && type === 'departments' && (
+                          <Icon className={cn('h-4 w-4', departmentInfo.color)} />
+                        )}
+                        <span>{option}</span>
+                      </div>
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          type === 'branches'
+                            ? selectedOptions === option
+                              ? 'opacity-100'
+                              : 'opacity-0'
+                            : (selectedOptions as string[]).includes(option)
+                              ? 'opacity-100'
+                              : 'opacity-0',
+                        )}
+                      />
+                    </div>
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>

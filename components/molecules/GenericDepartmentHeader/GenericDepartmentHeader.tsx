@@ -67,7 +67,7 @@ export function GenericDepartmentHeader() {
               </h1>
             </div>
             <div>
-              <p className="text-muted-foreground">{departmentData.description}</p>
+              {/* <p className="text-muted-foreground">{departmentData.description}</p> */}
             </div>
           </div>
         </div>

@@ -39,9 +39,7 @@ export function GenericHeader() {
                 })}
               <h1 className="text-4xl font-black animate-slide-right-fade-in">{title}</h1>
             </div>
-            <div>
-              <p className="text-muted-foreground">{description}</p>
-            </div>
+            <div>{/* <p className="text-muted-foreground">{description}</p> */}</div>
           </div>
         </div>
       </div>

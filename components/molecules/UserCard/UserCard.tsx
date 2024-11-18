@@ -35,12 +35,26 @@ const AnimatedDigit = ({
 };
 
 const UserCard = ({
-  userId,
+  userId = '',
   isWelcome = false,
+  skeletonLoader = false,
 }: {
-  userId: string;
+  userId?: string;
   isWelcome?: boolean;
+  skeletonLoader?: boolean;
 }) => {
+  if (skeletonLoader || userId === '') {
+    return (
+      <Card
+        key={userId}
+        className="animate-pulse [animation-duration:1.5s] relative flex h-[300px] select-none flex-col items-start justify-between gap-4 p-6 w-full max-w-3xl group transition-all duration-300 overflow-hidden"
+      >
+        <div className="absolute left-0 top-0 z-10 flex h-full transition-all duration-300 w-full flex-col items-start justify-between bg-gradient-to-br from-muted/50 to-transparent p-0" />
+        <div className="group-hover:flex hidden group-hover:opacity-100 opacity-0 absolute left-0 top-0 z-10 h-full animate-slide-up-fade-in group-hover:animate-pulse transition-all duration-300 w-full flex-col items-start justify-between bg-gradient-to-br from-muted/75 to-transparent p-0 animation-fill-forwards group-hover:animation-fill-forwards group-hover:animation-delay-1000" />
+      </Card>
+    );
+  }
+
   const [hoveredUserId, setHoveredUserId] = useState<boolean>(false);
 
   const supabase = createBrowserClient();
@@ -286,7 +300,7 @@ const UserCard = ({
       </div>
       <div
         className={`absolute h-full flex items-end z-20 ${
-          isWelcome ? '-right-4 top-4' : 'right-4 top-4'
+          isWelcome ? 'right-4 top-4' : 'right-4 top-4'
         }
         ${
           (String(user?.first_name) + String(user?.last_name)).length > 16 && isWelcome

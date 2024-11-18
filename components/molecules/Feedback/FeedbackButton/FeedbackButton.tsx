@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,32 +6,40 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { BugIcon, CircleHelp, Lightbulb, Puzzle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import {
+  BugIcon,
+  CircleHelp,
+  History,
+  Lightbulb,
+  MessageCircleWarning,
+  Puzzle,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { usePathname } from "next/navigation";
-import { createBrowserClient } from "@/utils/supabase/client";
-import { ChevronDown } from "lucide-react";
+} from '@/components/ui/select';
+import { usePathname } from 'next/navigation';
+import { createBrowserClient } from '@/utils/supabase/client';
+import { ChevronDown } from 'lucide-react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 interface FeedbackTicket {
   id: string;
@@ -50,10 +58,10 @@ export const FeedbackButton = React.memo(function FeedbackButton({
   isCollapsed,
 }: FeedbackButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("submit");
+  const [activeTab, setActiveTab] = useState('submit');
   const [feedbackTickets, setFeedbackTickets] = useState<FeedbackTicket[]>([]);
-  const [feedbackType, setFeedbackType] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [feedbackType, setFeedbackType] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState(false);
 
   const pathName = usePathname();
@@ -64,21 +72,21 @@ export const FeedbackButton = React.memo(function FeedbackButton({
       try {
         // Fetch existing tickets
         const { data, error } = await supabase
-          .from("feedback_tickets")
-          .select("*")
-          .order("created_at", { ascending: false });
+          .from('feedback_tickets')
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setFeedbackTickets(data as unknown as FeedbackTicket[]);
 
         // Set up real-time listener
         const channel = supabase
-          .channel("listen-feedback-tickets")
+          .channel('listen-feedback-tickets')
           .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "feedback_tickets" },
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'feedback_tickets' },
             (payload) => {
-              console.log("Change received!", payload);
+              console.log('Change received!', payload);
               setFeedbackTickets((prevTickets) => {
                 const newTicket = payload.new as FeedbackTicket;
                 return [
@@ -95,7 +103,7 @@ export const FeedbackButton = React.memo(function FeedbackButton({
           supabase.removeChannel(channel);
         };
       } catch (error) {
-        console.error("Error fetching feedback tickets:", error);
+        console.error('Error fetching feedback tickets:', error);
       }
     };
 
@@ -103,7 +111,7 @@ export const FeedbackButton = React.memo(function FeedbackButton({
   }, [supabase]);
 
   useEffect(() => {
-    setIsFormValid(feedbackType !== "" && description.length > 5);
+    setIsFormValid(feedbackType !== '' && description.length > 5);
   }, [feedbackType, description]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -112,34 +120,26 @@ export const FeedbackButton = React.memo(function FeedbackButton({
 
     const formData = new FormData(event.currentTarget);
     const feedbackData = {
-      page_url: formData.get("page-url") as string,
+      page_url: formData.get('page-url') as string,
       feedback_type: feedbackType,
       description: description,
-      status: "open", // Assuming new tickets are always "open"
+      status: 'open', // Assuming new tickets are always "open"
       created_at: new Date().toISOString(), // Add the current timestamp
     };
 
     try {
-      const { data, error } = await supabase
-        .from("feedback_tickets")
+      const { error } = await supabase
+        .from('feedback_tickets')
         .insert([feedbackData])
         .select(); // Add this to return the inserted row
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
 
-      // Update local state with the new ticket
-      if (data && data.length > 0) {
-        setFeedbackTickets((prevTickets) => [
-          data[0] as FeedbackTicket,
-          ...prevTickets,
-        ]);
-      }
-
-      setActiveTab("history");
-      setFeedbackType("");
-      setDescription("");
+      setActiveTab('history');
+      setFeedbackType('');
+      setDescription('');
     } catch (error) {
-      console.error("Error submitting feedback:", error);
+      console.error('Error submitting feedback:', error);
     }
   };
 
@@ -151,9 +151,9 @@ export const FeedbackButton = React.memo(function FeedbackButton({
   );
 
   const linkClass = cn(
-    "flex items-center py-2 text-sm font-medium border border-warning-foreground/40 rounded-md transition-all duration-200 ease-in-out",
-    "text-warning-foreground hover:bg-warning-foreground/20 hover:text-foreground",
-    isCollapsed ? "w-10 h-10 justify-center mx-auto" : "px-4 mx-4",
+    'flex items-center py-2 text-sm font-medium border border-warning-foreground/40 rounded-md transition-all duration-200 ease-in-out',
+    'text-warning-foreground hover:bg-warning-foreground/20 hover:text-foreground',
+    isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'px-4 mx-4',
   );
 
   return (
@@ -161,7 +161,7 @@ export const FeedbackButton = React.memo(function FeedbackButton({
       <DialogTrigger asChild>
         <button className={linkClass}>{linkContent}</button>
       </DialogTrigger>
-      <DialogContent className="flex flex-col items-start justify-start p-6 sm:h-[600px] sm:max-w-[800px]">
+      <DialogContent className="flex flex-col items-start justify-start p-8 sm:h-[600px] sm:max-w-[800px]">
         <DialogHeader className="">
           <DialogTitle className="flex items-center gap-2">
             <BugIcon className="h-4 w-4" />
@@ -175,18 +175,46 @@ export const FeedbackButton = React.memo(function FeedbackButton({
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
-            className="h-full w-full"
+            className="h-full w-full px-0"
           >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="submit">Submit Feedback</TabsTrigger>
-              <TabsTrigger value="history">Feedback History</TabsTrigger>
+            <TabsList className="flex w-fit bg-transparent grid-cols-2 px-0 gap-2 items-center transition-all duration-200 ease-in-out">
+              <TabsTrigger
+                value="submit"
+                className="flex items-center gap-2 group/submit"
+              >
+                <MessageCircleWarning className="w-4 h-4 group-hover/submit:text-foreground transition-all duration-200 ease-in-out" />
+                <p
+                  className={cn(
+                    'text-sm font-medium',
+                    'group-hover/submit:text-foreground transition-all duration-200 ease-in-out',
+                    activeTab === 'submit' ? 'underline underline-offset-4' : '',
+                  )}
+                >
+                  Submit Feedback
+                </p>
+              </TabsTrigger>
+              <TabsTrigger
+                value="history"
+                className="flex items-center gap-2 group/history"
+              >
+                <History className="w-4 h-4 group-hover/history:text-foreground transition-all duration-200 ease-in-out" />
+                <p
+                  className={cn(
+                    'text-sm font-medium',
+                    'group-hover/history:text-foreground transition-all duration-200 ease-in-out',
+                    activeTab === 'history' ? 'underline underline-offset-4' : '',
+                  )}
+                >
+                  Feedback History
+                </p>
+              </TabsTrigger>
             </TabsList>
-            <TabsContent
-              value="submit"
-              className="h-full animate-slide-down-fade-in"
-            >
+            <TabsContent value="submit" className="h-full animate-slide-down-fade-in">
               <form
-                onSubmit={handleSubmit}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void handleSubmit(e);
+                }}
                 className="mt-8 flex flex-col justify-between space-y-8"
               >
                 <div className="grid grid-cols-2 gap-4">
@@ -197,12 +225,7 @@ export const FeedbackButton = React.memo(function FeedbackButton({
                     >
                       Page
                     </Label>
-                    <Input
-                      id="page-url"
-                      name="page-url"
-                      value={pathName}
-                      readOnly
-                    />
+                    <Input id="page-url" name="page-url" value={pathName} readOnly />
                   </div>
                   <div className="grid w-full items-center gap-1.5">
                     <Label
@@ -262,14 +285,18 @@ export const FeedbackButton = React.memo(function FeedbackButton({
                     className="flex-grow"
                     rows={10}
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => {
+                      setDescription(e.target.value);
+                    }}
                   />
                 </div>
                 <div className="mt-auto flex justify-end gap-2">
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => {
+                      setIsOpen(false);
+                    }}
                   >
                     Cancel
                   </Button>
@@ -281,53 +308,58 @@ export const FeedbackButton = React.memo(function FeedbackButton({
             </TabsContent>
             <TabsContent value="history">
               <div className="animate-slide-down-fade-in">
-                <div className="space-y-4">
-                  <div className="mt-4">
+                <div className="flex flex-col gap-8 mt-8">
+                  <div className="flex flex-col gap-4">
                     <Label
                       htmlFor="open-tickets"
-                      className="ml-2 text-xs text-muted-foreground"
+                      className="text-sm text-muted-foreground pl-0 font-bold"
                     >
                       Open Tickets
                     </Label>
                     <div className="space-y-2">
-                      {feedbackTickets
-                        .filter((ticket) => ticket.status === "open")
-                        .map((ticket) => (
-                          <FeedbackItem
-                            key={ticket.id}
-                            title={ticket.description.substring(0, 50) + "..."}
-                            type={ticket.feedback_type}
-                            status="open"
-                            date={new Date(
-                              ticket.created_at,
-                            ).toLocaleDateString()}
-                            description={ticket.description}
-                          />
-                        ))}
+                      {feedbackTickets.length > 0 ? (
+                        feedbackTickets
+                          .filter((ticket) => ticket.status === 'open')
+                          .map((ticket) => (
+                            <FeedbackItem
+                              key={ticket.id}
+                              title={ticket.description.substring(0, 50) + '...'}
+                              type={ticket.feedback_type}
+                              status="open"
+                              date={new Date(ticket.created_at).toLocaleDateString()}
+                              description={ticket.description}
+                            />
+                          ))
+                      ) : (
+                        <p className="text-muted-foreground/50">No open tickets!</p>
+                      )}
                     </div>
                   </div>
-                  <div>
+                  <Separator className="w-full my-2" />
+                  <div className="flex flex-col gap-4">
                     <Label
                       htmlFor="closed-tickets"
-                      className="ml-2 text-xs text-muted-foreground"
+                      className="text-sm text-muted-foreground pl-0 font-bold"
                     >
                       Closed Tickets
                     </Label>
-                    <div className="space-y-2">
-                      {feedbackTickets
-                        .filter((ticket) => ticket.status === "closed")
-                        .map((ticket) => (
-                          <FeedbackItem
-                            key={ticket.id}
-                            title={ticket.description.substring(0, 50) + "..."}
-                            type={ticket.feedback_type}
-                            status="closed"
-                            date={new Date(
-                              ticket.created_at,
-                            ).toLocaleDateString()}
-                            description={ticket.description}
-                          />
-                        ))}
+                    <div className="flex flex-col gap-2">
+                      {feedbackTickets.length > 0 ? (
+                        feedbackTickets
+                          .filter((ticket) => ticket.status === 'closed')
+                          .map((ticket) => (
+                            <FeedbackItem
+                              key={ticket.id}
+                              title={ticket.description.substring(0, 50) + '...'}
+                              type={ticket.feedback_type}
+                              status="closed"
+                              date={new Date(ticket.created_at).toLocaleDateString()}
+                              description={ticket.description}
+                            />
+                          ))
+                      ) : (
+                        <p className="text-muted-foreground/50">No closed tickets!</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -343,7 +375,7 @@ export const FeedbackButton = React.memo(function FeedbackButton({
 interface FeedbackItemProps {
   title: string;
   type: string;
-  status: "open" | "closed";
+  status: 'open' | 'closed';
   date: string;
   description: string;
 }
@@ -359,11 +391,11 @@ const FeedbackItem: React.FC<FeedbackItemProps> = ({
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "bug":
+      case 'bug':
         return <BugIcon className="h-3 w-3" />;
-      case "feature-request":
+      case 'feature-request':
         return <Puzzle className="h-3 w-3" />;
-      case "idea":
+      case 'idea':
         return <Lightbulb className="h-3 w-3" />;
       default:
         return <CircleHelp className="h-3 w-3" />;
@@ -372,14 +404,14 @@ const FeedbackItem: React.FC<FeedbackItemProps> = ({
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case "bug":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      case "feature-request":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-      case "idea":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+      case 'bug':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      case 'feature-request':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'idea':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
       default:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
     }
   };
 
@@ -390,7 +422,7 @@ const FeedbackItem: React.FC<FeedbackItemProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center space-x-2">
-          <Badge className={cn("px-2 py-1", getTypeColor(type))}>
+          <Badge className={cn('px-2 py-1', getTypeColor(type))}>
             <span className="flex items-center">
               {getTypeIcon(type)}
               <span className="ml-1 text-xs capitalize">{type}</span>
@@ -400,20 +432,20 @@ const FeedbackItem: React.FC<FeedbackItemProps> = ({
         </div>
         <div className="flex items-center space-x-2">
           <Badge
-            variant={status === "open" ? "default" : "secondary"}
+            variant={status === 'open' ? 'default' : 'secondary'}
             className={cn(
-              "border text-xs font-bold",
-              status === "open"
-                ? "border-green-700/50 bg-green-100 text-green-700 dark:border-green-300/50 dark:bg-green-900 dark:text-green-300"
-                : "border-red-700/50 bg-red-100 text-red-700 dark:border-red-300/50 dark:bg-red-900 dark:text-red-300",
+              'border text-xs font-bold',
+              status === 'open'
+                ? 'border-green-700/50 bg-green-100 text-green-700 dark:border-green-300/50 dark:bg-green-900 dark:text-green-300'
+                : 'border-red-700/50 bg-red-100 text-red-700 dark:border-red-300/50 dark:bg-red-900 dark:text-red-300',
             )}
           >
             {status}
           </Badge>
           <ChevronDown
             className={cn(
-              "h-4 w-4 transition-transform duration-200",
-              isExpanded && "rotate-180 transform",
+              'h-4 w-4 transition-transform duration-200',
+              isExpanded && 'rotate-180 transform',
             )}
           />
         </div>

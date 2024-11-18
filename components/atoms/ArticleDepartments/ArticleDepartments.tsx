@@ -54,12 +54,6 @@ const ArticleDepartments = ({
         }),
       }));
 
-      console.log(`enrichedDepartments`);
-      console.log(enrichedDepartments);
-
-      console.log(`data`);
-      console.log(data);
-
       return enrichedDepartments;
       // return data;
     },

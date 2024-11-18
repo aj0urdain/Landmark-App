@@ -35,7 +35,7 @@ const stateIcons: Record<string, StateInfo> = {
 interface BranchBadgeProps {
   branchName?: string;
   list?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'huge';
   colored?: boolean;
   showIcon?: boolean;
   className?: string;
@@ -100,6 +100,11 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
       icon: 'h-5 w-5',
       text: 'text-lg',
     },
+    huge: {
+      button: 'p-0',
+      icon: 'h-16 w-16',
+      text: 'text-5xl font-bold',
+    },
   };
 
   if (isLoading) {
@@ -123,6 +128,7 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
           'm-0 flex items-center gap-1 p-0 text-muted-foreground hover:bg-transparent animate-slide-left-fade-in',
           colored ? color : '',
           list ? 'h-auto' : 'bg-transparent',
+          size === 'huge' ? 'gap-4' : '',
           'transition-colors',
           sizeClasses[size].button,
         )}
