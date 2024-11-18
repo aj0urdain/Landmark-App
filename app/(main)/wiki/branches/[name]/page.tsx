@@ -122,7 +122,7 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
           level_number,
           suite_number,
           street_number,
-          phone,
+          contact_number,
           email,
           states (
             state_name,

@@ -42,10 +42,14 @@ const SeniorLeadershipDepartmentPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Tabs defaultValue="people" className="w-full">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 bg-transparent flex gap-4 w-fit">
           <TabsTrigger value="people">People</TabsTrigger>
-          <TabsTrigger value="news">News & Announcements</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
+          <TabsTrigger value="news" disabled>
+            News & Announcements
+          </TabsTrigger>
+          <TabsTrigger value="resources" disabled>
+            Resources
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="people" className="space-y-6">
