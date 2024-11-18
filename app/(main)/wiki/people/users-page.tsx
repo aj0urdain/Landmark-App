@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 import debounce from 'lodash/debounce';
 import Fuse from 'fuse.js';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
@@ -12,7 +12,6 @@ import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/Stagge
 import UserCard from '@/components/molecules/UserCard/UserCard';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { UserFilter } from '@/components/molecules/UserFilter/UserFilter';
 import { Label } from '@/components/ui/label';
@@ -22,20 +21,29 @@ export function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
-  const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
+  const [selectedBranches, setSelectedBranches] = useState<string>('');
+  const [isSearching, setIsSearching] = useState(false);
   const scrollDirection = useScrollDirection();
 
-  // Debounced search handler
+  // Debounced search handler with 1 second delay
   const debouncedSearch = useCallback(
     debounce((query: string) => {
       setDebouncedQuery(query);
-    }, 300),
+      setIsSearching(false);
+    }, 1000),
     [],
   );
 
+  // Immediate search handler
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setIsSearching(true);
+    debouncedSearch(value);
+  };
+
   const {
     data: users,
-    isLoading,
+    isLoading: isLoadingUsers,
     isError,
   } = useQuery({
     queryKey: ['allUsers'],
@@ -81,8 +89,7 @@ export function UsersPage() {
         selectedDepartments.every((dept) => user.departments?.includes(dept));
 
       const matchesBranch =
-        selectedBranches.length === 0 ||
-        selectedBranches.every((branch) => user.branches?.includes(branch));
+        selectedBranches === '' || user.branches?.includes(selectedBranches);
 
       return matchesDepartment && matchesBranch;
     });
@@ -91,13 +98,13 @@ export function UsersPage() {
   // Get unique departments and branches
   const allDepartments = useMemo(() => {
     if (!users) return [];
-    const departments = new Set(users.flatMap((user) => user.departments || []));
+    const departments = new Set(users.flatMap((user) => user.departments ?? []));
     return Array.from(departments);
   }, [users]);
 
   const allBranches = useMemo(() => {
     if (!users) return [];
-    const branches = new Set(users.flatMap((user) => user.branches || []));
+    const branches = new Set(users.flatMap((user) => user.branches ?? []));
     return Array.from(branches);
   }, [users]);
 
@@ -128,17 +135,21 @@ export function UsersPage() {
                     placeholder="Search by name, email, department, branch, or role..."
                     value={searchQuery}
                     onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      debouncedSearch(e.target.value);
+                      handleSearch(e.target.value);
                     }}
                     className="pl-8"
                   />
+                  {isSearching && (
+                    <div className="absolute right-2 top-2.5">
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 w-full">
                 <Label className="text-sm text-muted-foreground">Filter</Label>
-                <div className="flex gap-4">
+                <div className="flex gap-4 w-full">
                   <UserFilter
                     type="departments"
                     options={allDepartments}
@@ -158,12 +169,10 @@ export function UsersPage() {
         </Card>
       </div>
 
-      {isLoading ? (
+      {isLoadingUsers || isSearching ? (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
           {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="h-32">
-              <Skeleton className="h-full w-full" />
-            </div>
+            <UserCard userId={''} skeletonLoader={true} key={index} />
           ))}
         </div>
       ) : filteredByFilters.length === 0 ? (

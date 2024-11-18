@@ -11,7 +11,16 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building2, Users, Phone, Mail, MapPin } from 'lucide-react';
+import {
+  Building2,
+  Users,
+  Phone,
+  Mail,
+  MapPin,
+  Briefcase,
+  Newspaper,
+  Calendar,
+} from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -185,69 +194,182 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
     <div className="container mx-auto space-y-8 p-8">
       <div className="relative h-64 w-full overflow-hidden rounded-xl">
         <Image
-          src="/images/office-placeholder.jpg"
+          src="https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/user_uploads/e2570807-6d18-4f80-921c-f66fa4d8b76a/lmbg-e2570807-6d18-4f80-921c-f66fa4d8b76a.webp"
           alt={branch.branch_name}
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background to-background/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background to-background/70" />
+
         <div className="absolute bottom-6 left-6">
           <Badge className="mb-2">{branch.states?.state_name}</Badge>
-          <h1 className="text-4xl font-bold text-white">{branch.branch_name}</h1>
+          <h1 className="text-4xl font-bold text-white">
+            <BranchBadge
+              branchName={branch.branch_name}
+              size="huge"
+              list
+              colored={false}
+            />
+          </h1>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Location
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg">{formatAddress()}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="h-5 w-5" />
-              Contact
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p>{branch.contact_number}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Staff Count
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{staff?.length || 0}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Separator />
-
-      <Tabs defaultValue="staff" className="w-full">
-        <TabsList>
-          <TabsTrigger value="staff" className="flex items-center gap-2">
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="bg-transparent flex items-center gap-2 w-fit justify-center">
+          <TabsTrigger
+            value="overview"
+            className="flex items-center gap-2 hover:text-foreground"
+          >
+            <Building2 className="h-4 w-4" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="staff"
+            className="flex items-center gap-2 hover:text-foreground"
+          >
             <Users className="h-4 w-4" />
             Staff
           </TabsTrigger>
-          <TabsTrigger value="facilities" className="flex items-center gap-2">
+          <TabsTrigger value="facilities" className="flex items-center gap-2" disabled>
             <Building2 className="h-4 w-4" />
             Facilities
           </TabsTrigger>
+          <TabsTrigger value="news" className="flex items-center gap-2" disabled>
+            <Newspaper className="h-4 w-4" />
+            News
+          </TabsTrigger>
+          <TabsTrigger value="events" className="flex items-center gap-2" disabled>
+            <Calendar className="h-4 w-4" />
+            Events
+          </TabsTrigger>
         </TabsList>
+        <Separator className="my-8" />
+
+        <TabsContent value="overview" className="mt-6 animate-slide-down-fade-in">
+          <div className="grid grid-cols-2 gap-6">
+            {/* Office Information Card */}
+            <Card className="h-fit w-full">
+              <CardHeader className="space-y-4">
+                <CardTitle className="flex items-start gap-1.5 text-xs font-medium text-muted-foreground/80">
+                  <Building2 className="h-3 w-3" />
+                  Office Information
+                </CardTitle>
+                <div className="whitespace-pre-line leading-snug">
+                  <div className="flex flex-col gap-4">
+                    {/* Location */}
+                    <div className="flex flex-col items-start justify-start gap-0.5">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+                        <MapPin className="h-3.5 w-3.5" />
+                        {formatAddress()}
+                      </div>
+                    </div>
+
+                    {/* Contact */}
+                    <div className="flex flex-col gap-2">
+                      {branch.contact_number && (
+                        <div className="flex items-center gap-2 text-sm text-foreground/80">
+                          <Phone className="h-3.5 w-3.5" />
+                          {branch.contact_number}
+                        </div>
+                      )}
+                      {branch.email && (
+                        <div className="flex items-center gap-2 text-sm text-foreground/80">
+                          <Mail className="h-3.5 w-3.5" />
+                          {branch.email}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <Separator className="mx-6 w-[calc(100%-48px)] bg-muted" />
+
+              <CardHeader className="space-y-4">
+                <CardTitle className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground/80">
+                  <Briefcase className="h-3 w-3" />
+                  Working Hours
+                </CardTitle>
+                <div className="whitespace-pre-line leading-snug">
+                  <div className="flex flex-col gap-2">
+                    <p className="flex justify-between text-sm">
+                      <span className="font-medium text-muted-foreground">Monday</span>
+                      <span className="font-semibold text-foreground/80">
+                        8:30am - 5:30pm
+                      </span>
+                    </p>
+                    <p className="flex justify-between text-sm">
+                      <span className="font-medium text-muted-foreground">Tuesday</span>
+                      <span className="font-semibold text-foreground/80">
+                        8:30am - 5:30pm
+                      </span>
+                    </p>
+                    <p className="flex justify-between text-sm">
+                      <span className="font-medium text-muted-foreground">Wednesday</span>
+                      <span className="font-semibold text-foreground/80">
+                        8:30am - 5:30pm
+                      </span>
+                    </p>
+                    <p className="flex justify-between text-sm">
+                      <span className="font-medium text-muted-foreground">Thursday</span>
+                      <span className="font-semibold text-foreground/80">
+                        8:30am - 5:30pm
+                      </span>
+                    </p>
+                    <p className="flex justify-between text-sm">
+                      <span className="font-medium text-muted-foreground">Friday</span>
+                      <span className="font-semibold text-foreground/80">
+                        8:30am - 5:30pm
+                      </span>
+                    </p>
+                    <p className="flex justify-between">
+                      <span className="font-medium text-muted">Saturday</span>
+                      <span className="text-muted">Not Available</span>
+                    </p>
+                    <p className="flex justify-between">
+                      <span className="font-medium text-muted">Sunday</span>
+                      <span className="text-muted">Not Available</span>
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Staff Information Card */}
+            <Card className="h-fit w-full">
+              <CardHeader className="space-y-4">
+                <CardTitle className="flex items-start gap-1.5 text-xs font-medium text-muted-foreground/80">
+                  <Users className="h-3 w-3" />
+                  Staff Information
+                </CardTitle>
+                <div className="whitespace-pre-line leading-snug">
+                  <div className="flex flex-col gap-4">
+                    {/* Staff Count */}
+                    <div className="flex items-center gap-2 text-sm text-foreground/80">
+                      <p className="text-2xl font-bold">{staff?.length || 0}</p>
+                      <p className="text-muted-foreground">Staff Members</p>
+                    </div>
+
+                    {/* Department List */}
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs text-muted-foreground/80">Departments</p>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {Object.entries(staffByDepartment).map(([deptId, { name }]) => (
+                          <DepartmentBadge
+                            key={deptId}
+                            department={name}
+                            size="large"
+                            list
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+          </div>
+        </TabsContent>
 
         <TabsContent value="staff" className="mt-6">
           <div className="space-y-24">
