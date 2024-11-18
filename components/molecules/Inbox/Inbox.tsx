@@ -707,10 +707,7 @@ export function Inbox({
                             {task.title}
                           </h1>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            <ReactTimeAgo
-                              date={new Date(notification.created_at)}
-                              locale="en-US"
-                            />
+                            <ReactTimeAgo date={new Date(notification.created_at)} />
                           </p>
                         </div>
                         <Button

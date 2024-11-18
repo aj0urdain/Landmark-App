@@ -121,7 +121,7 @@ const ToDoSection: React.FC = () => {
           if (count > 0) {
             const IconComponent = sectionIcons[section as SectionName];
             return (
-              <TooltipProvider>
+              <TooltipProvider key={section}>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
                     <Button
