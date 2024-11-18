@@ -32,6 +32,8 @@ interface PortfolioWithAuctions {
   advertising_period_start: string;
 }
 
+// TODO: complete this page
+
 const AuctionsPage = () => {
   const { data: activePortfolio, isLoading } = useQuery({
     queryKey: ['activePortfolio'],

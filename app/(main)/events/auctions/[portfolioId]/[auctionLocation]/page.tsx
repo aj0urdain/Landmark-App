@@ -42,6 +42,8 @@ const renderer = ({
   }
 };
 
+// TODO: complete this page
+
 const AuctionByPortfolioAndLocationPage = () => {
   const { portfolioId, auctionLocation } = useParams();
 

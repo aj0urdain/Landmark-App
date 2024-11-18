@@ -22,6 +22,8 @@ import { useCalendarEvents } from '@/utils/getCalendarEvents';
 
 const allEventTypes = Object.keys(eventTypeInfo).filter((key) => key !== 'default');
 
+// TODO: complete this page
+
 const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const currentYear = selectedDate
