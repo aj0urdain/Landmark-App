@@ -24,7 +24,8 @@
     "preview-magazine": "node utils/scripts/rename-magazine-stack.js preview",
     "rename-magazine": "node utils/scripts/rename-magazine-stack.js rename",
     "preview-users": "ts-node utils/scripts/import-users.ts preview",
-    "import-users": "ts-node utils/scripts/import-users.ts import"
+    "import-users": "ts-node utils/scripts/import-users.ts import",
+    "find-unused": "ts-node scripts/find-unused-components.ts"
   },
   "dependencies": {
     "@hocuspocus/provider": "^2.13.7",
