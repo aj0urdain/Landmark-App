@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export type Database = {
+export interface Database {
   public: {
     Tables: {
       app_config: {
@@ -33,11 +33,13 @@ export type Database = {
           author_id: string | null;
           author_id_secondary: string | null;
           author_id_tertiary: string | null;
+          authorisation: boolean;
           content: Json | null;
           cover_image: string | null;
           created_at: string | null;
           departments: number[] | null;
           description: string | null;
+          featured: boolean | null;
           id: number;
           public: boolean;
           reactions: Json | null;
@@ -51,11 +53,13 @@ export type Database = {
           author_id?: string | null;
           author_id_secondary?: string | null;
           author_id_tertiary?: string | null;
+          authorisation?: boolean;
           content?: Json | null;
           cover_image?: string | null;
           created_at?: string | null;
           departments?: number[] | null;
           description?: string | null;
+          featured?: boolean | null;
           id?: number;
           public?: boolean;
           reactions?: Json | null;
@@ -69,11 +73,13 @@ export type Database = {
           author_id?: string | null;
           author_id_secondary?: string | null;
           author_id_tertiary?: string | null;
+          authorisation?: boolean;
           content?: Json | null;
           cover_image?: string | null;
           created_at?: string | null;
           departments?: number[] | null;
           description?: string | null;
+          featured?: boolean | null;
           id?: number;
           public?: boolean;
           reactions?: Json | null;
@@ -145,22 +151,86 @@ export type Database = {
         };
         Relationships: [];
       };
+      auction_results: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          file_path: string | null;
+          id: number;
+          is_active: boolean | null;
+          locations: string | null;
+          portfolio_id: number | null;
+          title: string | null;
+          version: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          file_path?: string | null;
+          id?: number;
+          is_active?: boolean | null;
+          locations?: string | null;
+          portfolio_id?: number | null;
+          title?: string | null;
+          version?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          file_path?: string | null;
+          id?: number;
+          is_active?: boolean | null;
+          locations?: string | null;
+          portfolio_id?: number | null;
+          title?: string | null;
+          version?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'auction_results_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'auction_results_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'auction_results_portfolio_id_fkey';
+            columns: ['portfolio_id'];
+            isOneToOne: false;
+            referencedRelation: 'portfolios';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       auction_venues: {
         Row: {
           created_at: string;
           id: number;
+          image: string | null;
           location_id: number | null;
           name: string | null;
         };
         Insert: {
           created_at?: string;
           id?: number;
+          image?: string | null;
           location_id?: number | null;
           name?: string | null;
         };
         Update: {
           created_at?: string;
           id?: number;
+          image?: string | null;
           location_id?: number | null;
           name?: string | null;
         };
@@ -264,17 +334,76 @@ export type Database = {
       branches: {
         Row: {
           branch_name: string;
+          contact_number: string | null;
+          country_id: number | null;
+          description: string | null;
+          headline: string | null;
           id: number;
+          level_number: string | null;
+          state_id: number | null;
+          street_id: number | null;
+          street_number: string | null;
+          suburb_id: number | null;
+          suite_number: string | null;
         };
         Insert: {
           branch_name: string;
+          contact_number?: string | null;
+          country_id?: number | null;
+          description?: string | null;
+          headline?: string | null;
           id?: number;
+          level_number?: string | null;
+          state_id?: number | null;
+          street_id?: number | null;
+          street_number?: string | null;
+          suburb_id?: number | null;
+          suite_number?: string | null;
         };
         Update: {
           branch_name?: string;
+          contact_number?: string | null;
+          country_id?: number | null;
+          description?: string | null;
+          headline?: string | null;
           id?: number;
+          level_number?: string | null;
+          state_id?: number | null;
+          street_id?: number | null;
+          street_number?: string | null;
+          suburb_id?: number | null;
+          suite_number?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'branches_country_id_fkey';
+            columns: ['country_id'];
+            isOneToOne: false;
+            referencedRelation: 'countries';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'branches_state_id_fkey';
+            columns: ['state_id'];
+            isOneToOne: false;
+            referencedRelation: 'states';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'branches_street_id_fkey';
+            columns: ['street_id'];
+            isOneToOne: false;
+            referencedRelation: 'streets';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'branches_suburb_id_fkey';
+            columns: ['suburb_id'];
+            isOneToOne: false;
+            referencedRelation: 'suburbs';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       chat_messages: {
         Row: {
@@ -325,20 +454,51 @@ export type Database = {
       chat_rooms: {
         Row: {
           created_at: string;
+          department_id: number | null;
           id: number;
           name: string | null;
+          parent_room: number | null;
+          team_id: number | null;
         };
         Insert: {
           created_at?: string;
+          department_id?: number | null;
           id?: number;
           name?: string | null;
+          parent_room?: number | null;
+          team_id?: number | null;
         };
         Update: {
           created_at?: string;
+          department_id?: number | null;
           id?: number;
           name?: string | null;
+          parent_room?: number | null;
+          team_id?: number | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'chat_rooms_department_id_fkey';
+            columns: ['department_id'];
+            isOneToOne: false;
+            referencedRelation: 'departments';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_rooms_parent_room_fkey';
+            columns: ['parent_room'];
+            isOneToOne: false;
+            referencedRelation: 'chat_rooms';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_rooms_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       comments: {
         Row: {
@@ -401,17 +561,38 @@ export type Database = {
           },
         ];
       };
+      countries: {
+        Row: {
+          country_name: string | null;
+          created_at: string;
+          id: number;
+        };
+        Insert: {
+          country_name?: string | null;
+          created_at?: string;
+          id?: number;
+        };
+        Update: {
+          country_name?: string | null;
+          created_at?: string;
+          id?: number;
+        };
+        Relationships: [];
+      };
       departments: {
         Row: {
           department_name: string;
+          description: string | null;
           id: number;
         };
         Insert: {
           department_name: string;
+          description?: string | null;
           id?: number;
         };
         Update: {
           department_name?: string;
+          description?: string | null;
           id?: number;
         };
         Relationships: [];
@@ -662,6 +843,88 @@ export type Database = {
         };
         Relationships: [];
       };
+      link_categories: {
+        Row: {
+          created_at: string;
+          id: number;
+          name: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      links: {
+        Row: {
+          branches: number[] | null;
+          category_id: number | null;
+          created_at: string;
+          created_by: string | null;
+          departments: number[];
+          description: string | null;
+          id: number;
+          teams: number[] | null;
+          title: string;
+          updated_at: string | null;
+          url: string;
+        };
+        Insert: {
+          branches?: number[] | null;
+          category_id?: number | null;
+          created_at?: string;
+          created_by?: string | null;
+          departments: number[];
+          description?: string | null;
+          id?: number;
+          teams?: number[] | null;
+          title: string;
+          updated_at?: string | null;
+          url: string;
+        };
+        Update: {
+          branches?: number[] | null;
+          category_id?: number | null;
+          created_at?: string;
+          created_by?: string | null;
+          departments?: number[];
+          description?: string | null;
+          id?: number;
+          teams?: number[] | null;
+          title?: string;
+          updated_at?: string | null;
+          url?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'links_category_id_fkey';
+            columns: ['category_id'];
+            isOneToOne: false;
+            referencedRelation: 'link_categories';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'links_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'links_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       notes: {
         Row: {
           created_at: string | null;
@@ -742,6 +1005,70 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [];
+      };
+      portfolio_magazines: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          file_path: string | null;
+          id: number;
+          is_active: boolean | null;
+          portfolio_id: number | null;
+          stack_image_path: string | null;
+          title: string | null;
+          updated_at: string | null;
+          version: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          file_path?: string | null;
+          id?: number;
+          is_active?: boolean | null;
+          portfolio_id?: number | null;
+          stack_image_path?: string | null;
+          title?: string | null;
+          updated_at?: string | null;
+          version?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          file_path?: string | null;
+          id?: number;
+          is_active?: boolean | null;
+          portfolio_id?: number | null;
+          stack_image_path?: string | null;
+          title?: string | null;
+          updated_at?: string | null;
+          version?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'portfolio_magazines_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'portfolio_magazines_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'portfolio_magazines_portfolio_id_fkey';
+            columns: ['portfolio_id'];
+            isOneToOne: false;
+            referencedRelation: 'portfolios';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       portfolios: {
         Row: {
@@ -955,6 +1282,85 @@ export type Database = {
           },
         ];
       };
+      report_types: {
+        Row: {
+          created_at: string;
+          id: number;
+          name: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          name?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          name?: string | null;
+        };
+        Relationships: [];
+      };
+      reports: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          date_published: string | null;
+          description: string | null;
+          file_path: string | null;
+          id: number;
+          is_active: boolean | null;
+          report_type: number | null;
+          title: string | null;
+          version: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          date_published?: string | null;
+          description?: string | null;
+          file_path?: string | null;
+          id?: number;
+          is_active?: boolean | null;
+          report_type?: number | null;
+          title?: string | null;
+          version?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          date_published?: string | null;
+          description?: string | null;
+          file_path?: string | null;
+          id?: number;
+          is_active?: boolean | null;
+          report_type?: number | null;
+          title?: string | null;
+          version?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'reports_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reports_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reports_report_type_fkey';
+            columns: ['report_type'];
+            isOneToOne: false;
+            referencedRelation: 'report_types';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       roles: {
         Row: {
           id: number;
@@ -972,21 +1378,32 @@ export type Database = {
       };
       states: {
         Row: {
+          country_id: number | null;
           id: number;
           short_name: string | null;
           state_name: string;
         };
         Insert: {
+          country_id?: number | null;
           id?: number;
           short_name?: string | null;
           state_name: string;
         };
         Update: {
+          country_id?: number | null;
           id?: number;
           short_name?: string | null;
           state_name?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'states_country_id_fkey';
+            columns: ['country_id'];
+            isOneToOne: false;
+            referencedRelation: 'countries';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       streets: {
         Row: {
@@ -1210,6 +1627,38 @@ export type Database = {
           },
         ];
       };
+      teams: {
+        Row: {
+          created_at: string;
+          department_id: number | null;
+          description: string | null;
+          id: number;
+          team_name: string;
+        };
+        Insert: {
+          created_at?: string;
+          department_id?: number | null;
+          description?: string | null;
+          id?: never;
+          team_name: string;
+        };
+        Update: {
+          created_at?: string;
+          department_id?: number | null;
+          description?: string | null;
+          id?: never;
+          team_name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'teams_department_id_fkey';
+            columns: ['department_id'];
+            isOneToOne: false;
+            referencedRelation: 'departments';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       tokens: {
         Row: {
           access_token: string | null;
@@ -1264,25 +1713,33 @@ export type Database = {
             referencedRelation: 'branches';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'user_branches_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_branches_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
         ];
       };
       user_departments: {
         Row: {
           department_id: number;
-          department_name: string | null;
-          user_email: string | null;
           user_id: string;
         };
         Insert: {
           department_id: number;
-          department_name?: string | null;
-          user_email?: string | null;
           user_id: string;
         };
         Update: {
           department_id?: number;
-          department_name?: string | null;
-          user_email?: string | null;
           user_id?: string;
         };
         Relationships: [
@@ -1291,6 +1748,20 @@ export type Database = {
             columns: ['department_id'];
             isOneToOne: false;
             referencedRelation: 'departments';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_departments_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_departments_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
             referencedColumns: ['id'];
           },
         ];
@@ -1363,6 +1834,46 @@ export type Database = {
           },
         ];
       };
+      user_teams: {
+        Row: {
+          created_at: string;
+          team_id: number;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          team_id: number;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          team_id?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_teams_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_teams_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_teams_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       user_profile_complete: {
@@ -1370,9 +1881,11 @@ export type Database = {
           biography_description: string | null;
           biography_title: string | null;
           birthday: string | null;
+          branch_ids: number[] | null;
           branches: string[] | null;
           business_number: string | null;
           created_at: string | null;
+          department_ids: number[] | null;
           departments: string[] | null;
           email: string | null;
           first_name: string | null;
@@ -1380,7 +1893,10 @@ export type Database = {
           last_name: string | null;
           mobile_number: string | null;
           profile_picture: string | null;
+          role_ids: number[] | null;
           roles: string[] | null;
+          team_ids: number[] | null;
+          teams: string[] | null;
           work_anniversary: string | null;
         };
         Relationships: [];
@@ -1457,6 +1973,14 @@ export type Database = {
         };
         Returns: Json;
       };
+      sync_existing_department_chat_rooms: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      sync_existing_users_to_burgess_rawson: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
       toggle_article_reaction: {
         Args: {
           p_article_id: number;
@@ -1479,7 +2003,7 @@ export type Database = {
       [_ in never]: never;
     };
   };
-};
+}
 
 type PublicSchema = Database[Extract<keyof Database, 'public'>];
 
