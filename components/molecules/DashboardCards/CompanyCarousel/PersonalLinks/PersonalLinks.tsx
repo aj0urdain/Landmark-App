@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Link2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -25,18 +25,26 @@ const LinkTile = ({ title, url }: { title: string; url: string }) => {
   const getFaviconUrl = (url: string) => {
     try {
       const domain = new URL(url).hostname;
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+      return `https://icon.horse/icon/${domain}`;
     } catch {
       return null;
     }
   };
 
+  const [faviconError, setFaviconError] = useState(false);
   const faviconUrl = url.startsWith('http') ? getFaviconUrl(url) : null;
 
   return (
     <div className="flex items-center justify-start gap-1 w-fit group">
-      {faviconUrl ? (
-        <img src={faviconUrl} alt="" className="w-4 h-4" />
+      {faviconUrl && !faviconError ? (
+        <img
+          src={faviconUrl}
+          alt=""
+          className="w-4 h-4"
+          onError={() => {
+            setFaviconError(true);
+          }}
+        />
       ) : (
         <span className="">🔗</span>
       )}
@@ -78,8 +86,7 @@ const PersonalLinks = () => {
         .order('name');
 
       if (error) {
-        console.error(`Error fetching categories: ${error}`);
-        return [];
+        throw new Error(error.message);
       }
 
       return data;
@@ -96,8 +103,7 @@ const PersonalLinks = () => {
       const { data, error } = await supabase.from('links').select('*').order('title');
 
       if (error) {
-        console.error(`Error fetching links: ${error}`);
-        return [];
+        throw new Error(error.message);
       }
 
       return data;
@@ -110,7 +116,7 @@ const PersonalLinks = () => {
 
     // If link has no restrictions, show it to everyone
     if (
-      (!link.departments?.length || link.departments.length === 0) &&
+      (!link.departments.length || link.departments.length === 0) &&
       (!link.branches?.length || link.branches.length === 0) &&
       (!link.teams?.length || link.teams.length === 0)
     ) {

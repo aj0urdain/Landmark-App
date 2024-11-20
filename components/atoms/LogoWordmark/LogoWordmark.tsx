@@ -23,6 +23,7 @@ export function LogoWordmark({ className }: LogoWordmarkProps) {
       alt="Burgess Rawson Logo"
       width={900}
       height={300}
+      priority
       className={cn('h-auto w-full', shouldInvert && 'invert', className)}
     />
   );

@@ -300,6 +300,7 @@ const UserCard = ({
               sizes="300px"
               width={1382}
               height={1632}
+              priority={isWelcome}
               className="h-full w-auto object-cover rounded-r-xl transition-all duration-500 group-hover:drop-shadow-[-75px_-100px_200px_rgba(255,255,255,0.35)] animate-slide-right-fade-in animation-delay-1000 animation-fill-forwards"
             />
           </Link>

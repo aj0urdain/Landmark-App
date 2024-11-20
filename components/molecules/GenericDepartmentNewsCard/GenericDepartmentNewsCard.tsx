@@ -39,8 +39,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
         .eq('article_type', 'announcement')
         .eq('public', true)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -68,8 +67,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
         .eq('article_type', 'news')
         .eq('public', true)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -150,6 +148,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
             alt="Department News"
             fill
             sizes="250px"
+            priority
             className="object-cover rounded-xl"
           />
         )}
