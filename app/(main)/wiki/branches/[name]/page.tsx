@@ -29,6 +29,7 @@ import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/Stagge
 import BranchBadge from '@/components/molecules/BranchBadge/BranchBadge';
 import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
 import { Dot } from '@/components/atoms/Dot/Dot';
+import { useDepartments } from '@/queries/departments/hooks';
 
 interface BranchDetails {
   branch_name: string;
@@ -80,19 +81,7 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
     },
   });
 
-  const { data: departments } = useQuery({
-    queryKey: ['departments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('*')
-        .order('id')
-        .neq('department_name', 'Burgess Rawson');
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: departments } = useDepartments();
 
   const { data: staff } = useQuery({
     queryKey: ['branchStaff', branch?.branch_name],
@@ -107,47 +96,6 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
       return data;
     },
     enabled: !!branch,
-  });
-
-  const { data: branchDetails } = useQuery({
-    queryKey: ['branchDetails', branch?.branch_name],
-    queryFn: async () => {
-      if (!branch?.branch_name) return null;
-
-      const { data: branchData, error } = await supabase
-        .from('branches')
-        .select(
-          `
-          branch_name,
-          level_number,
-          suite_number,
-          street_number,
-          contact_number,
-          email,
-          states (
-            state_name,
-            short_name
-          ),
-          streets (
-            street_name
-          ),
-          suburbs (
-            suburb_name,
-            postcode
-          )
-        `,
-        )
-        .eq('branch_name', branch.branch_name)
-        .single();
-
-      if (error) {
-        console.error('Error fetching branch details:', error);
-        return null;
-      }
-
-      return branchData;
-    },
-    enabled: !!branch?.branch_name,
   });
 
   if (isLoading) {
@@ -176,7 +124,9 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
     departments?.reduce(
       (acc, department) => {
         const departmentStaff =
-          staff?.filter((member) => member.department_ids?.includes(department.id)) ?? [];
+          staff?.filter((member) =>
+            member.departments?.includes(department.department_name),
+          ) ?? [];
 
         if (departmentStaff.length > 0) {
           acc[department.id] = {
@@ -230,10 +180,7 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
             <Users className="h-4 w-4" />
             Staff
           </TabsTrigger>
-          <TabsTrigger value="facilities" className="flex items-center gap-2" disabled>
-            <Building2 className="h-4 w-4" />
-            Facilities
-          </TabsTrigger>
+
           <TabsTrigger value="news" className="flex items-center gap-2" disabled>
             <Newspaper className="h-4 w-4" />
             News
@@ -346,7 +293,7 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
                   <div className="flex flex-col gap-4">
                     {/* Staff Count */}
                     <div className="flex items-center gap-2 text-sm text-foreground/80">
-                      <p className="text-2xl font-bold">{staff?.length || 0}</p>
+                      <p className="text-2xl font-bold">{staff?.length ?? 0}</p>
                       <p className="text-muted-foreground">Staff Members</p>
                     </div>
 
@@ -354,14 +301,18 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
                     <div className="flex flex-col gap-2">
                       <p className="text-xs text-muted-foreground/80">Departments</p>
                       <div className="grid grid-cols-2 gap-1.5">
-                        {Object.entries(staffByDepartment).map(([deptId, { name }]) => (
-                          <DepartmentBadge
-                            key={deptId}
-                            department={name}
-                            size="large"
-                            list
-                          />
-                        ))}
+                        {Object.entries(staffByDepartment).map(([deptId, { name }]) => {
+                          if (name === 'Burgess Rawson') return null;
+
+                          return (
+                            <DepartmentBadge
+                              key={deptId}
+                              department={name}
+                              size="large"
+                              list
+                            />
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -399,37 +350,6 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
                 </div>
               );
             })}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="facilities" className="mt-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Office Amenities</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  <li>Meeting Rooms</li>
-                  <li>Kitchen Facilities</li>
-                  <li>Parking Available</li>
-                  <li>24/7 Access</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Transportation</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  <li>Nearby Public Transport</li>
-                  <li>Secure Parking</li>
-                  <li>Bicycle Storage</li>
-                </ul>
-              </CardContent>
-            </Card>
           </div>
         </TabsContent>
       </Tabs>

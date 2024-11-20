@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+
 import { Loader2, Search } from 'lucide-react';
 import debounce from 'lodash/debounce';
 import Fuse from 'fuse.js';
@@ -10,14 +10,14 @@ import { cn } from '@/lib/utils';
 
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
 import UserCard from '@/components/molecules/UserCard/UserCard';
-import { createBrowserClient } from '@/utils/supabase/client';
+
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { UserFilter } from '@/components/molecules/UserFilter/UserFilter';
 import { Label } from '@/components/ui/label';
+import { useUsers } from '@/queries/users/hooks';
 
 export function UsersPage() {
-  const supabase = createBrowserClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
@@ -34,32 +34,13 @@ export function UsersPage() {
     [],
   );
 
-  // Immediate search handler
   const handleSearch = (value: string) => {
     setSearchQuery(value);
     setIsSearching(true);
     debouncedSearch(value);
   };
 
-  const {
-    data: users,
-    isLoading: isLoadingUsers,
-    isError,
-  } = useQuery({
-    queryKey: ['allUsers'],
-    queryFn: async () => {
-      const { data: users, error } = await supabase
-        .from('user_profile_complete')
-        .select('*')
-        .order('work_anniversary', { ascending: true });
-
-      if (error) {
-        console.error(error);
-      }
-
-      return users;
-    },
-  });
+  const { data: users, isLoading: isLoadingUsers, isError } = useUsers();
 
   // Initialize Fuse.js for fuzzy search
   const fuse = useMemo(() => {
@@ -154,13 +135,17 @@ export function UsersPage() {
                     type="departments"
                     options={allDepartments}
                     selectedOptions={selectedDepartments}
-                    onFilterChange={setSelectedDepartments}
+                    onFilterChange={
+                      setSelectedDepartments as (selected: string | string[]) => void
+                    }
                   />
                   <UserFilter
                     type="branches"
                     options={allBranches}
                     selectedOptions={selectedBranches}
-                    onFilterChange={setSelectedBranches}
+                    onFilterChange={
+                      setSelectedBranches as (selected: string | string[]) => void
+                    }
                   />
                 </div>
               </div>
@@ -170,7 +155,7 @@ export function UsersPage() {
       </div>
 
       {isLoadingUsers || isSearching ? (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {Array.from({ length: 6 }).map((_, index) => (
             <UserCard userId={''} skeletonLoader={true} key={index} />
           ))}
@@ -181,10 +166,10 @@ export function UsersPage() {
           <p className="text-sm text-muted-foreground">Try adjusting your search terms</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {filteredByFilters.map((user, index) => (
             <StaggeredAnimation key={String(user.id)} index={index}>
-              <UserCard userId={user.id ?? ''} />
+              <UserCard userId={user.id} />
             </StaggeredAnimation>
           ))}
         </div>

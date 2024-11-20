@@ -1,32 +1,13 @@
 'use client';
 
 import React from 'react';
-import { createBrowserClient } from '@/utils/supabase/client';
-import { useQuery } from '@tanstack/react-query';
 import DepartmentLinkCard from '@/components/molecules/DepartmentLinkCard/DepartmentLinkCard';
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useDepartments } from '@/queries/departments/hooks';
 
 export default function DepartmentsPage() {
-  const supabase = createBrowserClient();
-
-  const { data: departments, isLoading } = useQuery({
-    queryKey: ['departments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('*')
-        .order('id')
-        .neq('department_name', 'Burgess Rawson');
-
-      if (error) {
-        console.error(error);
-        return [];
-      }
-
-      return data;
-    },
-  });
+  const { data: departments, isLoading } = useDepartments();
 
   if (isLoading) {
     return (
@@ -51,7 +32,7 @@ export default function DepartmentsPage() {
               key={String(department.id)}
               department={department.department_name}
               departmentId={department.id}
-              description={department.description}
+              description={department.description ?? ''}
             />
           </StaggeredAnimation>
         ))}
