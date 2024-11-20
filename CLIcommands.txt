@@ -1,0 +1,4 @@
+# CLI commands
+
+// generate supabase types
+npx supabase gen types --lang=typescript > types/supabaseTypes.ts
