@@ -275,7 +275,6 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
                 <DepartmentBadge
                   key={String(department)}
                   department={department}
-                  id
                   list
                   size="small"
                   className="animate-slide-left-fade-in opacity-0 [animation-fill-mode:forwards]"

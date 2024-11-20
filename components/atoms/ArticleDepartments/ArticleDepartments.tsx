@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Ban, Component, PencilIcon, PlusIcon, Check } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { departmentInfo, getDepartmentInfo } from '@/utils/getDepartmentInfo';
+import { getDepartmentInfo } from '@/utils/getDepartmentInfo';
 import { cn } from '@/lib/utils';
 import { createBrowserClient } from '@/utils/supabase/client';
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useDepartments } from '@/queries/departments/hooks';
 
 const ArticleDepartments = ({
   article,
@@ -35,29 +36,7 @@ const ArticleDepartments = ({
   const supabase = createBrowserClient();
   const queryClient = useQueryClient();
 
-  const { data: allDepartments } = useQuery({
-    queryKey: ['departments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('*')
-        .order('department_name');
-
-      if (error) throw error;
-
-      // join departmentnames and id from supabase with departmentInfo metadata
-      const enrichedDepartments = data.map((dept) => ({
-        ...dept,
-        ...(departmentInfo.find((info) => info.name === dept.department_name) ?? {
-          color: 'gray',
-          backgroundColor: 'bg-gray-100',
-        }),
-      }));
-
-      return enrichedDepartments;
-      // return data;
-    },
-  });
+  const { data: allDepartments } = useDepartments();
 
   useEffect(() => {
     if (isDialogOpen) {
@@ -66,7 +45,7 @@ const ArticleDepartments = ({
   }, [isDialogOpen, article.departments]);
 
   const handleDepartmentRemove = async (departmentId: number) => {
-    console.log(`attempting to remove ${departmentId}`);
+    console.log(`attempting to remove ${String(departmentId)}`);
 
     if (article.departments.length === 1) {
       const burgessRawsonDept = allDepartments?.find(
@@ -84,7 +63,7 @@ const ArticleDepartments = ({
         .select();
 
       if (error) {
-        throw error;
+        throw new Error(error.message);
       }
       return;
     }
@@ -100,7 +79,7 @@ const ArticleDepartments = ({
       .select();
 
     if (error) {
-      throw error;
+      throw new Error(error.message);
     }
   };
 
@@ -112,7 +91,7 @@ const ArticleDepartments = ({
       .select();
 
     if (error) {
-      throw error;
+      throw new Error(error.message);
     }
   };
 
@@ -146,8 +125,6 @@ const ArticleDepartments = ({
   };
 
   if (!allDepartments) return null;
-
-  if (!article.departments) return null;
 
   return editing ? (
     <>
@@ -237,7 +214,7 @@ const ArticleDepartments = ({
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-2">
-              {allDepartments?.map((dept) => {
+              {allDepartments.map((dept) => {
                 const isSelected = selectedDepartments.includes(dept.id);
                 const departmentInfo = getDepartmentInfo(dept.department_name);
                 if (!departmentInfo) return null;
@@ -252,7 +229,9 @@ const ArticleDepartments = ({
                       isSelected && `border ${color}`,
                       'transition-all duration-300',
                     )}
-                    onClick={() => toggleDepartment(dept.id)}
+                    onClick={() => {
+                      toggleDepartment(dept.id);
+                    }}
                   >
                     {isSelected ? (
                       <Check className={`h-4 w-4 shrink-0 ${color}`} />
@@ -273,11 +252,18 @@ const ArticleDepartments = ({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDialogOpen(false);
+              }}
+            >
               Cancel
             </Button>
             <Button
-              onClick={() => addDepartmentsMutation.mutate()}
+              onClick={() => {
+                addDepartmentsMutation.mutate();
+              }}
               disabled={selectedDepartments.length === 0}
             >
               Add Departments
@@ -288,7 +274,7 @@ const ArticleDepartments = ({
     </>
   ) : (
     <div className="flex flex-row gap-8">
-      {article?.departments?.length > 0 &&
+      {article.departments.length > 0 &&
         article.departments.map((department) => {
           const fullDepartment = allDepartments.find((dept) => dept.id == department);
 

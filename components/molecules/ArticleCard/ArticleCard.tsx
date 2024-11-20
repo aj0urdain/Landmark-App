@@ -137,7 +137,6 @@ const ArticleCard = ({ articleId, size = 'default' }: ArticleCardProps) => {
               <DepartmentBadge
                 key={String(department)}
                 department={department}
-                id
                 list
                 size={size === 'xlarge' ? 'xlarge' : 'small'}
                 className="animate-slide-left-fade-in opacity-0 [animation-fill-mode:forwards]"
