@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 
 import { ChevronsRight, Gavel } from 'lucide-react';
 import {
-  EventCalendar,
   CalendarEvent,
   MemoizedEventCalendar,
 } from '@/components/molecules/EventCalendar/EventCalendar';
@@ -14,8 +13,8 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { CalendarLogic } from '@/components/molecules/CalendarLogic/CalendarLogic';
-import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
-import { cn } from '@/lib/utils';
+
+import { useActivePortfolio, useAllPortfolios } from '@/queries/portfolios/hooks';
 
 const renderer = ({
   days,
@@ -75,6 +74,10 @@ export default function AuctionCountdown() {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [monthDate, setMonthDate] = useState<Date | null>(null);
+
+  const { data: activePortfolioTest } = useAllPortfolios();
+
+  console.log(activePortfolioTest);
 
   useEffect(() => {
     if (auctions?.[0]?.start_date) {

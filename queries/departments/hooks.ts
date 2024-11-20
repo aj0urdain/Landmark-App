@@ -24,8 +24,6 @@ export function useDepartments() {
         }),
       );
 
-      console.log(enrichedDepartments);
-
       return enrichedDepartments;
     },
   });

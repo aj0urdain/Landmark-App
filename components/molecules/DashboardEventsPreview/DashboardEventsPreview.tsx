@@ -90,8 +90,6 @@ export default function DashboardEventsPreview() {
         (auctionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
       );
 
-      console.log('typedData', typedData);
-
       return {
         ...typedData,
         closestAuctionPortfolioId: typedData.portfolio_id,

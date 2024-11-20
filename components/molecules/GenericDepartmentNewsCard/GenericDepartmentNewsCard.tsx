@@ -77,8 +77,6 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
         return null;
       }
 
-      console.log(data);
-
       return data;
     },
   });
