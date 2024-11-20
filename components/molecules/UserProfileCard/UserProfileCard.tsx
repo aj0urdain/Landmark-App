@@ -1,6 +1,5 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { createBrowserClient } from '@/utils/supabase/client';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import DepartmentBadge from '@/components/molecules/DepartmentBadge/DepartmentBadge';
@@ -9,6 +8,7 @@ import { UserHoverCard } from '../LiveChat/UserHoverCard/UserHoverCard';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
+import { useUser } from '@/queries/users/hooks';
 
 interface UserProfileCardProps {
   id: string;
@@ -39,29 +39,7 @@ export function UserProfileCard({
   avatarOnly = false,
   textSize = 'base',
 }: UserProfileCardProps) {
-  const supabase = createBrowserClient();
-
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['user', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_profile_complete')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
-
-      return data;
-    },
-  });
+  const { data: user, isLoading, error } = useUser(id);
 
   if (isLoading)
     return (
@@ -87,7 +65,7 @@ export function UserProfileCard({
               <div className="relative bottom-0 rounded-full h-full w-full pt-4">
                 <Image
                   src={user.profile_picture}
-                  alt={`${user.first_name ?? ''} ${user.last_name ?? ''}`}
+                  alt={`${user.first_name} ${user.last_name}`}
                   fill
                   sizes="25px"
                   className="object-contain scale-150 rounded-b-full absolute pb-[5px]"
@@ -95,8 +73,8 @@ export function UserProfileCard({
               </div>
             ) : (
               <div className="flex items-center justify-center text-xs font-semibold text-muted-foreground h-full w-full">
-                {user.first_name?.[0] ?? ''}
-                {user.last_name?.[0] ?? ''}
+                {user.first_name[0]}
+                {user.last_name[0]}
               </div>
             )}
           </div>
@@ -138,13 +116,13 @@ export function UserProfileCard({
                   }`}
                 >
                   <AvatarImage
-                    src={user.profile_picture ?? ''}
-                    alt={`${user.first_name ?? ''} ${user.last_name ?? ''}`}
+                    src={String(user.profile_picture)}
+                    alt={`${user.first_name} ${user.last_name}`}
                     className="object-cover rounded-b-full w-auto h-[120%]"
                   />
                   <AvatarFallback>
-                    {user.first_name?.[0] ?? ''}
-                    {user.last_name?.[0] ?? ''}
+                    {user.first_name[0]}
+                    {user.last_name[0]}
                   </AvatarFallback>
                 </Avatar>
               )}

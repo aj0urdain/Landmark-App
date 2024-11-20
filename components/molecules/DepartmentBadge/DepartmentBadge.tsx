@@ -4,79 +4,39 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { getDepartmentInfo } from '@/utils/getDepartmentInfo';
-import { createBrowserClient } from '@/utils/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useDepartments } from '@/queries/departments/hooks';
 
 interface DepartmentBadgeProps {
   department: string | number | null | undefined;
   list?: boolean;
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   className?: string;
-  id?: boolean;
   showDepartmentName?: boolean;
   onAnimationEnd?: () => void;
 }
 
-const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
+const DepartmentBadge = ({
   department,
   list = false,
   size = 'medium',
   className,
-  id = false,
   showDepartmentName = true,
   onAnimationEnd,
-}) => {
-  const supabase = createBrowserClient();
+}: DepartmentBadgeProps) => {
+  const { data: departments } = useDepartments();
 
-  // if department is given as an id, fetch the department name
-  const { data: departmentDataID } = useQuery({
-    enabled: id && typeof department === 'number',
-    queryKey: ['departmentID', department],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('id, department_name')
-        .eq('id', department as string)
-        .single();
+  if (!department || !departments) return null;
 
-      if (error) {
-        console.error('Error fetching department:', error);
-        return null;
-      }
+  // Find the department from enriched data
+  const enrichedDepartment = departments.find((dept) =>
+    typeof department === 'string'
+      ? dept.department_name.toLowerCase() === department.toLowerCase()
+      : dept.id === department,
+  );
 
-      return data;
-    },
-  });
+  if (!enrichedDepartment) return null;
 
-  const { data: departmentDataName } = useQuery({
-    enabled: !id && typeof department === 'string',
-    queryKey: ['department', department],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('id, department_name')
-        .eq('department_name', department as string)
-        .single();
-
-      if (error) {
-        console.error('Error fetching department:', error);
-        return null;
-      }
-
-      return data;
-    },
-  });
-
-  const departmentData = departmentDataID ?? departmentDataName;
-
-  const departmentInformation = getDepartmentInfo(departmentData?.department_name);
-
-  if (!departmentInformation || !departmentData?.department_name) {
-    return null;
-  }
-
-  const { icon: Icon, color, link } = departmentInformation;
+  const { department_name, icon: Icon, color, link } = enrichedDepartment;
 
   const sizeClasses = {
     small: {
@@ -102,7 +62,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
   };
 
   return (
-    <Link href={`/wiki/departments/${link}`} passHref className="no-underline">
+    <Link href={`/wiki/departments/${String(link)}`} passHref className="no-underline">
       <Button
         variant={list ? 'ghost' : 'outline'}
         size="sm"
@@ -114,12 +74,12 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
           'transition-colors',
           'p-0',
           className,
-          `hover:text-${color} hover:bg-transparent`,
+          `hover:text-${String(color)} hover:bg-transparent`,
           size === 'small' ? 'after:bottom-[-1px]' : '',
         )}
       >
         <div className={cn('flex items-center justify-center', sizeClasses[size].icon)}>
-          <Icon className="h-full w-full" />
+          {Icon && <Icon className="h-full w-full" />}
         </div>
         {showDepartmentName && (
           <span
@@ -128,7 +88,7 @@ const DepartmentBadge: React.FC<DepartmentBadgeProps> = ({
               sizeClasses[size].text,
             )}
           >
-            {departmentData.department_name}
+            {department_name}
           </span>
         )}
       </Button>

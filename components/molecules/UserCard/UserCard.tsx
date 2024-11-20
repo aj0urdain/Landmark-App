@@ -12,10 +12,9 @@ import { IdCard, Sun } from 'lucide-react';
 import EmailContact from '@/components/atoms/EmailContact/EmailContact';
 import PhoneContact from '@/components/atoms/PhoneContact/PhoneContact';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
-import { createBrowserClient } from '@/utils/supabase/client';
 import { Separator } from '@/components/ui/separator';
 import { Dot } from '@/components/atoms/Dot/Dot';
+import { useUser } from '@/queries/users/hooks';
 
 const AnimatedDigit = ({
   digit,
@@ -57,8 +56,6 @@ const UserCard = ({
 
   const [hoveredUserId, setHoveredUserId] = useState<boolean>(false);
 
-  const supabase = createBrowserClient();
-
   const [currentTime, setCurrentTime] = useState(new Date());
   const [time, setTime] = useState({
     hours: '00',
@@ -91,26 +88,7 @@ const UserCard = ({
     };
   }, [time]);
 
-  const {
-    data: user,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ['user', userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_profile_complete')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error(error);
-      }
-
-      return data;
-    },
-  });
+  const { data: user, isLoading, isError } = useUser(userId);
 
   const debouncedSetHoveredUserId = useCallback(
     debounce((state: boolean) => {
@@ -318,7 +296,7 @@ const UserCard = ({
           >
             <Image
               src={user.profile_picture}
-              alt={user.first_name ?? 'User Profile Picture'}
+              alt={user.first_name + ' ' + user.last_name}
               sizes="300px"
               width={1382}
               height={1632}

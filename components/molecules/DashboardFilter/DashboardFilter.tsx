@@ -39,7 +39,9 @@ export default function DashboardFilter({
         <DepartmentFilterBadge
           department="Loading.."
           isSelected={false}
-          onClick={() => {}}
+          onClick={() => {
+            console.log('Loading filters..');
+          }}
         />
       </div>
     );
