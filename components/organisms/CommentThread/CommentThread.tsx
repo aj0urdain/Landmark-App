@@ -1,100 +1,124 @@
-import React, { forwardRef, useState } from 'react';
+import { CommentWithReactions } from '@/queries/articles/types';
 import { CommentItem } from '@/components/molecules/CommentItem/CommentItem';
+import { Separator } from '@/components/ui/separator';
 
-interface User {
-  id: string;
-  first_name: string;
-  last_name: string;
-  profile_picture: string | null;
-}
+const organizeComments = (
+  comments: CommentWithReactions[],
+  commentMap: Record<string, CommentWithReactions>,
+) => {
+  const rootComments: CommentWithReactions[] = [];
+  const replyGroups: Record<string, CommentWithReactions[]> = {};
 
-interface Reaction {
-  user_id: string;
-  react_time: string;
-  user: User;
-}
-
-interface Comment {
-  id: string;
-  comment: string;
-  created_at: string;
-  created_by: User;
-  parent_id: string | null;
-  reactions: Reaction[] | null;
-  replies?: Comment[]; // Add this line for nested replies
-  parentComment?: Comment;
-}
-
-interface CommentThreadProps {
-  comment: Comment;
-  onReact: (commentId: string, reactionType: string) => void;
-  onReply: (content: string, parentId?: string) => void;
-  scrollToComment?: (commentId: string) => void;
-  parentComment?: Comment;
-}
-
-export const CommentThread: React.FC<CommentThreadProps> = ({
-  comment,
-  onReact,
-  onReply,
-  scrollToComment,
-  parentComment,
-}) => {
-  const [replyContent, setReplyContent] = useState('');
-
-  const findParentUser = (parentId: string | null): string => {
-    if (!parentId) return '';
-
-    // Check if direct parent is the root comment
-    if (parentComment?.id === parentId) {
-      return `${parentComment.created_by.first_name} ${parentComment.created_by.last_name}`;
+  // First pass: identify root comments and create reply groups
+  comments.forEach((comment) => {
+    if (!comment.parent_id) {
+      rootComments.push(commentMap[comment.id]);
+      replyGroups[comment.id] = [];
     }
+  });
 
-    // Check in replies
-    if (parentComment?.replies) {
-      const replyParent = parentComment.replies.find((reply) => reply.id === parentId);
-      if (replyParent) {
-        return `${replyParent.created_by.first_name} ${replyParent.created_by.last_name}`;
+  // Second pass: organize replies into groups
+  comments.forEach((comment) => {
+    if (comment.parent_id) {
+      const parentComment = commentMap[comment.parent_id];
+      const rootParent = findRootParent(comment.parent_id, commentMap);
+
+      // Only proceed if we found both the parent comment and root parent
+      if (rootParent && parentComment) {
+        // If replying to root comment, add directly to its replies
+        if (comment.parent_id === rootParent.id) {
+          if (!rootParent.replies) rootParent.replies = [];
+          rootParent.replies.push({
+            ...commentMap[comment.id],
+            replyingToId: comment.parent_id,
+          });
+        } else {
+          // If replying to a reply, add it after its parent
+          if (!parentComment.replies) parentComment.replies = [];
+          parentComment.replies.push({
+            ...commentMap[comment.id],
+            replyingToId: comment.parent_id,
+          });
+        }
       }
     }
+  });
 
-    return '';
-  };
+  // Sort root comments by creation date
+  rootComments.sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+  );
 
-  const handleReply = (content: string) => {
-    onReply(content, comment.id);
-    setReplyContent('');
-  };
+  // Sort replies within each group by creation date
+  rootComments.forEach((comment) => {
+    if (comment.replies) {
+      comment.replies.sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      );
+    }
+  });
+
+  return rootComments;
+};
+
+const findRootParent = (
+  commentId: string,
+  commentMap: Record<string, CommentWithReactions>,
+): CommentWithReactions | null => {
+  const comment = commentMap[commentId];
+
+  // Return null if comment doesn't exist in the map
+  if (!comment) return null;
+
+  if (comment.parent_id == null) return comment;
+  return findRootParent(comment.parent_id, commentMap);
+};
+
+const flattenReplies = (comment: CommentWithReactions): CommentWithReactions[] => {
+  const result: CommentWithReactions[] = [];
+
+  if (comment.replies) {
+    comment.replies.forEach((reply) => {
+      result.push(reply);
+      if (reply.replies) {
+        result.push(...flattenReplies(reply));
+      }
+    });
+  }
+
+  return result;
+};
+
+const scrollToComment = (commentId: string) => {
+  const commentElement = document.getElementById(`comment-${commentId}`);
+  if (commentElement) {
+    commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
+
+export const CommentThread = ({ comments }: { comments: CommentWithReactions[] }) => {
+  const commentMap: Record<string, CommentWithReactions> = {};
+  comments.forEach((comment) => {
+    commentMap[comment.id] = { ...comment, replies: [] };
+  });
+
+  const organizedComments = organizeComments(comments, commentMap);
 
   return (
-    <div id={`comment-${comment.id}`} className="flex flex-col gap-4">
-      <CommentItem
-        {...comment}
-        onReact={onReact}
-        onReply={handleReply}
-        replyContent={replyContent}
-        onReplyContentChange={setReplyContent}
-        isReply={!!comment.parent_id}
-        replyUserName={
-          comment.parent_id
-            ? findParentUser(comment.parent_id)
-            : `${comment.created_by.first_name} ${comment.created_by.last_name}`
-        }
-        scrollToComment={scrollToComment}
-      />
-      {comment.replies && comment.replies.length > 0 && (
-        <div className="ml-8">
-          {comment.replies.map((reply) => (
-            <CommentThread
-              key={reply.id}
-              comment={reply}
-              onReact={onReact}
-              onReply={onReply}
-              parentComment={comment}
-            />
-          ))}
+    <div className="space-y-4">
+      {organizedComments.map((comment, index) => (
+        <div key={comment.id} className="">
+          <CommentItem comment={comment} commentMap={commentMap} />
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="ml-8 space-y-4">
+              {flattenReplies(comment).map((reply) => (
+                <CommentItem key={reply.id} comment={reply} commentMap={commentMap} />
+              ))}
+            </div>
+          )}
+          {index !== organizedComments.length - 1 && <Separator className="my-8" />}
         </div>
-      )}
+      ))}
     </div>
   );
 };
