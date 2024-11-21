@@ -2,18 +2,17 @@ import React from 'react';
 import { Article } from '@/types/articleTypes';
 import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
+import { useArticleComments } from '@/queries/articles/hooks';
 
 const ArticleCommentsButton = ({
   article,
-  editing,
-  commentNumber,
   commentSectionRef,
 }: {
   article: Article;
-  editing: boolean;
-  commentNumber: number;
   commentSectionRef: React.RefObject<HTMLDivElement>;
 }) => {
+  const { data: comments } = useArticleComments(article.id);
+
   return (
     <Button
       variant="ghost"
@@ -29,7 +28,7 @@ const ArticleCommentsButton = ({
     >
       <MessageCircle className="w-4 h-4" />
       <span className="text-sm">
-        {commentNumber} Comment{commentNumber != 1 ? 's' : ''}
+        {comments?.length} Comment{comments?.length != 1 ? 's' : ''}
       </span>
     </Button>
   );

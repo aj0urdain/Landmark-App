@@ -136,17 +136,28 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
       <div className="absolute top-0 left-0 w-full h-full z-10 rounded-xl overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-background group-hover:opacity-90 opacity-100 transition-opacity duration-300 via-background/95 to-background/90 z-10" />
 
-        {(latestAnnouncement?.cover_image ?? latestNews?.cover_image) && (
+        {latestAnnouncement?.cover_image ? (
           <Image
-            src={
-              activeTab === 'announcement'
-                ? (latestAnnouncement?.cover_image ?? '')
-                : (latestNews?.cover_image ?? '')
-            }
+            src={latestAnnouncement.cover_image}
             alt="Department News"
             fill
             sizes="250px"
-            priority
+            className="object-cover rounded-xl"
+          />
+        ) : latestNews?.cover_image ? (
+          <Image
+            src={latestNews.cover_image}
+            alt="Department News"
+            fill
+            sizes="250px"
+            className="object-cover rounded-xl"
+          />
+        ) : (
+          <Image
+            src="/images/default-news-cover.png"
+            alt="Department News"
+            fill
+            sizes="250px"
             className="object-cover rounded-xl"
           />
         )}

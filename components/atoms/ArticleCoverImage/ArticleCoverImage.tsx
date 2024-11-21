@@ -35,6 +35,7 @@ const ArticleCoverImage = ({
 
   // Query for buckets
   const { data: buckets } = useQuery({
+    enabled: isOpen,
     queryKey: ['storage-buckets'],
     queryFn: async () => {
       const { data, error } = await supabase.storage.listBuckets();

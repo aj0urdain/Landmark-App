@@ -10,7 +10,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { userProfileOptions } from '@/types/userProfileTypes';
 import { useUserProfile } from '@/hooks/useUserProfile';
 
-const ArticleReactions = ({ article }: { article: Article }) => {
+const ArticleReactions = ({ articleId }: { articleId: number }) => {
+  if (articleId) return null;
+
   const queryClient = useQueryClient();
   const { data: currentUser } = useQuery(userProfileOptions);
   const currentUserId = currentUser?.id;
