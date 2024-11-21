@@ -7,12 +7,12 @@ const routeAccess = {
   '/admin': ['Technology'],
   '/create': ['Technology'],
   '/sandbox': ['Technology'],
-  '/events': ['Technology'],
+  '/events': [],
   '/tasks': ['Technology'],
-  '/news': ['Technology'],
+  '/news': [],
   '/wiki': [],
   '/properties': ['Technology'],
-  '/updates': ['Technology'],
+  '/updates': [],
 };
 
 type Department =
@@ -34,7 +34,7 @@ export function AccessControl({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && userProfile) {
-      const requiredAccess = routeAccess[pathname as keyof typeof routeAccess] ?? [];
+      const requiredAccess = routeAccess[pathname as keyof typeof routeAccess];
       const userDepartments = userProfile.departments ?? [];
 
       const access =

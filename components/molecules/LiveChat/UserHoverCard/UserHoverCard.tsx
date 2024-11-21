@@ -60,7 +60,7 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
       <Portal>
         <HoverCardContent
-          className="z-[9999] w-80 animate-slide-up-fade-in overflow-y-visible p-0"
+          className="z-[9999] w-96 animate-slide-up-fade-in overflow-y-visible p-0"
           align="start"
           side="top"
           sideOffset={15}
@@ -105,7 +105,7 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
             <Link
               href={`/wiki/people/${String(user.first_name)}-${String(user.last_name)}`}
               onClick={handleNameClick}
-              className="absolute bottom-0 right-0 w-1/3 cursor-pointer"
+              className="absolute bottom-0 right-2 w-1/3 cursor-pointer"
             >
               {user.profile_picture ? (
                 <Image
@@ -113,7 +113,11 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
                   alt={String(user.first_name)}
                   width={200}
                   height={200}
-                  className="rounded-r-xl object-fill"
+                  className="rounded-r-xl object-fill shadow-2xl"
+                  style={{
+                    // drop a shadow on the top of the image
+                    boxShadow: '0px -10px 10px 0px rgba(0, 0, 0, 0.1)',
+                  }}
                 />
               ) : (
                 <div className="h-full w-full rounded-r-xl bg-muted" />
