@@ -34,7 +34,7 @@ export function AccessControl({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && userProfile) {
-      const requiredAccess = routeAccess[pathname as keyof typeof routeAccess];
+      const requiredAccess = routeAccess[pathname as keyof typeof routeAccess] ?? [];
       const userDepartments = userProfile.departments ?? [];
 
       const access =
