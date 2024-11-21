@@ -27,6 +27,153 @@ export interface Database {
         };
         Relationships: [];
       };
+      article_comment_reactions: {
+        Row: {
+          comment_id: string | null;
+          created_at: string;
+          id: number;
+          react_type: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          comment_id?: string | null;
+          created_at?: string;
+          id?: number;
+          react_type?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          comment_id?: string | null;
+          created_at?: string;
+          id?: number;
+          react_type?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'article_comment_reactions_comment_id_fkey';
+            columns: ['comment_id'];
+            isOneToOne: false;
+            referencedRelation: 'article_comments';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_comment_reactions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_comment_reactions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      article_comments: {
+        Row: {
+          article_id: number;
+          comment: string;
+          created_at: string | null;
+          created_by: string | null;
+          deleted: boolean;
+          edit_history: Json | null;
+          id: string;
+          parent_id: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          article_id: number;
+          comment: string;
+          created_at?: string | null;
+          created_by?: string | null;
+          deleted?: boolean;
+          edit_history?: Json | null;
+          id?: string;
+          parent_id?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          article_id?: number;
+          comment?: string;
+          created_at?: string | null;
+          created_by?: string | null;
+          deleted?: boolean;
+          edit_history?: Json | null;
+          id?: string;
+          parent_id?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'article_comments_article_id_fkey';
+            columns: ['article_id'];
+            isOneToOne: false;
+            referencedRelation: 'articles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_comments_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_comments_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_comments_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: false;
+            referencedRelation: 'comments';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      article_reactions: {
+        Row: {
+          created_at: string | null;
+          id: number;
+          reaction_type: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: number;
+          reaction_type: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: number;
+          reaction_type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'article_reactions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_reactions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       articles: {
         Row: {
           article_type: string | null;
@@ -42,7 +189,6 @@ export interface Database {
           featured: boolean | null;
           id: number;
           public: boolean;
-          reactions: Json | null;
           title: string | null;
           updated_at: string | null;
           viewer_ids: string[] | null;
@@ -62,7 +208,6 @@ export interface Database {
           featured?: boolean | null;
           id?: number;
           public?: boolean;
-          reactions?: Json | null;
           title?: string | null;
           updated_at?: string | null;
           viewer_ids?: string[] | null;
@@ -82,7 +227,6 @@ export interface Database {
           featured?: boolean | null;
           id?: number;
           public?: boolean;
-          reactions?: Json | null;
           title?: string | null;
           updated_at?: string | null;
           viewer_ids?: string[] | null;
