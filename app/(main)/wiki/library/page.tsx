@@ -23,6 +23,7 @@ const categorizedItems = {
       description: 'Access all of our portfolios',
       href: '/wiki/library/portfolios',
       count: '172 portfolios',
+      disabled: true,
     },
     {
       title: 'Portfolio Magazines',
@@ -30,6 +31,7 @@ const categorizedItems = {
       description: 'Access our collection of portfolio magazines and publications',
       href: '/wiki/library/portfolio-magazines',
       count: '172 magazines',
+      disabled: true,
     },
     {
       title: 'Portfolio Results',
@@ -37,6 +39,7 @@ const categorizedItems = {
       description: 'Access our collection of portfolio results',
       href: '/wiki/library/portfolio-results',
       count: '172 results',
+      disabled: true,
     },
   ],
   assets: [
@@ -46,6 +49,7 @@ const categorizedItems = {
       description: 'Document templates for various business needs',
       href: '/wiki/library/templates',
       count: '24 templates',
+      disabled: true,
     },
     {
       title: 'Images',
@@ -53,6 +57,7 @@ const categorizedItems = {
       description: 'Property images, logos, and marketing assets',
       href: '/wiki/library/images',
       count: '1.2k images',
+      disabled: true,
     },
     {
       title: 'Handbooks',
@@ -60,6 +65,7 @@ const categorizedItems = {
       description: 'Company manuals, guides, and documentation',
       href: '/wiki/library/handbooks',
       count: '12 handbooks',
+      disabled: true,
     },
   ],
   insights: [
@@ -69,6 +75,7 @@ const categorizedItems = {
       description: 'Access all of our industry reports',
       href: '/wiki/library/reports',
       count: '172 reports',
+      disabled: true,
     },
     {
       title: 'Snapshots',
@@ -76,6 +83,7 @@ const categorizedItems = {
       description: 'Market snapshots and industry reports',
       href: '/wiki/library/snapshots',
       count: '45 reports',
+      disabled: true,
     },
   ],
   other: [
@@ -85,6 +93,7 @@ const categorizedItems = {
       description: 'Historical documents and archived materials',
       href: '/wiki/library/archive',
       count: '200+ files',
+      disabled: true,
     },
   ],
 };
@@ -100,12 +109,13 @@ export default function LibraryPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {items.map((item) => (
-              <Link href={item.href} key={item.title}>
+              <Link href={item.disabled ? '/updates' : item.href} key={item.title}>
                 <Card
                   className={cn(
                     'transition-all p-6 flex flex-col justify-between h-52 cursor-pointer group',
                     'hover:shadow-lg hover:-translate-y-1',
                     'border-muted hover:border-primary',
+                    item.disabled && 'cursor-not-allowed opacity-50',
                   )}
                 >
                   <div className="flex flex-col gap-4">

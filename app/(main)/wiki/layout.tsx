@@ -34,6 +34,7 @@ export const wikiLinks = [
     name: 'Learn',
     icon: GraduationCap,
     href: '/wiki/learn',
+    disabled: true,
   },
 ];
 
