@@ -133,7 +133,7 @@ export interface Database {
             foreignKeyName: 'article_comments_parent_id_fkey';
             columns: ['parent_id'];
             isOneToOne: false;
-            referencedRelation: 'comments';
+            referencedRelation: 'article_comments';
             referencedColumns: ['id'];
           },
         ];
@@ -1519,6 +1519,123 @@ export interface Database {
           role_name?: string;
         };
         Relationships: [];
+      };
+      route_access: {
+        Row: {
+          created_at: string;
+          department_id: number | null;
+          id: string;
+          role_id: number | null;
+          route_id: string;
+          team_id: number | null;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          department_id?: number | null;
+          id?: string;
+          role_id?: number | null;
+          route_id: string;
+          team_id?: number | null;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          department_id?: number | null;
+          id?: string;
+          role_id?: number | null;
+          route_id?: string;
+          team_id?: number | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'route_access_department_id_fkey';
+            columns: ['department_id'];
+            isOneToOne: false;
+            referencedRelation: 'departments';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'route_access_role_id_fkey';
+            columns: ['role_id'];
+            isOneToOne: false;
+            referencedRelation: 'roles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'route_access_route_id_fkey';
+            columns: ['route_id'];
+            isOneToOne: false;
+            referencedRelation: 'route_permissions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'route_access_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'route_access_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'route_access_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      route_permissions: {
+        Row: {
+          created_at: string;
+          developing: boolean | null;
+          icon: string | null;
+          id: string;
+          label: string;
+          parent_path: string | null;
+          path: string;
+          sort_order: number | null;
+          visible: boolean | null;
+        };
+        Insert: {
+          created_at?: string;
+          developing?: boolean | null;
+          icon?: string | null;
+          id?: string;
+          label: string;
+          parent_path?: string | null;
+          path: string;
+          sort_order?: number | null;
+          visible?: boolean | null;
+        };
+        Update: {
+          created_at?: string;
+          developing?: boolean | null;
+          icon?: string | null;
+          id?: string;
+          label?: string;
+          parent_path?: string | null;
+          path?: string;
+          sort_order?: number | null;
+          visible?: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'route_permissions_parent_path_fkey';
+            columns: ['parent_path'];
+            isOneToOne: false;
+            referencedRelation: 'route_permissions';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       states: {
         Row: {
