@@ -27,14 +27,14 @@ interface NavigationProps {
 }
 
 const links = [
-  // {
-  //   href: '/admin',
-  //   icon: ShieldCheck,
-  //   label: 'Admin',
-  //   access: ['Technology, Senior Leadership'],
-  //   comingSoon: true,
-  //   requiredAccess: ['Technology'],
-  // },
+  {
+    href: '/admin',
+    icon: ShieldCheck,
+    label: 'Admin',
+    access: [],
+    comingSoon: true,
+    requiredAccess: [],
+  },
   // {
   //   href: '/create',
   //   icon: WandSparkles,
@@ -51,7 +51,7 @@ const links = [
   //   comingSoon: true,
   //   requiredAccess: ['Technology'],
   // },
-  // { type: 'separator' },
+  { type: 'separator' },
 
   {
     href: '/dashboard',
