@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { List, PackagePlus, Pyramid, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
+import { LandmarkLogo } from '@/components/atoms/LandmarkLogo/LandmarkLogo';
 
 export default function UpdatesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -65,7 +66,7 @@ export default function UpdatesPage() {
     <Card className="h-full w-full p-6">
       <CardHeader className="mb-6 p-4">
         <div className="flex items-center gap-2 mb-2">
-          <Pyramid className="w-8 h-8" />
+          <LandmarkLogo className="w-6 h-6" />
           <h1 className="text-3xl font-bold">Landmark Updates</h1>
         </div>
         <p className="text-muted-foreground">
