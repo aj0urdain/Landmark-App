@@ -116,6 +116,16 @@ const TemplatesPage = () => {
         <div className="rounded-md border">
           <FolderTree structure={folderStructure} />
         </div>
+        <div className="flex gap-2">
+          <Button>A</Button>
+          <Button>B</Button>
+          <Button>C</Button>
+          <Button>D</Button>
+          <Button>E</Button>
+        </div>
+
+        {/* Add filtering system, add script to parse all files inside bucket and create categories, add script to do fuzzy search on files */}
+        {/* Attempt to get sharepoint API to automatically sync files to bucket */}
       </Card>
     </div>
   );

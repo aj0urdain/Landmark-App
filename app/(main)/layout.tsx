@@ -14,6 +14,7 @@ import { Inbox } from '@/components/molecules/Inbox/Inbox';
 import { AccessControl } from '@/components/atoms/AccessControl/AccessControl';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { RoutePermissionControl } from '@/components/atoms/RoutePermissionControl/RoutePermissionControl';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -59,7 +60,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <ScrollArea className="flex-1">
             <main className="mx-4 flex h-full w-full items-center justify-center py-4 2xl:mx-auto">
               <div className="h-full w-full max-w-6xl">
-                <AccessControl>{children}</AccessControl>
+                <RoutePermissionControl>{children}</RoutePermissionControl>
               </div>
             </main>
           </ScrollArea>

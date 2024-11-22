@@ -40,7 +40,7 @@ const WikiPage = () => {
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">
             <Image
-              src="https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/staff_images/BR-Partners-Photo-1.jpg?t=2024-10-01T04%3A13%3A33.044Z"
+              src="https://dodfdwvvwmnnlntpnrec.supabase.co/storage/v1/object/public/wiki_images/home/BR-Partners-Photo.jpg"
               alt="Burgess Rawson Partners"
               width={1500}
               height={1500}
@@ -167,6 +167,50 @@ const WikiPage = () => {
                 Specialists across 17 key property categories, including fast food, early
                 education, medical facilities, and industrial properties. Expert guidance
                 for blue-chip tenant investments.
+              </p>
+              <a href="#" className="text-primary hover:underline">
+                Learn more
+              </a>
+            </div>
+          </Card>
+          <Card className="p-6">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl font-bold text-foreground">First Time Buyers</h2>
+              <p className="text-muted-foreground">
+                Dedicated support for first-time commercial property investors. Our
+                experts provide guidance on market entry, risk assessment, and investment
+                strategies to help you make informed decisions.
+              </p>
+              <a href="#" className="text-primary hover:underline">
+                Learn more
+              </a>
+            </div>
+          </Card>
+          <Card className="p-6">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl font-bold text-foreground">
+                Institutional Investment
+              </h2>
+              <p className="text-muted-foreground">
+                Specialized services for institutional investors seeking premium
+                commercial assets. Our team provides comprehensive market analysis,
+                portfolio optimization, and strategic investment opportunities across
+                Australia.
+              </p>
+              <a href="#" className="text-primary hover:underline">
+                Learn more
+              </a>
+            </div>
+          </Card>
+          <Card className="p-6">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl font-bold text-foreground">
+                Asian Investment Services
+              </h2>
+              <p className="text-muted-foreground">
+                Specialized support for Asian investors in Australian commercial property.
+                Our multilingual team offers cultural understanding, market insights, and
+                end-to-end transaction support for seamless cross-border investments.
               </p>
               <a href="#" className="text-primary hover:underline">
                 Learn more

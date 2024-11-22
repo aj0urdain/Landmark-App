@@ -5,15 +5,22 @@ import Providers from '@/providers/providers';
 import { metroSans } from '@/utils/font';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from 'sonner';
+import type { Metadata } from 'next';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : 'http://localhost:3000';
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'Landmark | Burgess Rawson',
-  description: 'Created by Aaron J. Girton.',
+  title: {
+    template: '%s › Landmark',
+    default: 'Landmark › Burgess Rawson',
+  },
+  description: 'Burgess Rawson internal platform for commercial real estate operations.',
+  keywords: ['Burgess Rawson', 'commercial real estate', 'intranet', 'internal platform'],
+  authors: [{ name: 'Aaron J. Girton' }],
+  creator: 'Aaron J. Girton - Burgess Rawson Technology Department',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
