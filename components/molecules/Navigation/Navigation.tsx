@@ -1,174 +1,76 @@
 'use client';
 
-import { NavLink } from '@/components/atoms/NavLink/NavLink';
-import {
-  Home,
-  Newspaper,
-  CheckSquare,
-  Box,
-  HousePlus,
-  ShieldCheck,
-  FileCode,
-  BookText,
-  LayoutDashboard,
-  CalendarRange,
-  WandSparkles,
-  MessageCircle,
-} from 'lucide-react';
 import React from 'react';
-
+import { useRoutePermissions } from '@/queries/access/hooks';
+import { useQuery } from '@tanstack/react-query';
+import { userProfileOptions } from '@/types/userProfileTypes';
 import { Separator } from '@/components/ui/separator';
-
-import { LibraryBig, Component, MapPin, Users, GraduationCap } from 'lucide-react';
+import { NavLink } from '@/components/atoms/NavLink/NavLink';
 import { FeedbackButton } from '@/components/molecules/Feedback/FeedbackButton/FeedbackButton';
+import { getIconFromString } from '@/utils/icons/icons';
+import { useUser } from '@/queries/users/hooks';
 
 interface NavigationProps {
   isCollapsed: boolean;
 }
 
-const links = [
-  {
-    href: '/admin',
-    icon: ShieldCheck,
-    label: 'Admin',
-    access: [],
-    comingSoon: true,
-    requiredAccess: [],
-  },
-  // {
-  //   href: '/create',
-  //   icon: WandSparkles,
-  //   label: 'Create',
-  //   access: ['Technology'],
-  //   comingSoon: true,
-  //   requiredAccess: ['Technology'],
-  // },
-  // {
-  //   href: '/sandbox',
-  //   icon: Box,
-  //   label: 'Sandbox',
-  //   access: ['Technology'],
-  //   comingSoon: true,
-  //   requiredAccess: ['Technology'],
-  // },
-  { type: 'separator' },
-
-  {
-    href: '/dashboard',
-    icon: LayoutDashboard,
-    label: 'Dashboard',
-    access: [],
-    comingSoon: false,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/news',
-    icon: Newspaper,
-    label: 'News',
-    access: [],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/events',
-    icon: CalendarRange,
-    label: 'Events',
-    access: [],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/chat',
-    icon: MessageCircle,
-    label: 'Chat',
-    access: [],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/sandbox',
-    icon: Box,
-    label: 'Sandbox',
-    access: ['Technology'],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-  {
-    href: '/tasks',
-    icon: CheckSquare,
-    label: 'Tasks',
-    access: [],
-    comingSoon: true,
-    requiredAccess: [''],
-  },
-  // {
-  //   href: '/properties',
-  //   icon: HousePlus,
-  //   label: 'Properties',
-  //   access: [],
-  //   comingSoon: true,
-  //   requiredAccess: ['Technology'],
-  // },
-  { type: 'separator' },
-
-  {
-    href: '/wiki',
-    icon: BookText,
-    label: 'Wiki',
-    access: [],
-    comingSoon: false,
-    requiredAccess: [],
-    subsections: [
-      { name: 'Home', href: '/wiki', icon: Home },
-      { name: 'Library', href: '/wiki/library', icon: LibraryBig },
-      { name: 'Departments', href: '/wiki/departments', icon: Component },
-      { name: 'Branches', href: '/wiki/branches', icon: MapPin },
-      { name: 'People', href: '/wiki/people', icon: Users },
-      {
-        name: 'Learn',
-        href: '/wiki/learn',
-        icon: GraduationCap,
-        access: [],
-        comingSoon: true,
-        requiredAccess: [''],
-      },
-    ],
-  },
-  { type: 'separator' },
-  {
-    href: '/updates',
-    icon: FileCode,
-    label: ' Updates',
-    access: [],
-    comingSoon: true,
-    requiredAccess: ['Technology'],
-  },
-];
-
 export const Navigation = React.memo(function Navigation({
   isCollapsed,
 }: NavigationProps) {
+  const { data: routePermissions, isLoading } = useRoutePermissions();
+  const { data: userProfile } = useQuery(userProfileOptions);
+  const { data: user } = useUser(userProfile?.id ?? '');
+
+  if (isLoading || !routePermissions || !userProfile || !user) return null;
+
+  const mainRoutes = routePermissions
+    .filter((route) => route.visible && !route.parent_path)
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
   return (
     <nav className="flex w-full flex-col gap-2 pt-4">
-      {links.map((link, index: number) => {
-        if (link.type === 'separator') {
-          return <Separator key={`separator-${String(index)}`} className="my-4" />;
+      {mainRoutes.map((route) => {
+        if (!route.path) {
+          return <Separator key={`separator-${route.id}`} className="my-4" />;
         }
+
+        const subsections = routePermissions
+          .filter((r) => r.parent_path === route.id)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+        const Icon = getIconFromString(route.icon ?? '');
+
         return (
-          <NavLink
-            key={link.href}
-            href={link.href ?? ''}
-            icon={link.icon ?? Home}
-            isCollapsed={isCollapsed}
-            comingSoon={link.comingSoon}
-            subsections={link.subsections}
-            requiredAccess={link.requiredAccess}
-          >
-            {link.label}
-          </NavLink>
+          <>
+            <NavLink
+              key={route.path}
+              href={route.path}
+              icon={Icon}
+              routeId={route.id}
+              userId={user.id}
+              isCollapsed={isCollapsed}
+              comingSoon={route.developing ?? false}
+              subsections={
+                subsections.length > 0
+                  ? subsections.map((sub) => ({
+                      name: sub.label,
+                      href: sub.path,
+                      icon: getIconFromString(sub.icon ?? ''),
+                      comingSoon: sub.developing ?? false,
+                      routeId: sub.id,
+                      userId: user.id,
+                    }))
+                  : undefined
+              }
+            >
+              {route.label}
+            </NavLink>
+            {(route.path === '/wiki' || route.path === '/admin') && (
+              <Separator className="my-4" />
+            )}
+          </>
         );
       })}
-      {/* <Separator className="my-4" /> */}
       <FeedbackButton isCollapsed={isCollapsed} />
     </nav>
   );

@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { userProfileOptions } from '@/types/userProfileTypes';
+import { hasDepartmentAccess } from '@/utils/permissions';
 import {
   Tooltip,
   TooltipContent,
@@ -11,9 +14,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ChevronDown, Cpu, Hammer } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { userProfileOptions } from '@/types/userProfileTypes';
-import { hasDepartmentAccess } from '@/utils/permissions';
 
 interface NavLinkProps {
   href: string;
@@ -21,14 +21,16 @@ interface NavLinkProps {
   children: React.ReactNode;
   isCollapsed: boolean;
   comingSoon?: boolean;
+  routeId?: string;
+  userId?: string;
   subsections?: {
     name: string;
     href: string;
     icon: React.ElementType;
     comingSoon?: boolean;
-    requiredAccess?: string[];
+    routeId?: string;
+    userId?: string;
   }[];
-  requiredAccess?: string[];
 }
 
 export const NavLink = React.memo(function NavLink({
@@ -38,7 +40,6 @@ export const NavLink = React.memo(function NavLink({
   isCollapsed,
   comingSoon = false,
   subsections,
-  requiredAccess = [],
 }: NavLinkProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +47,8 @@ export const NavLink = React.memo(function NavLink({
   const pathname = usePathname();
   const { data: userProfile } = useQuery(userProfileOptions);
 
-  const hasAccess = hasDepartmentAccess(userProfile?.departments, requiredAccess);
-  const isDisabled = comingSoon && !hasAccess;
+  const isTechnology = hasDepartmentAccess(userProfile?.departments, ['Technology']);
+  const isClickable = !comingSoon || isTechnology;
 
   const isActive =
     pathname === href ||
@@ -70,10 +71,10 @@ export const NavLink = React.memo(function NavLink({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                e.stopPropagation(); // Add this line
+                e.stopPropagation();
                 setIsExpanded(!isExpanded);
               }}
-              className="relative z-10 ml-auto" // Add relative and z-10
+              className="relative z-10 ml-auto"
             >
               <ChevronDown
                 className={cn(
@@ -98,24 +99,38 @@ export const NavLink = React.memo(function NavLink({
           ? 'bg-primary text-primary-foreground'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
     isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'px-4 mx-4',
-    isDisabled && 'opacity-50 cursor-not-allowed',
+    comingSoon && 'opacity-50 cursor-not-allowed',
     isLoading && 'animate-pulse [animation-duration:2s]',
   );
 
   const linkElement = (
     <>
-      {isDisabled ? (
+      {comingSoon ? (
         <TooltipProvider delayDuration={100}>
           <Tooltip>
             <TooltipTrigger asChild>
               <div
-                className={`${linkClass} group transition-all duration-200 ease-in-out`}
+                className={cn(linkClass, 'group transition-all duration-200 ease-in-out')}
               >
-                {linkContent}
+                {isClickable ? (
+                  <Link
+                    href={href}
+                    className="flex w-full items-center"
+                    onClick={(e) => {
+                      if (!isActive) {
+                        e.preventDefault();
+                        setIsLoading(true);
+                        router.push(href);
+                      }
+                    }}
+                  >
+                    {linkContent}
+                  </Link>
+                ) : (
+                  linkContent
+                )}
                 {!isCollapsed && (
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    {/* <Construction className="h-4 w-4" /> */}
-
                     <Hammer className="h-4 w-4 group-hover:animate-spin" />
                   </div>
                 )}
@@ -132,7 +147,7 @@ export const NavLink = React.memo(function NavLink({
                 <p className="animated-underline-1">
                   {isCollapsed
                     ? `${String(children)} is under construction by`
-                    : 'Under construction by'}{' '}
+                    : 'Under construction by'}
                   <span className="font-bold"> @Aaron!</span>
                 </p>
               </Link>
@@ -155,10 +170,7 @@ export const NavLink = React.memo(function NavLink({
         </Link>
       )}
       {!isCollapsed && subsections && isExpanded && (
-        <div
-          key={String(isExpanded)}
-          className="ml-3 mt-1 animate-slide-down-fade-in space-y-1"
-        >
+        <div className="ml-3 mt-1 animate-slide-down-fade-in space-y-1">
           {subsections.map((subsection) => (
             <NavLink
               key={subsection.href}
@@ -166,7 +178,8 @@ export const NavLink = React.memo(function NavLink({
               icon={subsection.icon}
               isCollapsed={isCollapsed}
               comingSoon={subsection.comingSoon}
-              requiredAccess={subsection.requiredAccess}
+              routeId={subsection.routeId}
+              userId={subsection.userId}
             >
               <span className="text-xs">{subsection.name}</span>
             </NavLink>
@@ -176,7 +189,7 @@ export const NavLink = React.memo(function NavLink({
     </>
   );
 
-  if (isCollapsed && !isDisabled) {
+  if (isCollapsed && !comingSoon) {
     return (
       <TooltipProvider delayDuration={0}>
         <Tooltip>

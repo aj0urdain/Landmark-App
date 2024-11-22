@@ -22,6 +22,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Logo } from '@/components/atoms/Logo/Logo';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import { LandmarkLogo } from '@/components/atoms/LandmarkLogo/LandmarkLogo';
 
 export function UserMenu() {
   const router = useRouter();
@@ -84,7 +85,7 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <div className="flex flex-col items-start p-2 text-muted-foreground">
             <div className="flex items-center gap-1">
-              <Pyramid className="h-3 w-3" />
+              <LandmarkLogo className="h-2.5 w-auto" />
               <p className="text-sm font-bold">Landmark</p>
             </div>
             <p className="text-[0.6rem]">v0.4.2</p>
