@@ -139,7 +139,7 @@ export default function DashboardEventsPreview() {
         </Link>
       </div>
       <CardContent className="flex flex-col gap-6 pt-6 px-0">
-        <div className="grid w-full grid-cols-7 gap-2">
+        <div className="grid w-full grid-cols-4 sm:grid-cols-7 gap-2">
           {weekDays.map((day, index) => (
             <StaggeredAnimation
               baseDelay={0}
@@ -190,7 +190,7 @@ export default function DashboardEventsPreview() {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {isLoading ? (
             <Card className="p-4">
               <CardTitle>Loading events...</CardTitle>

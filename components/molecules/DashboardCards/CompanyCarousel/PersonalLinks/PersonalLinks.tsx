@@ -9,6 +9,14 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { userProfileOptions } from '@/types/userProfileTypes';
 import { Separator } from '@/components/ui/separator';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { ChevronsUpDown } from 'lucide-react';
 
 interface LinkType {
   id: number;
@@ -152,6 +160,8 @@ const PersonalLinks = () => {
     {} as Record<string, LinkType[]>,
   );
 
+  const [selectedTab, setSelectedTab] = useState<string>('all');
+
   return (
     <Card className="flex h-full w-full items-center flex-col overflow-hidden">
       {categoriesLoading || linksLoading ? (
@@ -164,7 +174,50 @@ const PersonalLinks = () => {
             <div className="flex items-center gap-1 text-muted-foreground/80">
               <Link2 className="h-4 w-4" />
             </div>
-            <div className="flex items-center gap-1">
+
+            {/* Mobile Dropdown */}
+            <div className="sm:hidden w-full flex justify-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-[150px] justify-between text-xs capitalize"
+                  >
+                    {categories.find((c) => c.name === selectedTab)?.name || 'Me'}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[150px]">
+                  <TabsTrigger value="all" className="w-full">
+                    <DropdownMenuItem
+                      className="text-xs capitalize"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      Me
+                    </DropdownMenuItem>
+                  </TabsTrigger>
+                  {categories
+                    .sort((a, b) => getCategoryOrder(a.name) - getCategoryOrder(b.name))
+                    .map((category) => (
+                      <TabsTrigger
+                        key={category.id}
+                        value={category.name}
+                        className="w-full"
+                      >
+                        <DropdownMenuItem
+                          className="text-xs capitalize"
+                          onSelect={(e) => e.preventDefault()}
+                        >
+                          {category.name}
+                        </DropdownMenuItem>
+                      </TabsTrigger>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Desktop Tabs */}
+            <div className="hidden sm:flex items-center gap-1">
               {categories.length > 0 && (
                 <StaggeredAnimation index={0} baseDelay={0.1} incrementDelay={0.05}>
                   <TabsTrigger key="all" value="all" className="text-xs capitalize">
@@ -213,7 +266,7 @@ const PersonalLinks = () => {
 
                         <Separator className="bg-muted/50" />
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {categoryLinks.map((link, index) => (
                           <StaggeredAnimation
                             key={link.id}
@@ -234,7 +287,7 @@ const PersonalLinks = () => {
               .sort((a, b) => getCategoryOrder(a.name) - getCategoryOrder(b.name))
               .map((category) => (
                 <TabsContent key={category.id} value={category.name} className="m-0 p-6">
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {(allLinksByCategory[category.name] || []).map((link, index) => (
                       <StaggeredAnimation
                         key={link.id}

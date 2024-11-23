@@ -133,8 +133,8 @@ export default function AuctionCountdown() {
   };
 
   return (
-    <Card className="flex h-full w-full items-center justify-between select-none">
-      <div className="flex h-full w-1/2 flex-col items-start justify-between p-6">
+    <Card className="flex h-full max-h-full w-full items-center justify-between select-none">
+      <div className="flex h-full w-full sm:w-1/2 flex-col items-start justify-between p-6">
         <Link href="/events/auctions" className="group">
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
             <Gavel className="h-4 w-4" />
@@ -197,7 +197,7 @@ export default function AuctionCountdown() {
         </div>
       </div>
 
-      <div className="flex h-full w-1/2 items-center justify-center p-4">
+      <div className="h-full items-center justify-center p-4 hidden sm:flex sm:w-1/2">
         <div className="flex items-center justify-center">
           {!isLoading && selectedDate && monthDate && renderCalendarMonth}
         </div>
