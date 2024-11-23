@@ -164,3 +164,14 @@ export async function toggleArticleCommentReaction(
     throw error;
   }
 }
+
+export async function incrementArticleView(articleId: number) {
+  const supabase = createBrowserClient();
+
+  const { data, error } = await supabase.rpc('increment_article_view', {
+    article_id_param: articleId,
+  });
+
+  if (error) throw new Error(error.message);
+  return data;
+}

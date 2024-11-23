@@ -1,7 +1,11 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getArticleCommentReactions, getArticleComments } from './api';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import {
+  getArticleCommentReactions,
+  getArticleComments,
+  incrementArticleView,
+} from './api';
 
 export const articleKeys = {
   all: ['articles'] as const,
@@ -27,5 +31,19 @@ export function useArticleCommentReactions(commentId: string) {
   return useQuery({
     queryKey: articleKeys.commentReactions(commentId),
     queryFn: () => getArticleCommentReactions(commentId),
+  });
+}
+
+export function useIncrementArticleView() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: incrementArticleView,
+    onSuccess: (data, articleId) => {
+      // Invalidate and refetch article data to update view count
+      queryClient.invalidateQueries({
+        queryKey: ['article', articleId.toString()],
+      });
+    },
   });
 }

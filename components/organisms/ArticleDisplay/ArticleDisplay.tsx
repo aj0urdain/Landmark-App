@@ -24,15 +24,22 @@ import ArticleAuthors from '@/components/molecules/ArticleAuthors/ArticleAuthors
 import ArticlePublic from '@/components/atoms/ArticlePublic/ArticlePublic';
 import ArticleAuthorisation from '@/components/atoms/ArticleAuthorisation/ArticleAuthorisation';
 import CommentSection from '@/components/organisms/CommentSection/CommentSection';
+import { useIncrementArticleView } from '@/queries/articles/hooks';
 
 const ArticleDisplay = ({ articleId }: { articleId: string }) => {
   const [editing, setEditing] = useState(false);
+  const incrementViewMutation = useIncrementArticleView();
 
   const commentSectionRef = useRef<HTMLDivElement>(null);
   const articleTitleRef = useRef<HTMLDivElement>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Increment view count when page loads
+    incrementViewMutation.mutate(articleId as unknown as number);
+  }, [articleId]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['article', articleId],

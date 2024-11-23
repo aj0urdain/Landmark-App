@@ -206,14 +206,14 @@ export const CommentItem = ({ comment, commentMap }: CommentItemProps) => {
                 </div>
               )}
             </div>
-            <p className="text-xs group-hover/comment:text-muted-foreground text-muted flex items-center ml-2 transition-all select-none">
+            <div className="text-xs group-hover/comment:text-muted-foreground text-muted flex items-center ml-2 transition-all select-none">
               <div className="hidden group-hover/comment:flex">
                 <Dot size="tiny" className="bg-muted-foreground animate-pulse" />
               </div>
-              <div className="flex items-center group-hover/comment:translate-x-2 transition-all">
+              <p className="flex items-center group-hover/comment:translate-x-2 transition-all">
                 <ReactTimeAgo date={new Date(comment.created_at)} />
-              </div>
-            </p>
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-2 w-fit mb-2">
