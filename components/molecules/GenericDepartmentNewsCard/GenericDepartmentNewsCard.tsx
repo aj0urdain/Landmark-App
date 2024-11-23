@@ -206,7 +206,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
 
       <div className="flex flex-col justify-between w-full h-full z-20 cursor-pointer">
         {/* Article Date and Authors */}
-        <div className="flex gap-2 items-center">
+        <div className="flex sm:flex-row flex-col gap-2 sm:items-center items-start">
           <Link href={`/events`} passHref>
             <p className="text-xs text-muted-foreground animated-underline-1 w-fit flex items-center gap-1">
               <Calendar className="h-2 w-2" />
@@ -216,7 +216,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
               )}
             </p>
           </Link>
-          <ChevronsRight className="h-3 w-3 text-muted-foreground" />
+          <ChevronsRight className="hidden sm:block h-3 w-3 text-muted-foreground" />
           <div className="flex gap-1.5 items-center h-fit">
             {/* Author */}
 

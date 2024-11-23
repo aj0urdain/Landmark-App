@@ -227,12 +227,15 @@ const UserCard = ({
                 {/* Today's Date */}
                 <Link href={`/events`}>
                   <div className="flex items-center gap-1.5 animated-underline-1 w-fit after:bottom-[0.5px]">
-                    <p className="text-xs font-medium text-muted-foreground">
+                    <p className="hidden sm:block text-xs font-medium text-muted-foreground">
                       {currentTime.toLocaleDateString('en-US', {
                         weekday: 'long',
                       })}
                     </p>
-                    <Dot size="tiny" className="bg-muted-foreground animate-pulse" />
+                    <Dot
+                      size="tiny"
+                      className="bg-muted-foreground animate-pulse hidden sm:block"
+                    />
                     <p className="text-xs text-muted-foreground">
                       {currentTime.toLocaleDateString('en-US', {
                         month: 'long',
@@ -277,14 +280,13 @@ const UserCard = ({
         )}
       </div>
       <div
-        className={`absolute h-full flex items-end z-20 ${
-          isWelcome ? 'right-4 top-4' : 'right-4 top-4'
-        }
-        ${
+        className={cn(
+          'absolute h-full flex items-end z-20',
+          isWelcome ? '-right-2 lg:right-4 top-4' : 'right-0 lg:right-4 top-4',
           (String(user?.first_name) + String(user?.last_name)).length > 16 && isWelcome
-            ? '-right-2'
-            : ''
-        }`}
+            ? '-right-4'
+            : '',
+        )}
       >
         {user?.profile_picture ? (
           <Link
