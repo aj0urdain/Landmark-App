@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { BlockEditor } from '@/components/atoms/TipTap/components/BlockEditor';
 import { EditorHeader } from '@/components/atoms/TipTap/components/BlockEditor/components/EditorHeader';

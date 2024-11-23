@@ -1,6 +1,7 @@
 import { CommentWithReactions } from '@/queries/articles/types';
 import { CommentItem } from '@/components/molecules/CommentItem/CommentItem';
 import { Separator } from '@/components/ui/separator';
+import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
 
 const organizeComments = (
   comments: CommentWithReactions[],
@@ -110,9 +111,11 @@ export const CommentThread = ({ comments }: { comments: CommentWithReactions[] }
         <div key={comment.id} className="">
           <CommentItem comment={comment} commentMap={commentMap} />
           {comment.replies && comment.replies.length > 0 && (
-            <div className="ml-8 space-y-4">
-              {flattenReplies(comment).map((reply) => (
-                <CommentItem key={reply.id} comment={reply} commentMap={commentMap} />
+            <div className="ml-8 space-y-0">
+              {flattenReplies(comment).map((reply, index) => (
+                <StaggeredAnimation index={index} key={reply.id}>
+                  <CommentItem key={reply.id} comment={reply} commentMap={commentMap} />
+                </StaggeredAnimation>
               ))}
             </div>
           )}
