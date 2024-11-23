@@ -28,7 +28,7 @@ export async function getArticleComments(articleId: number) {
   // Transform deleted comments to show placeholder text
   const transformedComments = comments.map((comment) => ({
     ...comment,
-    comment: comment.deleted ? 'This comment has been deleted' : comment.comment,
+    comment: comment.deleted ? 'This comment has been deleted.' : comment.comment,
   }));
 
   return transformedComments;
