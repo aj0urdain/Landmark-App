@@ -29,7 +29,7 @@ export const Navigation = React.memo(function Navigation({
 
   return (
     <nav className="flex w-full flex-col gap-2 pt-4">
-      {mainRoutes.map((route) => {
+      {mainRoutes.map((route, index) => {
         if (!route.path) {
           return <Separator key={`separator-${route.id}`} className="my-4" />;
         }
@@ -43,7 +43,7 @@ export const Navigation = React.memo(function Navigation({
         return (
           <>
             <NavLink
-              key={route.path}
+              key={`navlink-${route.id}-${index}`}
               href={route.path}
               icon={Icon}
               routeId={route.id}

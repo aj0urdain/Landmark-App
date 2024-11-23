@@ -24,6 +24,10 @@ interface UserProfileCardProps {
   nameOnly?: boolean;
   avatarOnly?: boolean;
   textSize?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  groupHovered?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  avatarPopOut?: boolean;
 }
 
 export function UserProfileCard({
@@ -39,6 +43,10 @@ export function UserProfileCard({
   nameOnly = false,
   avatarOnly = false,
   textSize = 'base',
+  groupHovered = false,
+  onMouseEnter,
+  onMouseLeave,
+  avatarPopOut = true,
 }: UserProfileCardProps) {
   const { data: user, isLoading, error } = useUser(id);
 
@@ -72,39 +80,6 @@ export function UserProfileCard({
   if (error) return <div>Error loading user profile</div>;
   if (!user) return null;
 
-  if (avatarOnly) {
-    return (
-      <UserHoverCard userId={id} visible={showHoverCard}>
-        <div className="group/user-profile-card relative">
-          <div
-            className={cn(
-              `border border-muted rounded-full bg-gradient-to-b transition-all from-transparent to-muted group-hover/user-profile-card:border-muted-foreground/50 group-hover/user-profile-card:to-muted-foreground/75 overflow-visible flex items-end justify-center`,
-              avatarSizes[avatarSize],
-              className,
-            )}
-          >
-            {user.profile_picture ? (
-              <div className="relative bottom-0 rounded-full h-full w-full pt-4 bg-yellow-300">
-                <Image
-                  src={user.profile_picture}
-                  alt={`${user.first_name} ${user.last_name}`}
-                  fill
-                  sizes="25px"
-                  className="object-contain scale-150 rounded-b-full absolute pb-[5px]"
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center text-xs font-semibold text-muted-foreground h-full w-full">
-                {user.first_name[0]}
-                {user.last_name[0]}
-              </div>
-            )}
-          </div>
-        </div>
-      </UserHoverCard>
-    );
-  }
-
   return (
     <UserHoverCard userId={id} visible={showHoverCard}>
       {nameOnly ? (
@@ -125,24 +100,33 @@ export function UserProfileCard({
           }`}
         >
           <CardContent
-            className={`${variant == 'minimal' ? 'px-0 py-0' : 'p-4'} border-none`}
+            className={`${variant == 'minimal' ? 'px-0 py-0' : 'p-4'} border-none overflow-visible`}
           >
             <div
-              className={`flex items-end relative space-x-4 ${
-                variant === 'minimal' && !showAvatar ? 'items-center' : ''
-              }`}
+              className={cn(
+                `flex items-end relative overflow-visible`,
+                variant === 'minimal' && !showAvatar ? 'items-center' : '',
+                avatarOnly ? 'space-x-0' : 'space-x-4',
+                !showRoles && 'space-x-2',
+              )}
             >
               {showAvatar && (
                 <Avatar
                   className={cn(
                     `border border-muted bg-gradient-to-b transition-all from-transparent to-muted group-hover:border-muted-foreground/50 group-hover:to-muted-foreground/75 overflow-visible flex items-end justify-center`,
                     avatarSizes[avatarSize],
+                    groupHovered ? 'border-muted-foreground/50' : '',
                   )}
                 >
                   <AvatarImage
                     src={String(user.profile_picture)}
                     alt={`${user.first_name} ${user.last_name}`}
-                    className="absolute object-cover bottom-0 rounded-b-full w-auto h-[140%]"
+                    className={cn(
+                      'rounded-b-full',
+                      avatarPopOut
+                        ? 'h-[150%] absolute bottom-0 w-auto object-cover'
+                        : 'w-full h-full object-contain',
+                    )}
                   />
                   <AvatarFallback>
                     {user.first_name[0]}
@@ -158,6 +142,7 @@ export function UserProfileCard({
                         variant === 'minimal' && !showAvatar ? 'text-xs' : ''
                       }`,
                       textSizes[textSize],
+                      groupHovered ? 'text-foreground' : '',
                     )}
                   >
                     {showName && (
