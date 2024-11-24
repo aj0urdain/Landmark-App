@@ -5,6 +5,9 @@ import {
   getArticleCommentReactions,
   getArticleComments,
   incrementArticleView,
+  getArticleViewers,
+  getArticleReactions,
+  toggleArticleReaction,
 } from './api';
 
 export const articleKeys = {
@@ -12,6 +15,8 @@ export const articleKeys = {
   comments: (articleId: number) => [...articleKeys.all, 'comments', articleId] as const,
   commentReactions: (commentId: string) =>
     [...articleKeys.all, 'commentReactions', commentId] as const,
+  viewers: (articleId: number) => [...articleKeys.all, 'viewers', articleId] as const,
+  reactions: (articleId: number) => [...articleKeys.all, 'reactions', articleId] as const,
 };
 
 export function useArticleComments(articleId: number) {
@@ -43,6 +48,34 @@ export function useIncrementArticleView() {
       // Invalidate and refetch article data to update view count
       queryClient.invalidateQueries({
         queryKey: ['article', articleId.toString()],
+      });
+    },
+  });
+}
+
+export function useArticleViewers(articleId: number) {
+  return useQuery({
+    queryKey: [...articleKeys.all, 'viewers', articleId],
+    queryFn: () => getArticleViewers(articleId),
+  });
+}
+
+export function useArticleReactions(articleId: number) {
+  return useQuery({
+    queryKey: articleKeys.reactions(articleId),
+    queryFn: () => getArticleReactions(articleId),
+  });
+}
+
+export function useToggleArticleReaction(articleId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ reactionType, userId }: { reactionType: string; userId: string }) =>
+      toggleArticleReaction(articleId, reactionType, userId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: articleKeys.reactions(articleId),
       });
     },
   });

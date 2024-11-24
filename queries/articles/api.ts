@@ -175,3 +175,91 @@ export async function incrementArticleView(articleId: number) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function getArticleViewers(articleId: number) {
+  const supabase = createBrowserClient();
+
+  const { data: viewers, error } = await supabase
+    .from('article_views')
+    .select(
+      `
+      id,
+      user_id,
+      view_count,
+      first_viewed_at,
+      last_viewed_at
+    `,
+    )
+    .eq('article_id', articleId)
+    .order('last_viewed_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return viewers;
+}
+
+export async function getArticleReactions(articleId: number) {
+  const supabase = createBrowserClient();
+
+  const { data: reactions, error: reactionsError } = await supabase
+    .from('article_reactions')
+    .select()
+    .eq('article_id', articleId);
+
+  if (reactionsError) throw new Error(reactionsError.message);
+
+  return reactions;
+}
+
+export async function toggleArticleReaction(
+  articleId: number,
+  reactionType: string,
+  userId: string,
+) {
+  const supabase = createBrowserClient();
+
+  try {
+    // First check if user has any reaction for this article
+    const { data: existing, error: checkError } = await supabase
+      .from('article_reactions')
+      .select('*')
+      .eq('article_id', articleId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw new Error(checkError.message);
+    }
+
+    if (existing) {
+      if (existing.react_type === reactionType) {
+        // If clicking the same reaction, delete it
+        const { error: deleteError } = await supabase
+          .from('article_reactions')
+          .delete()
+          .eq('id', existing.id);
+
+        if (deleteError) throw new Error(deleteError.message);
+      } else {
+        // If clicking a different reaction, update it
+        const { error: updateError } = await supabase
+          .from('article_reactions')
+          .update({ react_type: reactionType })
+          .eq('id', existing.id);
+
+        if (updateError) throw new Error(updateError.message);
+      }
+    } else {
+      // If no existing reaction, insert new one
+      const { error: insertError } = await supabase.from('article_reactions').insert({
+        article_id: articleId,
+        react_type: reactionType,
+        user_id: userId,
+      });
+
+      if (insertError) throw new Error(insertError.message);
+    }
+  } catch (error) {
+    console.error('Error in toggleArticleReaction:', error);
+    throw error;
+  }
+}

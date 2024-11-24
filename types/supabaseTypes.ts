@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       app_config: {
@@ -142,19 +142,19 @@ export interface Database {
         Row: {
           created_at: string | null;
           id: number;
-          reaction_type: string;
+          react_type: string;
           user_id: string;
         };
         Insert: {
           created_at?: string | null;
           id?: number;
-          reaction_type: string;
+          react_type: string;
           user_id: string;
         };
         Update: {
           created_at?: string | null;
           id?: number;
-          reaction_type?: string;
+          react_type?: string;
           user_id?: string;
         };
         Relationships: [
@@ -169,6 +169,58 @@ export interface Database {
             foreignKeyName: 'article_reactions_user_id_fkey';
             columns: ['user_id'];
             isOneToOne: true;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      article_views: {
+        Row: {
+          article_id: number | null;
+          created_at: string;
+          first_viewed_at: string;
+          id: number;
+          last_viewed_at: string;
+          user_id: string | null;
+          view_count: number | null;
+        };
+        Insert: {
+          article_id?: number | null;
+          created_at?: string;
+          first_viewed_at?: string;
+          id?: number;
+          last_viewed_at?: string;
+          user_id?: string | null;
+          view_count?: number | null;
+        };
+        Update: {
+          article_id?: number | null;
+          created_at?: string;
+          first_viewed_at?: string;
+          id?: number;
+          last_viewed_at?: string;
+          user_id?: string | null;
+          view_count?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'article_views_article_id_fkey';
+            columns: ['article_id'];
+            isOneToOne: false;
+            referencedRelation: 'articles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_views_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'article_views_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
             referencedRelation: 'user_profiles';
             referencedColumns: ['id'];
           },
@@ -2225,6 +2277,12 @@ export interface Database {
         };
         Returns: Json;
       };
+      increment_article_view: {
+        Args: {
+          article_id_param: number;
+        };
+        Returns: Json;
+      };
       insert_comment: {
         Args: {
           p_entity_id: string;
@@ -2264,7 +2322,7 @@ export interface Database {
       [_ in never]: never;
     };
   };
-}
+};
 
 type PublicSchema = Database[Extract<keyof Database, 'public'>];
 
