@@ -244,7 +244,7 @@ export const CommentItem = ({ comment, commentMap }: CommentItemProps) => {
                     </div>
                     <p
                       key={totalReactions}
-                      className="text-xs text-muted group-hover/reaction-summary:text-muted-foreground group-hover/reaction-summary:animated-underline-1 animated-underline-1 animate-slide-right-fade-in"
+                      className="text-xs text-muted group-hover/reaction-summary:font-medium transition-all group-hover/reaction-summary:text-muted-foreground group-hover/reaction-summary:animated-underline-1 animated-underline-1 animate-slide-right-fade-in"
                     >
                       {latestReactor && (
                         <>

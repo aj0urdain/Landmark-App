@@ -3,6 +3,7 @@ import { Article } from '@/types/articleTypes';
 import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
 import { useArticleComments } from '@/queries/articles/hooks';
+import CountUp from 'react-countup';
 
 const ArticleCommentsButton = ({
   article,
@@ -27,9 +28,23 @@ const ArticleCommentsButton = ({
       }}
     >
       <MessageCircle className="w-4 h-4" />
-      <span className="text-sm">
-        {comments?.length} Comment{comments?.length != 1 ? 's' : ''}
-      </span>
+      <p className="text-sm">
+        <CountUp
+          end={comments?.length ?? 0}
+          duration={5}
+          delay={2}
+          useEasing
+          smartEasingAmount={0.5}
+          easingFn={(t, b, c, d) => {
+            // Quartic easing in/out
+            t /= d / 2;
+            if (t < 1) return (c / 2) * t * t * t * t + b;
+            t -= 2;
+            return (-c / 2) * (t * t * t * t - 2) + b;
+          }}
+        />{' '}
+        Comment{comments?.length !== 1 ? 's' : ''}
+      </p>
     </Button>
   );
 };
