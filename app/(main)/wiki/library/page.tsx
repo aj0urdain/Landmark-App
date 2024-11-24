@@ -23,7 +23,7 @@ const categorizedItems = {
       description: 'Access all of our portfolios',
       href: '/wiki/library/portfolios',
       count: '172 portfolios',
-      disabled: true,
+      disabled: false,
     },
     {
       title: 'Portfolio Magazines',
@@ -31,7 +31,7 @@ const categorizedItems = {
       description: 'Access our collection of portfolio magazines and publications',
       href: '/wiki/library/portfolio-magazines',
       count: '172 magazines',
-      disabled: true,
+      disabled: false,
     },
     {
       title: 'Portfolio Results',
@@ -39,7 +39,7 @@ const categorizedItems = {
       description: 'Access our collection of portfolio results',
       href: '/wiki/library/portfolio-results',
       count: '172 results',
-      disabled: true,
+      disabled: false,
     },
   ],
   assets: [
@@ -49,7 +49,7 @@ const categorizedItems = {
       description: 'Document templates for various business needs',
       href: '/wiki/library/templates',
       count: '24 templates',
-      disabled: true,
+      disabled: false,
     },
     {
       title: 'Images',
@@ -57,7 +57,7 @@ const categorizedItems = {
       description: 'Property images, logos, and marketing assets',
       href: '/wiki/library/images',
       count: '1.2k images',
-      disabled: true,
+      disabled: false,
     },
     {
       title: 'Handbooks',
