@@ -139,7 +139,7 @@ const DepartmentLinkCard = ({
             ))}
           </div>
           <div
-            className="flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity"
+            className="flex items-center gap-0 opacity-50 group-hover:opacity-100 transition-opacity"
             onMouseEnter={() => debouncedSetHoveredDepartment(false)}
             onMouseLeave={() => debouncedSetHoveredDepartment(true)}
           >
@@ -150,7 +150,8 @@ const DepartmentLinkCard = ({
                     key={user.id}
                     id={user.id ?? ''}
                     showAvatar={true}
-                    avatarSize="small"
+                    avatarSize="xs"
+                    variant="minimal"
                     avatarOnly
                   />
                 </StaggeredAnimation>

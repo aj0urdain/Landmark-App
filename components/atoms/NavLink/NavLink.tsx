@@ -100,6 +100,7 @@ export const NavLink = React.memo(function NavLink({
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
     isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'px-4 mx-4',
     comingSoon && 'opacity-50 cursor-not-allowed',
+    isClickable && 'opacity-100',
     isLoading && 'animate-pulse [animation-duration:2s]',
   );
 
@@ -115,7 +116,7 @@ export const NavLink = React.memo(function NavLink({
                 {isClickable ? (
                   <Link
                     href={href}
-                    className="flex w-full items-center"
+                    className="flex w-full items-center justify-center"
                     onClick={(e) => {
                       if (!isActive) {
                         e.preventDefault();
@@ -140,15 +141,20 @@ export const NavLink = React.memo(function NavLink({
               side="right"
               align="center"
               sideOffset={10}
-              className="flex cursor-pointer items-center gap-1 bg-muted text-xs text-blue-500 select-none z-[100]"
+              className="flex cursor-pointer items-center gap-1 bg-muted text-xs text-muted-foreground select-none z-[100]"
             >
-              <Link href="/updates" className="flex items-center gap-1">
-                <Cpu className="h-4 w-4 animate-pulse" />
+              <Link href="/updates" className="flex items-center gap-1 z-[100]">
+                <Cpu className="h-4 w-4 animate-pulse text-blue-500" />
                 <p className="animated-underline-1">
-                  {isCollapsed
-                    ? `${String(children)} is under construction by`
-                    : 'Under construction by'}
-                  <span className="font-bold"> @Aaron!</span>
+                  {isCollapsed ? (
+                    <>
+                      <span className="font-bold">{String(children)}</span> is under
+                      construction by
+                    </>
+                  ) : (
+                    'Under construction by'
+                  )}
+                  <span className="font-bold text-blue-500"> @Aaron!</span>
                 </p>
               </Link>
             </TooltipContent>
@@ -170,7 +176,7 @@ export const NavLink = React.memo(function NavLink({
         </Link>
       )}
       {!isCollapsed && subsections && isExpanded && (
-        <div className="ml-3 mt-1 animate-slide-down-fade-in space-y-1">
+        <div className="ml-3 mt-1 animate-slide-down-fade-in space-y-1 z-[100] overflow-visible">
           {subsections.map((subsection) => (
             <NavLink
               key={subsection.href}
@@ -198,7 +204,7 @@ export const NavLink = React.memo(function NavLink({
             side="right"
             align="center"
             sideOffset={-10}
-            className="bg-background border-muted border z-50"
+            className="bg-background border-muted border z-[100]"
           >
             <p className="flex items-center gap-2 text-foreground font-medium select-none">
               {children}

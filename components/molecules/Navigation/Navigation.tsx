@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useRoutePermissions } from '@/queries/access/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { userProfileOptions } from '@/types/userProfileTypes';
@@ -41,9 +41,8 @@ export const Navigation = React.memo(function Navigation({
         const Icon = getIconFromString(route.icon ?? '');
 
         return (
-          <>
+          <Fragment key={`navlink-${route.id}-${index}`}>
             <NavLink
-              key={`navlink-${route.id}-${index}`}
               href={route.path}
               icon={Icon}
               routeId={route.id}
@@ -68,7 +67,7 @@ export const Navigation = React.memo(function Navigation({
             {(route.path === '/wiki' || route.path === '/admin') && (
               <Separator className="my-4" />
             )}
-          </>
+          </Fragment>
         );
       })}
       <FeedbackButton isCollapsed={isCollapsed} />
