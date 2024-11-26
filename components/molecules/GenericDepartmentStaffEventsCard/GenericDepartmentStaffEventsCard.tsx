@@ -12,11 +12,9 @@ import {
 } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import Image from 'next/image';
-import Link from 'next/link';
 import { differenceInDays, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import BirthdayConfetti from '../BirthdayConfetti/BirthdayConfetti';
 
 const getUpcomingEvents = (data: any[], eventType: string, limit = 3) => {
   const today = new Date();
@@ -136,197 +134,191 @@ const GenericDepartmentStaffEventsCard = ({
   };
 
   return (
-    <>
-      {currentEvent?.isTodayEvent && activeTab === 'birthdays' && isHovered && (
-        <BirthdayConfetti />
+    <Card
+      ref={cardRef}
+      className={cn(
+        'row-span-1 flex h-1/2 flex-col relative p-4 cursor-pointer overflow-hidden transition-colors',
+        isHovered && activeTab === 'birthdays' && 'border-pink-500/50',
+        isHovered && activeTab === 'anniversaries' && 'border-orange-500/50',
       )}
-
-      <Card
-        ref={cardRef}
-        className={cn(
-          'row-span-1 flex h-1/2 flex-col relative p-4 cursor-pointer overflow-hidden transition-colors',
-          isHovered && activeTab === 'birthdays' && 'border-pink-500/50',
-          isHovered && activeTab === 'anniversaries' && 'border-orange-500/50',
-        )}
-        onClick={handleCardClick}
-        onMouseEnter={() => {
-          setIsHovered(true);
-        }}
-        onMouseLeave={() => {
-          setIsHovered(false);
-        }}
-      >
-        <div className="flex flex-col h-full">
-          {/* Header section with fixed height */}
-          <div className="h-12 flex items-center gap-3">
-            <TooltipProvider>
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleToggleClick}
-                    className="hover:bg-background hover:border-muted-foreground relative z-50"
-                  >
-                    {timeLeft && !isHovered && (
-                      <div className="absolute -top-2 -right-2 bg-muted text-foreground-muted rounded-full w-4 h-4 flex items-center justify-center text-[8px]">
-                        {timeLeft}
-                      </div>
-                    )}
-                    {activeTab === 'birthdays' ? (
-                      <CakeIcon className="h-4 w-4 animate-slide-down-fade-in text-pink-500" />
-                    ) : (
-                      <BriefcaseIcon className="h-4 w-4 animate-slide-up-fade-in text-orange-500" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="text-xs z-50 flex gap-1 bg-background text-foreground"
-                  side="right"
-                >
-                  <p>
-                    Switch to{' '}
-                    <span className="font-bold">
-                      {activeTab === 'birthdays' ? 'Work Anniversaries' : 'Birthdays'}
-                    </span>
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <p
-              className={cn(
-                'text-xs text-muted-foreground font-bold animate-slide-left-fade-in',
-                activeTab === 'birthdays' && 'text-pink-300/75',
-                activeTab === 'anniversaries' && 'text-orange-300/75',
-              )}
-            >
-              Upcoming Staff{' '}
-              {activeTab === 'birthdays' ? 'Birthdays' : 'Work Anniversaries'}
-            </p>
-          </div>
-
-          {/* Main content with fixed layout */}
-          <div className="flex-1 flex gap-2 mt-4">
-            {/* Navigation buttons in fixed width column */}
-            <div className="w-10 flex flex-col gap-2">
-              {staffEvents?.[
-                activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries'
-              ]?.map((event, idx) => (
+      onClick={handleCardClick}
+      onMouseEnter={() => {
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+      }}
+    >
+      <div className="flex flex-col h-full">
+        {/* Header section with fixed height */}
+        <div className="h-12 flex items-center gap-3">
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
                 <Button
-                  key={String(event.id)}
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
-                  onClick={(e) => handleButtonClick(e, idx)}
-                  className={cn(
-                    'h-8 w-8 p-0 relative rounded-full',
-                    currentIndex === idx
-                      ? 'ring-1 ring-muted-foreground'
-                      : 'opacity-50 hover:opacity-100',
-                  )}
+                  onClick={handleToggleClick}
+                  className="hover:bg-background hover:border-muted-foreground relative z-50"
                 >
-                  {event.profile_picture ? (
-                    <Image
-                      src={event.profile_picture}
-                      alt={`${event.first_name} ${event.last_name}`}
-                      width={32}
-                      height={32}
-                      className="object-contain w-8 h-8 absolute bottom-0 rounded-full"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-muted flex items-center justify-center text-xs rounded-full">
-                      {event.first_name[0]}
-                      {event.last_name[0]}
+                  {timeLeft && !isHovered && (
+                    <div className="absolute -top-2 -right-2 bg-muted text-foreground-muted rounded-full w-4 h-4 flex items-center justify-center text-[8px]">
+                      {timeLeft}
                     </div>
+                  )}
+                  {activeTab === 'birthdays' ? (
+                    <CakeIcon className="h-4 w-4 animate-slide-down-fade-in text-pink-500" />
+                  ) : (
+                    <BriefcaseIcon className="h-4 w-4 animate-slide-up-fade-in text-orange-500" />
                   )}
                 </Button>
-              ))}
-            </div>
+              </TooltipTrigger>
+              <TooltipContent
+                className="text-xs z-50 flex gap-1 bg-background text-foreground"
+                side="right"
+              >
+                <p>
+                  Switch to{' '}
+                  <span className="font-bold">
+                    {activeTab === 'birthdays' ? 'Work Anniversaries' : 'Birthdays'}
+                  </span>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <p
+            className={cn(
+              'text-xs text-muted-foreground font-bold animate-slide-left-fade-in',
+              activeTab === 'birthdays' && 'text-pink-300/75',
+              activeTab === 'anniversaries' && 'text-orange-300/75',
+            )}
+          >
+            Upcoming Staff{' '}
+            {activeTab === 'birthdays' ? 'Birthdays' : 'Work Anniversaries'}
+          </p>
+        </div>
 
-            {/* Content section with fixed proportions */}
-            <div className="">
-              {currentEvent && (
-                <div className="h-full flex flex-col justify-center">
-                  <div className="flex flex-col justify-between h-full">
-                    <div className="flex flex-col gap-0">
-                      <p
-                        className={cn(
-                          'text-3xl',
-                          currentEvent.isTodayEvent &&
-                            (activeTab === 'birthdays'
-                              ? 'text-pink-300 animate-pulse'
-                              : 'text-orange-300 animate-pulse'),
-                        )}
-                      >
-                        <span className="font-light">{currentEvent.first_name}</span>{' '}
-                        <span className="font-bold">{currentEvent.last_name}</span>
-                      </p>
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        {activeTab === 'birthdays' && <Cake className="h-4 w-4" />}
-                        {activeTab === 'anniversaries' && (
-                          <BriefcaseIcon className="h-3.5 w-3.5" />
-                        )}
-                        <p>{format(currentEvent.nextOccurrence, 'MMMM d')}</p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground w-4/5">
-                      {activeTab === 'birthdays' ? (
-                        <>
-                          {currentEvent.isTodayEvent ? (
-                            <>Today is {currentEvent.first_name}'s birthday!</>
-                          ) : currentEvent.daysUntil === 0 ? (
-                            <>
-                              Make sure to wish{' '}
-                              <span className="font-bold">{currentEvent.first_name}</span>{' '}
-                              a happy birthday tomorrow!
-                            </>
-                          ) : (
-                            <>
-                              <span className="font-bold">{currentEvent.first_name}</span>{' '}
-                              is going to be celebrating a birthday in{' '}
-                              <span className="font-bold">
-                                {currentEvent.daysUntil} days!
-                              </span>
-                            </>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          Celebrate {currentEvent.first_name}'s work anniversary{' '}
-                          {currentEvent.isTodayEvent
-                            ? 'Today!'
-                            : currentEvent.daysUntil === 0
-                              ? 'Tomorrow!'
-                              : `in ${currentEvent.daysUntil} days!`}
-                        </>
+        {/* Main content with fixed layout */}
+        <div className="flex-1 flex gap-2 mt-4">
+          {/* Navigation buttons in fixed width column */}
+          <div className="w-10 flex flex-col gap-2">
+            {staffEvents?.[
+              activeTab === 'birthdays' ? 'birthdays' : 'workAnniversaries'
+            ]?.map((event, idx) => (
+              <Button
+                key={String(event.id)}
+                variant="ghost"
+                size="icon"
+                onClick={(e) => handleButtonClick(e, idx)}
+                className={cn(
+                  'h-8 w-8 p-0 relative rounded-full',
+                  currentIndex === idx
+                    ? 'ring-1 ring-muted-foreground'
+                    : 'opacity-50 hover:opacity-100',
+                )}
+              >
+                {event.profile_picture ? (
+                  <Image
+                    src={event.profile_picture}
+                    alt={`${event.first_name} ${event.last_name}`}
+                    width={32}
+                    height={32}
+                    className="object-contain w-8 h-8 absolute bottom-0 rounded-full"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-muted flex items-center justify-center text-xs rounded-full">
+                    {event.first_name[0]}
+                    {event.last_name[0]}
+                  </div>
+                )}
+              </Button>
+            ))}
+          </div>
+
+          {/* Content section with fixed proportions */}
+          <div className="">
+            {currentEvent && (
+              <div className="h-full flex flex-col justify-center">
+                <div className="flex flex-col justify-between h-full">
+                  <div className="flex flex-col gap-0">
+                    <p
+                      className={cn(
+                        'text-3xl',
+                        currentEvent.isTodayEvent &&
+                          (activeTab === 'birthdays'
+                            ? 'text-pink-300 animate-pulse'
+                            : 'text-orange-300 animate-pulse'),
                       )}
+                    >
+                      <span className="font-light">{currentEvent.first_name}</span>{' '}
+                      <span className="font-bold">{currentEvent.last_name}</span>
                     </p>
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      {activeTab === 'birthdays' && <Cake className="h-4 w-4" />}
+                      {activeTab === 'anniversaries' && (
+                        <BriefcaseIcon className="h-3.5 w-3.5" />
+                      )}
+                      <p>{format(currentEvent.nextOccurrence, 'MMMM d')}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground w-4/5">
+                    {activeTab === 'birthdays' ? (
+                      <>
+                        {currentEvent.isTodayEvent ? (
+                          <>Today is {currentEvent.first_name}'s birthday!</>
+                        ) : currentEvent.daysUntil === 0 ? (
+                          <>
+                            Make sure to wish{' '}
+                            <span className="font-bold">{currentEvent.first_name}</span> a
+                            happy birthday tomorrow!
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-bold">{currentEvent.first_name}</span>{' '}
+                            is going to be celebrating a birthday in{' '}
+                            <span className="font-bold">
+                              {currentEvent.daysUntil} days!
+                            </span>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        Celebrate {currentEvent.first_name}'s work anniversary{' '}
+                        {currentEvent.isTodayEvent
+                          ? 'Today!'
+                          : currentEvent.daysUntil === 0
+                            ? 'Tomorrow!'
+                            : `in ${currentEvent.daysUntil} days!`}
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+            )}
+            <div className="absolute right-4 bottom-0 h-[90%]">
+              {currentEvent.profile_picture ? (
+                <Image
+                  src={currentEvent.profile_picture}
+                  alt={`${currentEvent.first_name} ${currentEvent.last_name}`}
+                  width={250}
+                  height={250}
+                  key={currentEvent.profile_picture}
+                  className="h-full w-auto object-cover rounded-r-lg transition-all duration-500 animate-slide-up-fade-in"
+                />
+              ) : (
+                <div className="h-full w-32 bg-muted flex items-center justify-center rounded-r-lg">
+                  <div className="text-2xl">
+                    {currentEvent.first_name[0]}
+                    {currentEvent.last_name[0]}
                   </div>
                 </div>
               )}
-              <div className="absolute right-4 bottom-0 h-[90%]">
-                {currentEvent.profile_picture ? (
-                  <Image
-                    src={currentEvent.profile_picture}
-                    alt={`${currentEvent.first_name} ${currentEvent.last_name}`}
-                    width={250}
-                    height={250}
-                    key={currentEvent.profile_picture}
-                    className="h-full w-auto object-cover rounded-r-lg transition-all duration-500 animate-slide-up-fade-in"
-                  />
-                ) : (
-                  <div className="h-full w-32 bg-muted flex items-center justify-center rounded-r-lg">
-                    <div className="text-2xl">
-                      {currentEvent.first_name[0]}
-                      {currentEvent.last_name[0]}
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
-      </Card>
-    </>
+      </div>
+    </Card>
   );
 };
 

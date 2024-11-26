@@ -45,6 +45,8 @@ export function GenericDepartmentRow({ department }: { department: string }) {
           height={420}
           key={departmentData.department_name}
         />
+
+        {/* Generic Department Announcements */}
       </div>
     </>
   );

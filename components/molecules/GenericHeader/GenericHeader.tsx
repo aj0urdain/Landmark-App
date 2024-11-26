@@ -1,12 +1,16 @@
-import { wikiLinks } from '@/app/(main)/wiki/layout';
+'use client';
+
+import { useRoutePermissions } from '@/queries/access/hooks';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import { getIconFromString } from '@/utils/icons/icons';
 
 export function GenericHeader() {
-  console.log('GenericHeader');
-
+  const { data: routePermissions } = useRoutePermissions();
   const pathname = usePathname();
+
+  if (!routePermissions) return null;
 
   const title = pathname
     .toString()
@@ -15,9 +19,8 @@ export function GenericHeader() {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
-  const icon = wikiLinks.find((link) => link.href === pathname)?.icon;
-
-  const description = wikiLinks.find((link) => link.href === pathname)?.description;
+  const currentRoute = routePermissions.find((route) => route.path === pathname);
+  const Icon = currentRoute?.icon ? getIconFromString(currentRoute.icon) : null;
 
   return (
     <div className="relative flex min-h-48 items-end justify-start overflow-hidden rounded-b-3xl">
@@ -33,13 +36,15 @@ export function GenericHeader() {
         <div>
           <div className="flex flex-col items-start justify-start gap-2">
             <div className="flex items-center gap-2" key={title}>
-              {icon &&
-                React.createElement(icon, {
+              {Icon &&
+                React.createElement(Icon, {
                   className: 'h-6 w-6 animate-slide-left-fade-in',
                 })}
               <h1 className="text-4xl font-black animate-slide-right-fade-in">{title}</h1>
             </div>
-            <div>{/* <p className="text-muted-foreground">{description}</p> */}</div>
+            <div>
+              {/* <p className="text-muted-foreground">{currentRoute?.description}</p> */}
+            </div>
           </div>
         </div>
       </div>

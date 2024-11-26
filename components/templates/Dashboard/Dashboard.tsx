@@ -21,25 +21,34 @@ import AssetManagementDashboard from '@/components/molecules/DashboardCards/Depa
 import { useState, useEffect } from 'react';
 import EmptyDashboard from '@/components/molecules/DashboardCards/DepartmentDashboards/EmptyDashboard/EmptyDashboard';
 import UserCard from '@/components/molecules/UserCard/UserCard';
+import { Loader2 } from 'lucide-react';
 
 export default function Dashboard() {
   const { data: userProfile, isLoading, isError } = useQuery(userProfileOptions);
-
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (userProfile?.departments) {
+      setSelectedDepartments(userProfile.departments);
+      console.log(`selectedDepartments`, selectedDepartments);
+    }
+  }, [userProfile?.departments]);
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-screen items-start justify-center pt-16">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
   }
 
   if (isError || !userProfile) {
-    return <div>Error loading user profile</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Error loading user profile
+      </div>
+    );
   }
-
-  useEffect(() => {
-    if (userProfile.departments) {
-      setSelectedDepartments(userProfile.departments);
-    }
-  }, [userProfile.departments]);
 
   const handleFilterChange = (departments: string[]) => {
     setSelectedDepartments(departments);
