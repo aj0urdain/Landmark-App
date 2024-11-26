@@ -1,37 +1,16 @@
-'use client';
-
-import React from 'react';
-import { Home, Speech, Building, Mailbox } from 'lucide-react';
 import SubNavigationMenu from '@/components/molecules/SubNavigationMenu/SubNavigationMenu';
+import type { Metadata } from 'next';
 
-const newsLinks = [
-  {
-    name: 'Home',
-    icon: Home,
-    href: '/news',
-  },
-  {
-    name: 'Announcements',
-    icon: Speech,
-    href: '/news/announcements',
-  },
-  {
-    name: 'Company',
-    icon: Building,
-    href: '/news/company',
-  },
-  {
-    name: 'External',
-    icon: Mailbox,
-    href: '/news/external',
-  },
-];
+export const metadata: Metadata = {
+  title: 'News',
+  description: 'View the latest news and announcements.',
+};
 
-export default function NewsLayout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full">
-      <SubNavigationMenu title="News" links={newsLinks} rootPath="/news" />
-      <div className="p-4">{children}</div>
+    <div className="flex flex-col h-full">
+      <SubNavigationMenu />
+      {children}
     </div>
   );
 }

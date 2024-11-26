@@ -3,7 +3,7 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Sidebar } from '@/components/molecules/Sidebar/Sidebar';
 import { Button } from '@/components/ui/button';
@@ -11,16 +11,26 @@ import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Header } from '@/components/molecules/Header/Header';
 import { UserProfileManager } from '@/components/atoms/UserProfileManager/UserProfileManager';
 import { Inbox } from '@/components/molecules/Inbox/Inbox';
-import { AccessControl } from '@/components/atoms/AccessControl/AccessControl';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { RoutePermissionControl } from '@/components/atoms/RoutePermissionControl/RoutePermissionControl';
+import { useRoutePermission } from '@/hooks/useRoutePermission';
+import { useRouter } from 'next/navigation';
 
 TimeAgo.addDefaultLocale(en);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
   const [isInboxCollapsed, setIsInboxCollapsed] = useState(false);
+  // const { hasPermission, isLoading } = useRoutePermission();
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   if (!isLoading && !hasPermission) {
+  //     router.replace('/access-denied');
+  //   }
+  // }, [hasPermission, isLoading, router]);
+
+  // if (!isLoading && !hasPermission) return null;
 
   const toggleLeftSidebar = () => {
     setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed);
@@ -59,9 +69,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Header />
           <ScrollArea className="flex-1">
             <main className="mx-auto px-6 flex h-full w-full items-center justify-center py-4 2xl:mx-auto">
-              <div className="h-full w-full max-w-6xl">
-                <RoutePermissionControl>{children}</RoutePermissionControl>
-              </div>
+              <div className="h-full w-full max-w-6xl">{children}</div>
             </main>
           </ScrollArea>
         </div>
