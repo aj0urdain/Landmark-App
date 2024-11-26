@@ -36,6 +36,7 @@ import { Event } from '@/components/molecules/CompanyCalendar/CompanyCalendar';
 import CountUp from 'react-countup';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { StaffHighlightSection } from '@/components/molecules/StaffHighlightSection/StaffHighlightSection';
+import { Suspense } from 'react';
 
 interface Auction {
   venue: string;
@@ -62,10 +63,14 @@ interface PortfolioWithAuctions {
   advertising_period_start: string;
 }
 
-export default function EventsHomePage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
+// Create a new component for the main content
+function EventsHomeContent({
+  searchParams,
+  router,
+}: {
+  searchParams: ReturnType<typeof useSearchParams>;
+  router: ReturnType<typeof useRouter>;
+}) {
   const portfolioRef = useRef<HTMLDivElement>(null);
   const staffRef = useRef<HTMLDivElement>(null);
   const trainingRef = useRef<HTMLDivElement>(null);
@@ -409,20 +414,6 @@ export default function EventsHomePage() {
               <BookOpenText className="h-3 w-3" />
               Portfolio
             </TabsTrigger>
-            <TabsTrigger
-              value="staff"
-              className="group gap-2 py-2 data-[state=active]:border-b data-[state=active]:border-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
-            >
-              <Users className="h-3 w-3" />
-              Staff
-            </TabsTrigger>
-            <TabsTrigger
-              value="training"
-              className="group gap-2 py-2 data-[state=active]:border-b data-[state=active]:border-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
-            >
-              <GraduationCap className="h-3 w-3" />
-              Training
-            </TabsTrigger>
           </TabsList>
           <TabsContent value="portfolio" ref={portfolioRef} className="w-full">
             {isLoadingPortfolio ? (
@@ -480,41 +471,25 @@ export default function EventsHomePage() {
               </Card>
             )}
           </TabsContent>
-          <TabsContent value="staff" ref={staffRef} className="w-full">
-            {isLoadingUserProfile ? (
-              <Card className="p-4">
-                <CardTitle>Loading upcoming events...</CardTitle>
-              </Card>
-            ) : (
-              <div className="mt-12 grid w-full grid-cols-2 gap-6">
-                <StaffHighlightSection
-                  title="Upcoming Birthdays"
-                  events={upcomingBirthdays}
-                  icon={CakeIcon}
-                  getEventDescription={(event) =>
-                    `Don't forget to wish ${event.first_name} a happy birthday!`
-                  }
-                />
-                <StaffHighlightSection
-                  title="Upcoming Work Anniversaries"
-                  events={upcomingWorkAnniversaries}
-                  icon={BriefcaseIcon}
-                  getEventDescription={(event) => {
-                    const today = new Date();
-                    const startDate = new Date(event.work_anniversary);
-                    const yearsOfService = differenceInYears(today, startDate) + 1; // +1 because we're celebrating the upcoming year
-                    return `${event.first_name} is going to celebrate ${yearsOfService.toString()} year${yearsOfService > 1 ? 's' : ''} at Burgess Rawson!`;
-                  }}
-                />
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="training" ref={trainingRef} className="w-full">
-            <h1 className="text-2xl font-semibold">Training Content</h1>
-            <p>Training content goes here</p>
-          </TabsContent>
         </Tabs>
       </div>
     </div>
+  );
+}
+
+// Create a new component for the search params logic
+function EventsHomeWithSearchParams() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  return <EventsHomeContent searchParams={searchParams} router={router} />;
+}
+
+// Update the main page component
+export default function EventsHomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EventsHomeWithSearchParams />
+    </Suspense>
   );
 }

@@ -25,9 +25,12 @@ import PortfolioPageControls from '@/components/organisms/PortfolioPageControls/
 import PortfolioPageViewer from '@/components/templates/PortfolioPageViewer/PortfolioPageViewer';
 import { toast } from 'sonner';
 
-const PortfolioPageContent = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+interface PortfolioPageContentProps {
+  searchParams: ReturnType<typeof useSearchParams>;
+  router: ReturnType<typeof useRouter>;
+}
+
+const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProps) => {
   const selectedListingId = searchParams.get('listing') ?? null;
   const selectedDocumentType = searchParams.get('documentType') ?? null;
   const [dialogOpen, setDialogOpen] = useState(false);
