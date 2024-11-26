@@ -5,21 +5,34 @@ import { createBrowserClient } from '@/utils/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
-import GenericDepartmentNewsCard from '@/components/molecules/GenericDepartmentNewsCard/GenericDepartmentNewsCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserCard from '@/components/molecules/UserCard/UserCard';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { FileText, Newspaper, Users } from 'lucide-react';
+import DepartmentNewsTabContent from '@/components/molecules/DepartmentNewsTabContent/DepartmentNewsTabContent';
 
-const SeniorLeadershipDepartmentPage = () => {
+const DepartmentPage = () => {
   const supabase = createBrowserClient();
+  const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab') || 'people';
+  const departmentSlug = params.department as string;
 
-  // Get department ID for Senior Leadership
+  // Convert slug to department name (e.g., "senior-leadership" to "Senior Leadership")
+  const departmentName = departmentSlug
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  // Get department ID for the current department
   const { data: department } = useQuery({
-    queryKey: ['department', 'Senior Leadership'],
+    queryKey: ['department', departmentName],
     queryFn: async () => {
       const { data } = await supabase
         .from('departments')
         .select('*')
-        .eq('department_name', 'Senior Leadership')
+        .eq('department_name', departmentName)
         .single();
       return data;
     },
@@ -39,16 +52,25 @@ const SeniorLeadershipDepartmentPage = () => {
     },
   });
 
+  const handleTabChange = (value: string) => {
+    router.push(`/wiki/departments/${departmentSlug}?tab=${value}`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <Tabs defaultValue="people" className="w-full">
+      <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="mb-4 bg-transparent flex gap-4 w-fit">
-          <TabsTrigger value="people">People</TabsTrigger>
-          <TabsTrigger value="news" disabled>
-            News & Announcements
+          <TabsTrigger value="people" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <p className="animated-underline-1">People</p>
           </TabsTrigger>
-          <TabsTrigger value="resources" disabled>
-            Resources
+          <TabsTrigger value="news" className="flex items-center gap-2">
+            <Newspaper className="h-4 w-4" />
+            <p className="animated-underline-1">News & Announcements</p>
+          </TabsTrigger>
+          <TabsTrigger value="resources" disabled className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            <p className="animated-underline-1">Resources</p>
           </TabsTrigger>
         </TabsList>
 
@@ -63,9 +85,9 @@ const SeniorLeadershipDepartmentPage = () => {
         </TabsContent>
 
         <TabsContent value="news">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-            {department?.id && <GenericDepartmentNewsCard departmentID={department.id} />}
-          </div>
+          {department?.id && (
+            <DepartmentNewsTabContent departmentId={String(department.id)} />
+          )}
         </TabsContent>
 
         <TabsContent value="resources">
@@ -83,4 +105,4 @@ const SeniorLeadershipDepartmentPage = () => {
   );
 };
 
-export default SeniorLeadershipDepartmentPage;
+export default DepartmentPage;
