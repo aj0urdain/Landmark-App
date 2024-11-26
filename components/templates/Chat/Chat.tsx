@@ -10,20 +10,37 @@ import { createBrowserClient } from '@/utils/supabase/client';
 import { Loader2, MessageCircle } from 'lucide-react';
 import { StaggeredAnimation } from '@/components/atoms/StaggeredAnimation/StaggeredAnimation';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 
-const ChatPage = () => {
-  const router = useRouter();
+const Chat = () => {
   const searchParams = useSearchParams();
-  const supabase = createBrowserClient();
+  const router = useRouter();
 
-  // Get the current department from URL
-  const selectedDepartmentName = searchParams.get('room') || 'burgess-rawson';
+  // Extract this into a custom hook for better organization
+  const useChatRoom = () => {
+    const room = searchParams.get('room');
+
+    // Handle initial routing
+    React.useEffect(() => {
+      if (!room) {
+        router.push('/chat?room=burgess-rawson');
+      }
+    }, [room, router]);
+
+    return {
+      selectedDepartmentName: room || 'burgess-rawson',
+    };
+  };
+
+  const { selectedDepartmentName } = useChatRoom();
+
+  const supabase = createBrowserClient();
 
   // Fetch all departments
   const { data: chatRooms, isLoading: isLoadingRooms } = useQuery({
     queryKey: ['chatRooms'],
     queryFn: async () => {
-      console.log('🔍 Fetching chat rooms...');
       const { data: rooms, error } = await supabase
         .from('chat_rooms')
         .select(
@@ -43,14 +60,9 @@ const ChatPage = () => {
         throw new Error(error.message);
       }
 
-      console.log('📦 Raw chat rooms data:', rooms);
-
       // Group rooms by department and parent/child relationship
       const parentRooms = rooms.filter((room) => !room.parent_room);
       const childRooms = rooms.filter((room) => room.parent_room);
-
-      console.log('👨‍👦 Parent rooms:', parentRooms);
-      console.log('👶 Child rooms:', childRooms);
 
       // Add child rooms to their parents
       const structuredRooms = parentRooms.map((parent) => {
@@ -59,14 +71,12 @@ const ChatPage = () => {
             child.parent_room === parent.id &&
             child.departments?.id === parent.departments?.id,
         );
-        console.log(`🔄 Children for parent ${String(parent.name)}:`, children);
+
         return {
           ...parent,
           subRooms: children,
         };
       });
-
-      console.log('🌳 Final structured rooms:', structuredRooms);
 
       // Sort to ensure Burgess Rawson is first
       return structuredRooms.sort((a, b) => {
@@ -91,7 +101,6 @@ const ChatPage = () => {
   const { data: userAccess, isLoading: isLoadingAccess } = useQuery({
     queryKey: ['userAccess'],
     queryFn: async () => {
-      console.log('🔍 Fetching user access...');
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -99,7 +108,6 @@ const ChatPage = () => {
         console.error('❌ No user found');
         throw new Error('No user found');
       }
-      console.log('👤 User:', user.id);
 
       // Get user's departments
       const { data: userDepts, error: deptError } = await supabase
@@ -110,7 +118,6 @@ const ChatPage = () => {
       if (deptError) {
         console.error('❌ Error fetching user departments:', deptError);
       }
-      console.log('🏢 User departments:', userDepts);
 
       // Get user's teams
       const { data: userTeams, error: teamError } = await supabase
@@ -121,13 +128,12 @@ const ChatPage = () => {
       if (teamError) {
         console.error('❌ Error fetching user teams:', teamError);
       }
-      console.log('👥 User teams:', userTeams);
 
       const access = {
         departments: userDepts?.map((d) => d.department_id) ?? [],
         teams: userTeams?.map((t) => t.team_id) ?? [],
       };
-      console.log('🔐 Final user access:', access);
+
       return access;
     },
   });
@@ -149,9 +155,6 @@ const ChatPage = () => {
   };
 
   // Add logging to the authorization filtering
-  console.log('🎯 Selected department name:', selectedDepartmentName);
-  console.log('📊 All chat rooms:', chatRooms);
-  console.log('🔑 User access:', userAccess);
 
   // Separate departments into authorized and unauthorized
   const authorizedDepts =
@@ -160,9 +163,6 @@ const ChatPage = () => {
   const unauthorizedDepts =
     chatRooms?.filter((dept) => !userAccess?.departments.includes(dept.departments.id)) ??
     [];
-
-  console.log('✅ Authorized departments:', authorizedDepts);
-  console.log('❌ Unauthorized departments:', unauthorizedDepts);
 
   // Add this near your other state/data declarations
   const selectedDepartment = chatRooms?.find(
@@ -193,9 +193,6 @@ const ChatPage = () => {
     // If it's a department chat
     return userAccess.departments.includes(selectedDepartment.departments.id);
   }, [selectedDepartment, selectedSubRoom, userAccess]);
-
-  console.log('🎯 Selected department:', selectedDepartment);
-  console.log('🔐 Has access:', hasAccess);
 
   return (
     <div className="w-full h-full flex gap-8 py-6">
@@ -358,4 +355,7 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage;
+// Wrap the export in a dynamic import with ssr disabled to prevent hydration issues
+export default dynamic(() => Promise.resolve(Chat), {
+  ssr: false,
+});

@@ -95,7 +95,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
   });
 
   // Get messages
-  const { data: messages = [], isLoading: isFetchingMessages } = useQuery({
+  const { data: messages, isLoading: isFetchingMessages } = useQuery({
     enabled: !!chatRoomData,
     queryKey: ['chat-messages', chatName],
     queryFn: async () => {
@@ -185,7 +185,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
   };
 
   const renderMessageGroups = () => {
-    if (isFetchingMessages) {
+    if (isFetchingMessages || !messages) {
       return (
         <div className="flex h-full w-full items-center justify-center">
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -259,12 +259,15 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
             }`}
           >
             <UserHoverCard userId={group[0].user_id.id}>
-              <span className="mb-1 flex cursor-pointer items-center text-xs text-muted-foreground">
+              <div className="mb-1 flex cursor-pointer items-center text-xs text-muted-foreground">
                 {hasRecentMessage && (
                   <Dot size="small" className="mr-1.5 animate-pulse bg-green-400" />
                 )}
-                {group[0].user_id.first_name} {group[0].user_id.last_name}
-              </span>
+                <p>
+                  {group[0].user_id.first_name}{' '}
+                  <span className="font-bold">{group[0].user_id.last_name}</span>
+                </p>
+              </div>
             </UserHoverCard>
             {group.map((message, messageIndex) => (
               <TooltipProvider key={message.id}>
@@ -338,9 +341,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
         </div>
       </CardHeader>
       <ScrollArea ref={scrollAreaRef} className="relative flex-grow h-[400px]">
-        <CardContent className="overflow-visible">
-          {messages.length === 0 ? <EmptyStateMessage /> : renderMessageGroups()}
-        </CardContent>
+        <CardContent className="overflow-visible">{renderMessageGroups()}</CardContent>
       </ScrollArea>
       <CardFooter className="flex-none">
         <div className="relative w-full">
