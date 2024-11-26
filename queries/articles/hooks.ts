@@ -8,6 +8,8 @@ import {
   getArticleViewers,
   getArticleReactions,
   toggleArticleReaction,
+  getDepartmentNews,
+  getDepartmentAnnouncements,
 } from './api';
 
 export const articleKeys = {
@@ -17,6 +19,10 @@ export const articleKeys = {
     [...articleKeys.all, 'commentReactions', commentId] as const,
   viewers: (articleId: number) => [...articleKeys.all, 'viewers', articleId] as const,
   reactions: (articleId: number) => [...articleKeys.all, 'reactions', articleId] as const,
+  departmentAnnouncements: (departmentId: number) =>
+    [...articleKeys.all, 'department-announcements', departmentId] as const,
+  departmentNews: (departmentId: number) =>
+    [...articleKeys.all, 'department-news', departmentId] as const,
 };
 
 export function useArticleComments(articleId: number) {
@@ -78,5 +84,21 @@ export function useToggleArticleReaction(articleId: number) {
         queryKey: articleKeys.reactions(articleId),
       });
     },
+  });
+}
+
+export function useDepartmentAnnouncements(departmentId: number) {
+  return useQuery({
+    queryKey: articleKeys.departmentAnnouncements(departmentId),
+    queryFn: () => getDepartmentAnnouncements(departmentId),
+    enabled: !!departmentId,
+  });
+}
+
+export function useDepartmentNews(departmentId: number) {
+  return useQuery({
+    queryKey: articleKeys.departmentNews(departmentId),
+    queryFn: () => getDepartmentNews(departmentId),
+    enabled: !!departmentId,
   });
 }

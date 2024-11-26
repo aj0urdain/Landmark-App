@@ -1,8 +1,9 @@
 import { createBrowserClient } from '@/utils/supabase/client';
 import { Database } from '@/types/supabaseTypes';
-import { useQueryClient } from '@tanstack/react-query';
+import { useAllPortfolios } from './hooks';
 
 type Portfolio = Database['public']['Tables']['portfolios']['Row'];
+type PortfolioWithAuctions = Awaited<ReturnType<typeof getActivePortfolioWithAuctions>>;
 
 export async function getAllPortfolios() {
   const supabase = createBrowserClient();
@@ -13,25 +14,20 @@ export async function getAllPortfolios() {
     .order('id', { ascending: false });
 
   if (error) {
+    console.error('📄 Error fetching all portfolios:', error);
     throw new Error(error.message);
   }
+
+  console.log('📄 All portfolios:', portfolios);
 
   return portfolios as Portfolio[];
 }
 
 export async function getPortfolioById(id: number): Promise<Portfolio | null> {
-  const queryClient = useQueryClient();
-
-  // First, try to get from cache
-  const cachedPortfolios = queryClient.getQueryData<Portfolio[]>(['portfolios']);
-
-  if (cachedPortfolios) {
-    const portfolio = cachedPortfolios.find((p) => p.id === id);
-    if (portfolio) return portfolio;
-  }
-
-  // If not in cache, fetch from API
   const supabase = createBrowserClient();
+
+  console.log('📄 Portfolio ID in API:', id);
+
   const { data, error } = await supabase
     .from('portfolios')
     .select('*')
@@ -43,5 +39,20 @@ export async function getPortfolioById(id: number): Promise<Portfolio | null> {
     throw new Error(error.message);
   }
 
-  return data as Portfolio;
+  return data;
+}
+
+export async function getActivePortfolioWithAuctions() {
+  const supabase = createBrowserClient();
+
+  const { data, error } = await supabase.rpc('get_active_portfolio_with_auctions');
+
+  if (error) {
+    console.error('📄 Error fetching active portfolio with auctions:', error);
+    throw new Error(error.message);
+  }
+
+  console.log('📄 Active portfolio with auctions:', data);
+
+  return data;
 }

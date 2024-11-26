@@ -7,7 +7,7 @@ export const usersApi = {
     const { data, error } = await supabase
       .from('user_profile_complete')
       .select('*')
-      .order('first_name', { ascending: true });
+      .order('work_anniversary', { ascending: true });
 
     if (error) throw new Error(error.message);
     return data as User[];

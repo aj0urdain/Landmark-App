@@ -263,3 +263,45 @@ export async function toggleArticleReaction(
     throw error;
   }
 }
+
+export async function getDepartmentAnnouncements(departmentId: number) {
+  const supabase = createBrowserClient();
+
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*')
+    .contains('departments', [departmentId])
+    .eq('article_type', 'announcement')
+    .eq('public', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      return [];
+    }
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function getDepartmentNews(departmentId: number) {
+  const supabase = createBrowserClient();
+
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*')
+    .contains('departments', [departmentId])
+    .eq('article_type', 'news')
+    .eq('public', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      return [];
+    }
+    throw new Error(error.message);
+  }
+
+  return data;
+}
