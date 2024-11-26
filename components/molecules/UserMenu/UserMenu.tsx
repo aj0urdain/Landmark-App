@@ -65,6 +65,7 @@ export function UserMenu() {
 
           <div className="flex items-center justify-start gap-1">
             <p className="font-bold sm:font-light">{userProfile.first_name}</p>
+
             <p className="hidden font-bold sm:block">{userProfile.last_name}</p>
           </div>
           <Image

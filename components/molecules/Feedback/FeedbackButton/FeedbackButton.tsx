@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface FeedbackTicket {
   id: string;
@@ -60,7 +61,7 @@ export const FeedbackButton = React.memo(function FeedbackButton({
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('submit');
   const [feedbackTickets, setFeedbackTickets] = useState<FeedbackTicket[]>([]);
-  const [feedbackType, setFeedbackType] = useState<string>('');
+  const [feedbackType, setFeedbackType] = useState<string>('bug');
   const [description, setDescription] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -215,82 +216,87 @@ export const FeedbackButton = React.memo(function FeedbackButton({
                   e.preventDefault();
                   void handleSubmit(e);
                 }}
-                className="mt-8 flex flex-col justify-between space-y-8"
+                className="flex flex-col h-full"
               >
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid w-full items-center gap-1.5">
-                    <Label
-                      htmlFor="page-url"
-                      className="ml-2 text-xs text-muted-foreground"
-                    >
-                      Page
-                    </Label>
-                    <Input id="page-url" name="page-url" value={pathName} readOnly />
+                <ScrollArea className="h-[340px] w-full pr-4">
+                  <div className="mt-8 space-y-8">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label
+                          htmlFor="page-url"
+                          className="ml-2 text-xs text-muted-foreground"
+                        >
+                          Page
+                        </Label>
+                        <Input id="page-url" name="page-url" value={pathName} readOnly />
+                      </div>
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label
+                          className="ml-2 text-xs text-muted-foreground"
+                          htmlFor="feedback-type"
+                        >
+                          Feedback Type
+                        </Label>
+                        <Select
+                          name="feedback-type"
+                          onValueChange={setFeedbackType}
+                          defaultValue="bug"
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select feedback type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bug">
+                              <div className="flex items-center gap-2 text-red-500">
+                                <BugIcon className="h-4 w-4" />
+                                <p>Bug</p>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="feature-request">
+                              <div className="flex items-center gap-2 text-yellow-500">
+                                <Puzzle className="h-4 w-4" />
+                                <p>Feature Request</p>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="idea">
+                              <div className="flex items-center gap-2 text-green-500">
+                                <Lightbulb className="h-4 w-4" />
+                                <p>Idea</p>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="other">
+                              <div className="flex items-center gap-2">
+                                <CircleHelp className="h-4 w-4" />
+                                <p>Other</p>
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid w-full gap-1.5">
+                      <Label
+                        htmlFor="description"
+                        className="ml-2 text-xs text-muted-foreground"
+                      >
+                        Description
+                      </Label>
+                      <Textarea
+                        id="description"
+                        name="description"
+                        placeholder="Please describe your feedback in detail. For bugs, include steps to reproduce if possible."
+                        className="flex-grow"
+                        rows={6}
+                        value={description}
+                        onChange={(e) => {
+                          setDescription(e.target.value);
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="grid w-full items-center gap-1.5">
-                    <Label
-                      className="ml-2 text-xs text-muted-foreground"
-                      htmlFor="feedback-type"
-                    >
-                      Feedback Type
-                    </Label>
-                    <Select
-                      name="feedback-type"
-                      onValueChange={setFeedbackType}
-                      value={feedbackType}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select feedback type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="bug">
-                          <div className="flex items-center gap-2 text-red-500">
-                            <BugIcon className="h-4 w-4" />
-                            <p>Bug</p>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="feature-request">
-                          <div className="flex items-center gap-2 text-yellow-500">
-                            <Puzzle className="h-4 w-4" />
-                            <p>Feature Request</p>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="idea">
-                          <div className="flex items-center gap-2 text-green-500">
-                            <Lightbulb className="h-4 w-4" />
-                            <p>Idea</p>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="other">
-                          <div className="flex items-center gap-2">
-                            <CircleHelp className="h-4 w-4" />
-                            <p>Other</p>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid w-full gap-1.5">
-                  <Label
-                    htmlFor="description"
-                    className="ml-2 text-xs text-muted-foreground"
-                  >
-                    Description
-                  </Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Please describe your feedback in detail. For bugs, include steps to reproduce if possible."
-                    className="flex-grow"
-                    rows={10}
-                    value={description}
-                    onChange={(e) => {
-                      setDescription(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className="mt-auto flex justify-end gap-2">
+                </ScrollArea>
+
+                <div className="mt-4 flex justify-end gap-2">
                   <Button
                     type="button"
                     variant="ghost"
@@ -307,63 +313,65 @@ export const FeedbackButton = React.memo(function FeedbackButton({
               </form>
             </TabsContent>
             <TabsContent value="history">
-              <div className="animate-slide-down-fade-in">
-                <div className="flex flex-col gap-8 mt-8">
-                  <div className="flex flex-col gap-4">
-                    <Label
-                      htmlFor="open-tickets"
-                      className="text-sm text-muted-foreground pl-0 font-bold"
-                    >
-                      Open Tickets
-                    </Label>
-                    <div className="space-y-2">
-                      {feedbackTickets.length > 0 ? (
-                        feedbackTickets
-                          .filter((ticket) => ticket.status === 'open')
-                          .map((ticket) => (
-                            <FeedbackItem
-                              key={ticket.id}
-                              title={ticket.description.substring(0, 50) + '...'}
-                              type={ticket.feedback_type}
-                              status="open"
-                              date={new Date(ticket.created_at).toLocaleDateString()}
-                              description={ticket.description}
-                            />
-                          ))
-                      ) : (
-                        <p className="text-muted-foreground/50">No open tickets!</p>
-                      )}
+              <ScrollArea className="h-[400px] w-full pr-4">
+                <div className="animate-slide-down-fade-in">
+                  <div className="flex flex-col gap-8 mt-8">
+                    <div className="flex flex-col gap-4">
+                      <Label
+                        htmlFor="open-tickets"
+                        className="text-sm text-muted-foreground pl-0 font-bold"
+                      >
+                        Open Tickets
+                      </Label>
+                      <div className="space-y-2">
+                        {feedbackTickets.length > 0 ? (
+                          feedbackTickets
+                            .filter((ticket) => ticket.status === 'open')
+                            .map((ticket) => (
+                              <FeedbackItem
+                                key={ticket.id}
+                                title={ticket.description.substring(0, 50) + '...'}
+                                type={ticket.feedback_type}
+                                status="open"
+                                date={new Date(ticket.created_at).toLocaleDateString()}
+                                description={ticket.description}
+                              />
+                            ))
+                        ) : (
+                          <p className="text-muted-foreground/50">No open tickets!</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <Separator className="w-full my-2" />
-                  <div className="flex flex-col gap-4">
-                    <Label
-                      htmlFor="closed-tickets"
-                      className="text-sm text-muted-foreground pl-0 font-bold"
-                    >
-                      Closed Tickets
-                    </Label>
-                    <div className="flex flex-col gap-2">
-                      {feedbackTickets.length > 0 ? (
-                        feedbackTickets
-                          .filter((ticket) => ticket.status === 'closed')
-                          .map((ticket) => (
-                            <FeedbackItem
-                              key={ticket.id}
-                              title={ticket.description.substring(0, 50) + '...'}
-                              type={ticket.feedback_type}
-                              status="closed"
-                              date={new Date(ticket.created_at).toLocaleDateString()}
-                              description={ticket.description}
-                            />
-                          ))
-                      ) : (
-                        <p className="text-muted-foreground/50">No closed tickets!</p>
-                      )}
+                    <Separator className="w-full my-2" />
+                    <div className="flex flex-col gap-4">
+                      <Label
+                        htmlFor="closed-tickets"
+                        className="text-sm text-muted-foreground pl-0 font-bold"
+                      >
+                        Closed Tickets
+                      </Label>
+                      <div className="flex flex-col gap-2">
+                        {feedbackTickets.length > 0 ? (
+                          feedbackTickets
+                            .filter((ticket) => ticket.status === 'closed')
+                            .map((ticket) => (
+                              <FeedbackItem
+                                key={ticket.id}
+                                title={ticket.description.substring(0, 50) + '...'}
+                                type={ticket.feedback_type}
+                                status="closed"
+                                date={new Date(ticket.created_at).toLocaleDateString()}
+                                description={ticket.description}
+                              />
+                            ))
+                        ) : (
+                          <p className="text-muted-foreground/50">No closed tickets!</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </ScrollArea>
             </TabsContent>
           </Tabs>
         </div>

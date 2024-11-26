@@ -47,7 +47,7 @@ export const Navigation = React.memo(function Navigation({
               routeId={route.id ?? ''}
               userId={userProfile.id}
               isCollapsed={isCollapsed}
-              comingSoon={!route.isClickable}
+              comingSoon={route.developing ?? true}
               isExpanded={activeSubsection === route.id}
               onExpand={() => {
                 setActiveSubsection(activeSubsection === route.id ? null : route.id);
@@ -58,7 +58,7 @@ export const Navigation = React.memo(function Navigation({
                       name: sub.label ?? '',
                       href: sub.path ?? '',
                       icon: getIconFromString(sub.icon ?? ''),
-                      comingSoon: !sub.isClickable,
+                      comingSoon: sub.developing ?? true,
                       routeId: sub.id ?? '',
                       userId: userProfile.id,
                     }))
