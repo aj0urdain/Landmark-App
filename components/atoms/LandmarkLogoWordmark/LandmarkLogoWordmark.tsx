@@ -9,11 +9,11 @@ interface LogoProps {
   className?: string;
 }
 
-export function LandmarkLogo({ className }: LogoProps) {
+export function LandmarkLogoWordmark({ className }: LogoProps) {
   const { resolvedTheme } = useTheme();
 
-  const blackLogo = '/images/landmark-logo-black.svg';
-  const whiteLogo = '/images/landmark-logo-white.svg';
+  const blackLogo = '/images/landmark-symbol-wordmark-black.svg';
+  const whiteLogo = '/images/landmark-symbol-wordmark-white.svg';
 
   const [logoPath, setLogoPath] = useState(blackLogo);
 
@@ -24,7 +24,7 @@ export function LandmarkLogo({ className }: LogoProps) {
   return (
     <Image
       src={logoPath}
-      alt="Landmark Logo"
+      alt="Landmark Logo and Wordmark"
       width={900}
       height={300}
       className={cn('h-auto', className)}
