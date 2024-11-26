@@ -4,6 +4,7 @@ import { accessApi } from './api';
 export const accessKeys = {
   all: ['access'] as const,
   routes: () => [...accessKeys.all, 'routes'] as const,
+  routeAccess: () => [...accessKeys.all, 'routeAccess'] as const,
 };
 
 export function useRoutePermissions() {

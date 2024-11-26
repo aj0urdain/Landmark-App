@@ -1,14 +1,31 @@
+import { Database } from '@/types/supabaseTypes';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
+  console.log('🚀 Starting middleware check for path:', request.nextUrl.pathname);
+
+  // Skip permission checks for these paths
+  if (
+    request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname.startsWith('/api') ||
+    request.nextUrl.pathname === '/sign-in' ||
+    request.nextUrl.pathname === '/access-denied' ||
+    request.nextUrl.pathname === '/not-found' ||
+    request.nextUrl.pathname.startsWith('/auth')
+  ) {
+    console.log('⏩ Skipping middleware check for excluded path');
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  console.log('🔑 Creating Supabase client...');
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
     {
       cookies: {
         getAll() {
@@ -27,30 +44,124 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
+  console.log('👤 Getting user...');
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If user is authenticated and trying to access the root or sign-in page, redirect to dashboard
+  console.log('User found:', user?.id ?? 'No user');
+
+  // Authentication redirects
   if (
     user &&
     (request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/sign-in')
   ) {
+    console.log(
+      '📍 Authenticated user accessing root or sign-in, redirecting to dashboard',
+    );
     const dashboardUrl = request.nextUrl.clone();
     dashboardUrl.pathname = '/dashboard';
     return NextResponse.redirect(dashboardUrl);
   }
 
-  // If user is not authenticated and trying to access any page other than sign-in or auth routes, redirect to sign-in
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/sign-in') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
+  if (!user) {
+    console.log('🚫 Unauthenticated user, redirecting to sign-in');
     const signInUrl = request.nextUrl.clone();
     signInUrl.pathname = '/sign-in';
     return NextResponse.redirect(signInUrl);
   }
 
-  return supabaseResponse;
+  try {
+    console.log('📚 Fetching route permissions and user profile...');
+    const [{ data: routePermissions }, { data: userProfile }] = await Promise.all([
+      supabase.from('route_permissions_complete').select('*'),
+      supabase.from('user_profile_complete').select('*').eq('id', user.id).single(),
+    ]);
+
+    if (!routePermissions || !userProfile) {
+      console.log('❌ Missing route permissions or user profile');
+      return NextResponse.redirect(new URL('/access-denied', request.url));
+    }
+
+    console.log('🔍 Finding closest matching route...');
+    const currentRoute = findClosestRoute(request.nextUrl.pathname, routePermissions);
+
+    if (!currentRoute) {
+      console.log('❌ No matching route found');
+      return NextResponse.redirect(new URL('/access-denied', request.url));
+    }
+
+    console.log('📄 Current route data:', currentRoute);
+    console.log('🛠️ Checking development status:', currentRoute.developing);
+    if (currentRoute.developing) {
+      const isTechnologyDepartment = userProfile.departments?.includes('Technology');
+      console.log('👨‍💻 Technology department access:', isTechnologyDepartment);
+      console.log('🔍 User departments:', userProfile.departments);
+      if (!isTechnologyDepartment) {
+        console.log('🚫 Non-technology user accessing development route');
+        return NextResponse.redirect(new URL('/access-denied', request.url));
+      }
+    }
+
+    if (currentRoute.public) {
+      console.log('🌐 Route is public, allowing access');
+      return supabaseResponse;
+    }
+
+    console.log('🔒 Checking access controls...');
+    const hasAccessControls =
+      (currentRoute.department_ids?.length ?? 0) > 0 ||
+      (currentRoute.team_ids?.length ?? 0) > 0 ||
+      (currentRoute.role_ids?.length ?? 0) > 0 ||
+      (currentRoute.user_ids?.length ?? 0) > 0;
+
+    if (!hasAccessControls) {
+      console.log('❌ No access controls defined');
+      return NextResponse.redirect(new URL('/access-denied', request.url));
+    }
+
+    console.log('🔑 Checking user permissions...');
+    const hasAccess =
+      (currentRoute.department_ids?.some((id) =>
+        userProfile.department_ids?.includes(id),
+      ) ??
+        false) ||
+      (currentRoute.team_ids?.some((id) => userProfile.team_ids?.includes(id)) ??
+        false) ||
+      (currentRoute.role_ids?.some((id) => userProfile.role_ids?.includes(id)) ??
+        false) ||
+      (currentRoute.user_ids?.includes(userProfile.id ?? '') ?? false);
+
+    console.log('✅ User has access:', hasAccess);
+
+    if (!hasAccess) {
+      console.log('🚫 Access denied');
+      return NextResponse.redirect(new URL('/access-denied', request.url));
+    }
+
+    console.log('✨ All checks passed, allowing access');
+    return supabaseResponse;
+  } catch (error) {
+    console.error('💥 Middleware error:', error);
+    return NextResponse.redirect(new URL('/access-denied', request.url));
+  }
 }
+
+const findClosestRoute = (pathname: string, routes: any[]) => {
+  // Split the pathname into segments
+  const pathSegments = pathname.split('/').filter(Boolean);
+
+  // Try increasingly shorter paths until we find a match
+  while (pathSegments.length > 0) {
+    const testPath = '/' + pathSegments.join('/');
+    const route = routes.find((r) => r.path === testPath);
+    if (route) {
+      console.log('🎯 Found closest matching route:', testPath);
+      return route;
+    }
+    pathSegments.pop();
+  }
+
+  // If no match found, check if root path exists
+  return routes.find((r) => r.path === '/');
+};
