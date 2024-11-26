@@ -187,7 +187,7 @@ const PortfolioPageViewer: React.FC = () => {
             </p>
           )}
 
-          {!selectedDocumentType && (
+          {!selectedDocumentType && selectedListingId && (
             <p className="animate-pulse text-lg text-foreground">
               Select a document type to get started!
             </p>

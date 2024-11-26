@@ -30,9 +30,19 @@ interface PortfolioPageContentProps {
   router: ReturnType<typeof useRouter>;
 }
 
+const usePortfolioParams = () => {
+  const searchParams = useSearchParams();
+  const listingId = searchParams?.get('listing');
+  const documentType = searchParams?.get('documentType');
+
+  return {
+    listingId: listingId && listingId !== 'null' ? listingId : null,
+    documentType: documentType && documentType !== 'null' ? documentType : null,
+  };
+};
+
 const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProps) => {
-  const selectedListingId = searchParams.get('listing') ?? null;
-  const selectedDocumentType = searchParams.get('documentType') ?? null;
+  const { listingId, documentType } = usePortfolioParams();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [documentTypeOpen, setDocumentTypeOpen] = useState(false);
@@ -64,7 +74,7 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
         )
       `,
       )
-      .eq('documents.listing_id', selectedListingId ?? -1)
+      .eq('documents.listing_id', listingId ?? -1)
       .ilike('type_name', '%portfolio%');
 
     if (error) {
@@ -152,9 +162,9 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
   });
 
   const { data: listingData, error: listingError } = useQuery({
-    queryKey: ['listing', selectedListingId],
-    queryFn: () => getListing(selectedListingId ?? ''),
-    enabled: !!selectedListingId,
+    queryKey: ['listing', listingId],
+    queryFn: () => getListing(listingId ?? ''),
+    enabled: !!listingId,
   });
 
   const { data: documentTypes, error: documentTypesError } = useQuery({
@@ -168,14 +178,14 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
     error: documentError,
     isFetching,
   } = useQuery({
-    enabled: !!selectedListingId && !!selectedDocumentType,
-    queryKey: ['document', selectedListingId, selectedDocumentType],
+    enabled: Boolean(listingId) && Boolean(documentType),
+    queryKey: ['document', listingId, documentType],
     queryFn: async () => {
-      console.log('Fetching document:', { selectedListingId, selectedDocumentType });
-      const { data: documentData, error } = await getDocument(
-        selectedListingId ?? '',
-        selectedDocumentType ?? '',
-      );
+      if (!listingId || !documentType) {
+        return null;
+      }
+
+      const { data: documentData, error } = await getDocument(listingId, documentType);
 
       console.log('documentData');
       console.log(documentData);
@@ -192,56 +202,56 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
 
       if (documentData?.document_data.headlineData) {
         queryClient.setQueryData(
-          ['draftHeadline', selectedListingId, selectedDocumentType],
+          ['draftHeadline', listingId, documentType],
           documentData.document_data.headlineData.headline as string,
         );
       }
 
       if (documentData?.document_data.propertyCopyData) {
         queryClient.setQueryData(
-          ['draftPropertyCopy', selectedListingId, selectedDocumentType],
+          ['draftPropertyCopy', listingId, documentType],
           documentData.document_data.propertyCopyData.propertyCopy as string,
         );
       }
 
       if (documentData?.document_data.agentsData) {
         queryClient.setQueryData(
-          ['draftAgents', selectedListingId, selectedDocumentType],
+          ['draftAgents', listingId, documentType],
           documentData.document_data.agentsData.agents,
         );
       }
 
       if (documentData?.document_data.saleTypeData) {
         queryClient.setQueryData(
-          ['draftSaleType', selectedListingId, selectedDocumentType],
+          ['draftSaleType', listingId, documentType],
           documentData.document_data.saleTypeData,
         );
       }
 
       if (documentData?.document_data.financeData) {
         queryClient.setQueryData(
-          ['draftFinance', selectedListingId, selectedDocumentType],
+          ['draftFinance', listingId, documentType],
           documentData.document_data.financeData,
         );
       }
 
       if (documentData?.document_data.addressData) {
         queryClient.setQueryData(
-          ['draftAddress', selectedListingId, selectedDocumentType],
+          ['draftAddress', listingId, documentType],
           documentData.document_data.addressData,
         );
       }
 
       if (documentData?.document_data?.photoData) {
         queryClient.setQueryData(
-          ['draftPhoto', selectedListingId, selectedDocumentType],
+          ['draftPhoto', listingId, documentType],
           documentData.document_data.photoData,
         );
       }
 
       if (documentData?.document_data?.logoData) {
         queryClient.setQueryData(
-          ['draftLogo', selectedListingId, selectedDocumentType],
+          ['draftLogo', listingId, documentType],
           documentData.document_data.logoData,
         );
       }
@@ -279,9 +289,7 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
                         aria-expanded={open}
                         className="w-full justify-between"
                       >
-                        {selectedListingId
-                          ? `Listing ${selectedListingId}`
-                          : 'Select listing...'}
+                        {listingId ? `Listing ${listingId}` : 'Select listing...'}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
@@ -361,7 +369,7 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
                                     <Check
                                       className={cn(
                                         'ml-auto h-4 w-4',
-                                        selectedListingId === listing.id.toString()
+                                        listingId === listing.id.toString()
                                           ? 'opacity-100'
                                           : 'opacity-0',
                                       )}
@@ -390,9 +398,9 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
                           aria-expanded={documentTypeOpen}
                           className="w-full justify-between"
                         >
-                          {selectedDocumentType
+                          {documentType
                             ? documentTypes?.find(
-                                (dt) => dt.id.toString() === selectedDocumentType,
+                                (dt) => dt.id.toString() === documentType,
                               )?.type_name
                             : 'Select Portfolio Page type...'}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -416,7 +424,7 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
                                   value={documentType.id.toString()}
                                   onSelect={(currentValue) => {
                                     router.push(
-                                      `/sandbox/document-generator/portfolio-page?listing=${selectedListingId}&documentType=${currentValue}`,
+                                      `/sandbox/document-generator/portfolio-page?listing=${listingId}&documentType=${currentValue}`,
                                     );
                                     setDocumentTypeOpen(false);
                                   }}
@@ -476,7 +484,7 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
                                   <Check
                                     className={cn(
                                       'ml-auto h-4 w-4',
-                                      selectedDocumentType === documentType.id.toString()
+                                      documentType === documentType.id.toString()
                                         ? 'opacity-100'
                                         : 'opacity-0',
                                     )}
@@ -495,15 +503,12 @@ const PortfolioPageContent = ({ searchParams, router }: PortfolioPageContentProp
           </Card>
 
           <PortfolioPageControls
-            isDisabled={!selectedListingId || !selectedDocumentType || !documentData}
+            isDisabled={!listingId || !documentType || !documentData}
             canEdit={true}
           />
         </div>
         <div className="relative z-10 flex h-full w-[55%] flex-col gap-4">
-          <PreviewControls
-            isDisabled={!selectedListingId}
-            setRerenderKey={setRerenderKey}
-          />
+          <PreviewControls isDisabled={!listingId} setRerenderKey={setRerenderKey} />
           <Card className="flex h-full overflow-hidden">
             <PortfolioPageViewer />
           </Card>
