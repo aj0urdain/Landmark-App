@@ -1,23 +1,12 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { redirect } from 'next/navigation';
 
-function AdminPage() {
-  return (
-    <div className="mx-auto flex h-full max-w-6xl flex-col items-center justify-center gap-4 py-4">
-      <Card className="h-full w-full">
-        <CardHeader>
-          <CardTitle>Admin Dashboard</CardTitle>
-          <CardDescription>Access administrator settings here</CardDescription>
-        </CardHeader>
-        <CardContent className="h-full w-full">Controls to come!</CardContent>
-      </Card>
-    </div>
-  );
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Admin',
+  description: 'Manage the Landmark platform.',
+};
+
+export default function AdminPage() {
+  redirect('/admin/home');
 }
-
-export default AdminPage;
