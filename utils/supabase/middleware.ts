@@ -109,28 +109,42 @@ export async function updateSession(request: NextRequest) {
     }
 
     console.log('🔒 Checking access controls...');
+    const routeWithInheritedAccess = getRouteWithInheritedAccess(
+      currentRoute,
+      routePermissions,
+    );
+
+    if (!routeWithInheritedAccess) {
+      console.log('❌ No route found after inheritance check');
+      return NextResponse.redirect(new URL('/access-denied', request.url));
+    }
+
     const hasAccessControls =
-      (currentRoute.department_ids?.length ?? 0) > 0 ||
-      (currentRoute.team_ids?.length ?? 0) > 0 ||
-      (currentRoute.role_ids?.length ?? 0) > 0 ||
-      (currentRoute.user_ids?.length ?? 0) > 0;
+      (routeWithInheritedAccess.department_ids?.length ?? 0) > 0 ||
+      (routeWithInheritedAccess.team_ids?.length ?? 0) > 0 ||
+      (routeWithInheritedAccess.role_ids?.length ?? 0) > 0 ||
+      (routeWithInheritedAccess.user_ids?.length ?? 0) > 0;
 
     if (!hasAccessControls) {
-      console.log('❌ No access controls defined');
+      console.log('❌ No access controls defined after inheritance');
       return NextResponse.redirect(new URL('/access-denied', request.url));
     }
 
     console.log('🔑 Checking user permissions...');
     const hasAccess =
-      (currentRoute.department_ids?.some((id) =>
+      (routeWithInheritedAccess.department_ids?.some((id) =>
         userProfile.department_ids?.includes(id),
       ) ??
         false) ||
-      (currentRoute.team_ids?.some((id) => userProfile.team_ids?.includes(id)) ??
+      (routeWithInheritedAccess.team_ids?.some((id) =>
+        userProfile.team_ids?.includes(id),
+      ) ??
         false) ||
-      (currentRoute.role_ids?.some((id) => userProfile.role_ids?.includes(id)) ??
+      (routeWithInheritedAccess.role_ids?.some((id) =>
+        userProfile.role_ids?.includes(id),
+      ) ??
         false) ||
-      (currentRoute.user_ids?.includes(userProfile.id ?? '') ?? false);
+      (routeWithInheritedAccess.user_ids?.includes(userProfile.id ?? '') ?? false);
 
     console.log('✅ User has access:', hasAccess);
 
@@ -164,4 +178,29 @@ const findClosestRoute = (pathname: string, routes: any[]) => {
 
   // If no match found, check if root path exists
   return routes.find((r) => r.path === '/');
+};
+
+const getRouteWithInheritedAccess = (route: any, routes: any[]) => {
+  if (!route) return null;
+
+  // Check if route has any access controls
+  const hasAccessControls =
+    (route.department_ids?.length ?? 0) > 0 ||
+    (route.team_ids?.length ?? 0) > 0 ||
+    (route.role_ids?.length ?? 0) > 0 ||
+    (route.user_ids?.length ?? 0) > 0;
+
+  // If route has access controls, return it as is
+  if (hasAccessControls) {
+    return route;
+  }
+
+  // If no access controls and has parent, inherit from parent
+  if (route.parent_path) {
+    const parentRoute = routes.find((r) => r.id === route.parent_path);
+    return getRouteWithInheritedAccess(parentRoute, routes);
+  }
+
+  // If no parent and no access controls, return original route
+  return route;
 };
