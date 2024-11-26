@@ -49,7 +49,7 @@ const ArticleViews = ({ article }: { article: Article }) => {
             {viewers?.length ?? 0} Unique Viewer{viewers?.length !== 1 ? 's' : ''}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground/75">
-            Viewers who have viewed this article.
+            Staff who have viewed this article.
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="h-[300px] pr-4">

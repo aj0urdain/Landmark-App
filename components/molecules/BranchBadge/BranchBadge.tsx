@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -74,15 +76,9 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
     },
   });
 
-  const stateInfo = branchData?.states
+  const stateInfo = branchData?.states?.short_name
     ? stateIcons[branchData.states.short_name.toUpperCase()]
     : null;
-
-  if (!stateInfo) {
-    return null;
-  }
-
-  const { icon: Icon, color } = stateInfo;
 
   const sizeClasses = {
     small: {
@@ -107,11 +103,7 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
     },
   };
 
-  if (isLoading) {
-    return null;
-  }
-
-  if (isError) {
+  if (isLoading || isError || !branchData) {
     return null;
   }
 
@@ -126,16 +118,16 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
         size="sm"
         className={cn(
           'm-0 flex items-center gap-1 p-0 text-muted-foreground hover:bg-transparent animate-slide-left-fade-in',
-          colored ? color : '',
+          colored && stateInfo ? stateInfo.color : '',
           list ? 'h-auto' : 'bg-transparent',
           size === 'huge' ? 'gap-4' : '',
           'transition-colors',
           sizeClasses[size].button,
         )}
       >
-        {showIcon && (
+        {showIcon && stateInfo && (
           <div className={cn('flex items-center justify-center', sizeClasses[size].icon)}>
-            <Icon className="h-full w-full" fill="currentColor" />
+            <stateInfo.icon className="h-full w-full" fill="currentColor" />
           </div>
         )}
         <span
@@ -145,7 +137,7 @@ const BranchBadge: React.FC<BranchBadgeProps> = ({
             className,
           )}
         >
-          {branchData?.branch_name}
+          {branchData.branch_name}
         </span>
       </Button>
     </Link>

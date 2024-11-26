@@ -16,7 +16,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { useRoutePermission } from '@/hooks/useRoutePermission';
 import { useRouter } from 'next/navigation';
 
-TimeAgo.addDefaultLocale(en);
+TimeAgo.addLocale(en);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);

@@ -20,6 +20,7 @@ import {
   Briefcase,
   Newspaper,
   Calendar,
+  Loader2,
 } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
@@ -57,6 +58,8 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
   const { data: branch, isLoading } = useQuery({
     queryKey: ['branch', params.name],
     queryFn: async () => {
+      const decodedBranchName = decodeURIComponent(params.name).replace(/-/g, ' ');
+
       const { data, error } = await supabase
         .from('branches')
         .select(
@@ -67,7 +70,7 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
           suburbs (suburb_name, postcode)
         `,
         )
-        .ilike('branch_name', params.name.replace(/-/g, ' '))
+        .ilike('branch_name', decodedBranchName)
         .single();
 
       if (error) {
@@ -99,7 +102,11 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
   });
 
   if (isLoading) {
-    return <div>Loading branch details...</div>;
+    return (
+      <div className="flex items-center justify-center h-48">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
   }
 
   if (!branch) {
@@ -152,7 +159,9 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-background to-background/70" />
 
         <div className="absolute bottom-6 left-6">
-          <Badge className="mb-2">{branch.states?.state_name}</Badge>
+          <Badge className="mb-2 bg-muted/80 hover:bg-muted/100 text-foreground">
+            {branch.states?.state_name}
+          </Badge>
           <h1 className="text-4xl font-bold text-white">
             <BranchBadge
               branchName={branch.branch_name}

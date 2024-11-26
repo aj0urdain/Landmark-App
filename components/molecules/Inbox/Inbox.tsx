@@ -14,6 +14,7 @@ import {
   Archive,
   X,
   RotateCcw,
+  Hammer,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Dot } from '@/components/atoms/Dot/Dot';
@@ -614,26 +615,20 @@ export function Inbox({
   };
 
   const renderCollapsedNotifications = (showArchive: boolean) => {
-    const filteredNotifications = showArchive
-      ? notifications.filter((n) => n.read)
-      : notifications.filter((n) => !n.read);
-
-    const groupedNotifications = groupNotifications(filteredNotifications, dummyTasks);
-
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 w-full">
         {(['me', 'groups', 'company'] as const).map((section) => {
-          const count = groupedNotifications[section].length;
-          if (count === 0) return null;
           return (
             <div
               key={section}
-              className="flex w-fit flex-col items-center justify-center gap-1 rounded-full border border-muted bg-muted/25 p-2"
+              className="flex w-full flex-col items-center text-muted-foreground justify-center gap-1 py-3 rounded-full border border-muted bg-muted/25 px-2"
             >
               {section === 'me' && <User className="h-4 w-4" />}
               {section === 'groups' && <Users className="h-4 w-4" />}
               {section === 'company' && <Building className="h-4 w-4" />}
-              <span className="mt-1 text-xs">{count}</span>
+              <span className="mt-1 text-xs">
+                <Hammer className="h-3 w-3 text-muted-foreground/75" />
+              </span>
             </div>
           );
         })}
@@ -654,12 +649,11 @@ export function Inbox({
     });
 
     return (
-      <>
+      <div className="w-full">
         {(['me', 'groups', 'company'] as const).map((section) => {
-          if (groupedNotifications[section].length === 0) return null;
           return (
-            <div key={section}>
-              <div className="flex items-center justify-between">
+            <div key={section} className="w-full">
+              <div className="flex w-full items-center justify-between min-w-full">
                 <h3 className="flex items-center gap-1 text-xs font-semibold capitalize text-muted-foreground">
                   {section === 'me' && <User className="h-3 w-3" />}
                   {section === 'groups' && <Users className="h-3 w-3" />}
@@ -680,58 +674,25 @@ export function Inbox({
                   )}
                 </Button>
               </div>
-              {visibleSections[section] &&
-                groupedNotifications[section].map((notification) => {
-                  const task = dummyTasks.find((t) => t.id === notification.task_id);
-                  if (!task) return null;
-                  return (
-                    <Card
-                      key={notification.id}
-                      className="relative mb-2 animate-slide-down-fade-in p-4"
-                    >
-                      <div className="flex items-start gap-2">
-                        <Dot
-                          size="small"
-                          className={`mt-1.5 ${
-                            task.priority === 'high'
-                              ? 'animate-pulse bg-red-500'
-                              : task.priority === 'medium'
-                                ? 'bg-yellow-500'
-                                : 'bg-green-500'
-                          }`}
-                        />
-                        <div className="flex-1">
-                          <h1
-                            className={`line-clamp-2 text-xs font-semibold ${showArchive ? 'text-muted-foreground line-through' : ''}`}
-                          >
-                            {task.title}
-                          </h1>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {/* <ReactTimeAgo date={new Date(notification.created_at)} /> */}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="group absolute right-1 top-1 h-6 w-6 rounded-full"
-                          onClick={() => {
-                            toggleNotificationRead(notification.id);
-                          }}
-                        >
-                          {notification.read ? (
-                            <RotateCcw className="h-3 w-3 text-muted-foreground group-hover:text-primary" />
-                          ) : (
-                            <X className="h-3 w-3 text-muted-foreground group-hover:text-destructive" />
-                          )}
-                        </Button>
-                      </div>
-                    </Card>
-                  );
-                })}
+              {visibleSections[section] && (
+                <Card className="relative mb-2 animate-slide-down-fade-in p-4 select-none">
+                  <div className="flex items-start gap-2">
+                    <Hammer className="mt-1 h-4 w-4 text-muted-foreground" />
+                    <div className="flex-1">
+                      <h1 className="line-clamp-2 text-xs font-semibold text-muted-foreground">
+                        Under Construction!
+                      </h1>
+                      <p className="mt-1 text-xs text-muted">
+                        This feature is under development.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              )}
             </div>
           );
         })}
-      </>
+      </div>
     );
   };
 
@@ -801,13 +762,13 @@ export function Inbox({
                   <p className="text-xs">Archive</p>
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="inbox" className="flex-grow overflow-hidden">
-                <ScrollArea className="h-full">
+              <TabsContent value="inbox" className="flex-grow overflow-hidden w-full">
+                <ScrollArea className="h-full w-full">
                   {showContent && renderNotifications(false)}
                 </ScrollArea>
               </TabsContent>
-              <TabsContent value="archive" className="flex-grow overflow-hidden">
-                <ScrollArea className="h-full">
+              <TabsContent value="archive" className="flex-grow overflow-hidden w-full">
+                <ScrollArea className="h-full w-full">
                   {showContent && renderNotifications(true)}
                 </ScrollArea>
               </TabsContent>
