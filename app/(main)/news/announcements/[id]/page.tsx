@@ -9,6 +9,8 @@ const AnnouncementArticlePage = () => {
   const articleId = params.id as string;
 
   return <ArticleDisplay articleId={articleId} />;
+
+  // Need to add further filters (branch, team, department)
 };
 
 export default AnnouncementArticlePage;
