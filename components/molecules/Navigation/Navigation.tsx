@@ -1,14 +1,13 @@
 'use client';
 
-import React, { Fragment } from 'react';
-import { useRoutePermissions } from '@/queries/access/hooks';
+import React, { Fragment, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { userProfileOptions } from '@/types/userProfileTypes';
 import { Separator } from '@/components/ui/separator';
 import { NavLink } from '@/components/atoms/NavLink/NavLink';
 import { FeedbackButton } from '@/components/molecules/Feedback/FeedbackButton/FeedbackButton';
 import { getIconFromString } from '@/utils/icons/icons';
-import { useUser } from '@/queries/users/hooks';
+import { useAccessibleRoutes } from '@/hooks/useAccessibleRoutes';
 
 interface NavigationProps {
   isCollapsed: boolean;
@@ -17,47 +16,51 @@ interface NavigationProps {
 export const Navigation = React.memo(function Navigation({
   isCollapsed,
 }: NavigationProps) {
-  const { data: routePermissions, isLoading } = useRoutePermissions();
+  const { accessibleRoutes, isLoading, getMainRoutes } = useAccessibleRoutes();
   const { data: userProfile } = useQuery(userProfileOptions);
-  const { data: user } = useUser(userProfile?.id ?? '');
+  const [activeSubsection, setActiveSubsection] = useState<string | null>(null);
 
-  if (isLoading || !routePermissions || !userProfile || !user) return null;
+  if (isLoading || !userProfile) return null;
 
-  const mainRoutes = routePermissions
-    .filter((route) => route.visible && !route.parent_path)
-    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const mainRoutes = getMainRoutes?.();
+
+  if (!mainRoutes) return null;
 
   return (
-    <nav className="flex w-full flex-col gap-2 pt-4">
+    <nav className="flex w-full flex-col gap-0 pt-4">
       {mainRoutes.map((route, index) => {
         if (!route.path) {
-          return <Separator key={`separator-${route.id}`} className="my-4" />;
+          return <Separator key={`separator-${String(route.id)}`} className="my-4" />;
         }
 
-        const subsections = routePermissions
+        const subsections = accessibleRoutes
           .filter((r) => r.parent_path === route.id)
           .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
         const Icon = getIconFromString(route.icon ?? '');
 
         return (
-          <Fragment key={`navlink-${route.id}-${index}`}>
+          <Fragment key={`navlink-${String(route.id)}-${String(index)}`}>
             <NavLink
               href={route.path}
               icon={Icon}
-              routeId={route.id}
-              userId={user.id}
+              routeId={route.id ?? ''}
+              userId={userProfile.id}
               isCollapsed={isCollapsed}
-              comingSoon={route.developing ?? false}
+              comingSoon={!route.isClickable}
+              isExpanded={activeSubsection === route.id}
+              onExpand={() => {
+                setActiveSubsection(activeSubsection === route.id ? null : route.id);
+              }}
               subsections={
                 subsections.length > 0
                   ? subsections.map((sub) => ({
-                      name: sub.label,
-                      href: sub.path,
+                      name: sub.label ?? '',
+                      href: sub.path ?? '',
                       icon: getIconFromString(sub.icon ?? ''),
-                      comingSoon: sub.developing ?? false,
-                      routeId: sub.id,
-                      userId: user.id,
+                      comingSoon: !sub.isClickable,
+                      routeId: sub.id ?? '',
+                      userId: userProfile.id,
                     }))
                   : undefined
               }

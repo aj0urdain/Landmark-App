@@ -23,6 +23,8 @@ interface NavLinkProps {
   comingSoon?: boolean;
   routeId?: string;
   userId?: string;
+  isExpanded?: boolean;
+  onExpand?: () => void;
   subsections?: {
     name: string;
     href: string;
@@ -31,6 +33,7 @@ interface NavLinkProps {
     routeId?: string;
     userId?: string;
   }[];
+  isSubsection?: boolean;
 }
 
 export const NavLink = React.memo(function NavLink({
@@ -40,8 +43,10 @@ export const NavLink = React.memo(function NavLink({
   isCollapsed,
   comingSoon = false,
   subsections,
+  isExpanded = false,
+  onExpand,
+  isSubsection = false,
 }: NavLinkProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -52,7 +57,13 @@ export const NavLink = React.memo(function NavLink({
 
   const isActive =
     pathname === href ||
-    (pathname.startsWith(`${href}/`) && href !== '/wiki' && href !== '/');
+    pathname === `${href}/home` ||
+    (pathname.startsWith(`${href}/`) && !pathname.endsWith('/home'));
+
+  const shouldRenderSubsection = (sub: { href: string }) => {
+    return !sub.href.endsWith('/home');
+  };
+
   const isSubsectionActive = subsections?.some(
     (sub) => pathname === sub.href || pathname.startsWith(`${sub.href}/`),
   );
@@ -72,7 +83,7 @@ export const NavLink = React.memo(function NavLink({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setIsExpanded(!isExpanded);
+                onExpand?.();
               }}
               className="relative z-10 ml-auto"
             >
@@ -90,7 +101,7 @@ export const NavLink = React.memo(function NavLink({
   );
 
   const linkClass = cn(
-    'flex items-center py-2 text-sm font-medium rounded-md transition-all duration-200 ease-in-out',
+    'flex items-center py-2 my-1 text-sm font-medium rounded-md transition-all duration-200 ease-in-out',
     isActive && !subsections
       ? 'bg-primary text-primary-foreground'
       : isSubsectionActive && subsections && !isCollapsed
@@ -141,7 +152,10 @@ export const NavLink = React.memo(function NavLink({
               side="right"
               align="center"
               sideOffset={10}
-              className="flex cursor-pointer items-center gap-1 bg-muted text-xs text-muted-foreground select-none z-[100]"
+              className={cn(
+                'flex cursor-pointer items-center gap-1 bg-muted text-xs text-muted-foreground select-none z-[100]',
+                isSubsection && 'mb-1.5',
+              )}
             >
               <Link href="/updates" className="flex items-center gap-1 z-[100]">
                 <Cpu className="h-4 w-4 animate-pulse text-blue-500" />
@@ -175,9 +189,18 @@ export const NavLink = React.memo(function NavLink({
           {linkContent}
         </Link>
       )}
-      {!isCollapsed && subsections && isExpanded && (
-        <div className="ml-3 mt-1 animate-slide-down-fade-in space-y-1 z-[100] overflow-visible">
-          {subsections.map((subsection) => (
+      {!isCollapsed && subsections && (
+        <div
+          className={cn(
+            'ml-3 space-y-1 z-[100] overflow-hidden transition-all duration-200 ease-in-out',
+            isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 p-0 m-0',
+          )}
+          style={{
+            visibility: isExpanded ? 'visible' : 'hidden',
+            marginBottom: isExpanded ? '0.25rem' : '0',
+          }}
+        >
+          {subsections.filter(shouldRenderSubsection).map((subsection) => (
             <NavLink
               key={subsection.href}
               href={subsection.href}
@@ -186,6 +209,9 @@ export const NavLink = React.memo(function NavLink({
               comingSoon={subsection.comingSoon}
               routeId={subsection.routeId}
               userId={subsection.userId}
+              isExpanded={isExpanded}
+              onExpand={onExpand}
+              isSubsection={true}
             >
               <span className="text-xs">{subsection.name}</span>
             </NavLink>

@@ -7,42 +7,43 @@ import { LogoWordmark } from '@/components/atoms/LogoWordmark/LogoWordmark';
 import { Dot } from '@/components/atoms/Dot/Dot';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Cpu, LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/atoms/Logo/Logo';
-import { Hammer } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import Link from 'next/link';
+import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAccessibleRoutes } from '@/hooks/useAccessibleRoutes';
+import { getIconFromString } from '@/utils/icons/icons';
+import { DevelopingTooltip } from '@/components/atoms/DevelopingTooltip/DevelopingTooltip';
 
-interface NavLink {
-  name: string;
-  icon: LucideIcon;
-  href: string;
-  disabled?: boolean;
-}
-
-interface SubNavigationMenuProps {
-  title: string;
-  links: NavLink[];
-  rootPath: string;
-}
-
-const SubNavigationMenu: React.FC<SubNavigationMenuProps> = ({
-  title,
-  links,
-  rootPath,
-}) => {
+const SubNavigationMenu: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const { accessibleRoutes, isLoading, getSubRoutes } = useAccessibleRoutes();
 
   useEffect(() => {
     setLoadingStates({});
   }, [pathname]);
+
+  // Get the first segment of the path
+  const segments = pathname.split('/').filter(Boolean);
+  const title =
+    segments[0]?.charAt(0).toUpperCase() + segments[0]?.slice(1).toLowerCase();
+
+  if (isLoading) return null;
+
+  // Find parent route to get its ID
+  const parentRoute = accessibleRoutes.find(
+    (route) => route.path === `/${title.toLowerCase()}`,
+  );
+
+  if (!parentRoute) return null;
+
+  // Get sub-routes for this section
+  const links = getSubRoutes?.(parentRoute.id ?? '').map((route) => ({
+    label: route.label,
+    icon: getIconFromString(route.icon ?? ''),
+    path: route.path,
+    developing: route.developing ?? false,
+  }));
 
   const handleClick = (href: string, disabled?: boolean) => {
     if (disabled) return;
@@ -51,6 +52,8 @@ const SubNavigationMenu: React.FC<SubNavigationMenuProps> = ({
       router.push(href);
     }
   };
+
+  if (!links) return null;
 
   return (
     <div className="sticky top-0 z-30 bg-gradient-to-b from-transparent via-background/50 to-background backdrop-blur-3xl rounded-b-xl">
@@ -64,45 +67,31 @@ const SubNavigationMenu: React.FC<SubNavigationMenuProps> = ({
           </div>
           <div className="flex items-center gap-4 sm:gap-6 xl:gap-8">
             {links.map((link) => (
-              <TooltipProvider key={link.name} delayDuration={100}>
+              <TooltipProvider key={link.label} delayDuration={100}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       onClick={() => {
-                        handleClick(link.href, link.disabled);
+                        handleClick(link.path ?? '', link.developing);
                       }}
                       variant="ghost"
                       className={cn(
                         'flex items-center p-0 px-0 transition-all sm:px-1 xl:gap-1 xl:px-2',
-                        pathname === link.href ||
-                          (pathname.startsWith(`${link.href}/`) && link.href !== rootPath)
+                        pathname === link.path ||
+                          (pathname.startsWith(`${String(link.path)}/`) &&
+                            link.path !== '/')
                           ? 'border-b-2 border-foreground text-foreground hover:bg-transparent'
                           : 'text-muted-foreground hover:border-b-2 hover:border-foreground hover:bg-transparent hover:text-foreground',
-                        loadingStates[link.href] &&
+                        loadingStates[link.path ?? ''] &&
                           'animate-pulse [animation-duration:2s]',
-                        link.disabled && 'cursor-not-allowed opacity-50',
+                        link.developing && 'cursor-not-allowed opacity-50',
                       )}
                     >
                       <link.icon className="h-4 w-4 xl:h-3 xl:w-3" />
-                      <span className="hidden xl:block">{link.name}</span>
+                      <span className="hidden xl:block">{link.label}</span>
                     </Button>
                   </TooltipTrigger>
-                  {link.disabled && (
-                    <TooltipContent
-                      side="top"
-                      align="center"
-                      sideOffset={10}
-                      className="flex cursor-pointer items-center gap-1 bg-muted text-xs text-blue-500 select-none z-[100]"
-                    >
-                      <Link href="/updates" className="flex items-center gap-1">
-                        <Cpu className="h-4 w-4 animate-pulse" />
-                        <p className="animated-underline-1">
-                          {link.name} is under construction by
-                          <span className="font-bold"> @Aaron!</span>
-                        </p>
-                      </Link>
-                    </TooltipContent>
-                  )}
+                  {link.developing && <DevelopingTooltip label={link.label ?? ''} />}
                 </Tooltip>
               </TooltipProvider>
             ))}
