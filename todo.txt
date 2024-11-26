@@ -1,0 +1,18 @@
+// need to define access to all routes
+// need to block off library
+// need to add further filters (branch, team, department) to announcements
+// edit login page to be mobile friendly and replace logo with
+// Burgess Rawson, powered by Landmark
+// need to test logins
+// need to get chelsea to test login and creating an announcement
+// need to create an admin panel for managing users
+// need to fix portfolio page with listings
+// need to fix auctions page
+// need to remove results from hardcoded values
+// need to add metadata to all pages
+// need to add coming soon to inbox section
+// need to fix department pages to use generic structure
+// need to add path access to all burgess rawson members
+// need to edit navigation control for visibility
+
+// 

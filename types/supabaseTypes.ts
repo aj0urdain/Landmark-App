@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export type Database = {
+export interface Database {
   public: {
     Tables: {
       app_config: {
@@ -140,24 +140,34 @@ export type Database = {
       };
       article_reactions: {
         Row: {
+          article_id: number | null;
           created_at: string | null;
           id: number;
           react_type: string;
           user_id: string;
         };
         Insert: {
+          article_id?: number | null;
           created_at?: string | null;
           id?: number;
           react_type: string;
           user_id: string;
         };
         Update: {
+          article_id?: number | null;
           created_at?: string | null;
           id?: number;
           react_type?: string;
           user_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'article_reactions_article_id_fkey';
+            columns: ['article_id'];
+            isOneToOne: false;
+            referencedRelation: 'articles';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'article_reactions_user_id_fkey';
             columns: ['user_id'];
@@ -696,67 +706,6 @@ export type Database = {
           },
         ];
       };
-      comments: {
-        Row: {
-          comment: string;
-          created_at: string | null;
-          created_by: string | null;
-          edit_history: Json | null;
-          entity_id: string;
-          entity_type: string | null;
-          id: string;
-          parent_id: string | null;
-          reactions: Json | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          comment: string;
-          created_at?: string | null;
-          created_by?: string | null;
-          edit_history?: Json | null;
-          entity_id: string;
-          entity_type?: string | null;
-          id?: string;
-          parent_id?: string | null;
-          reactions?: Json | null;
-          updated_at?: string | null;
-        };
-        Update: {
-          comment?: string;
-          created_at?: string | null;
-          created_by?: string | null;
-          edit_history?: Json | null;
-          entity_id?: string;
-          entity_type?: string | null;
-          id?: string;
-          parent_id?: string | null;
-          reactions?: Json | null;
-          updated_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'comments_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'user_profile_complete';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'comments_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'user_profiles';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'comments_parent_id_fkey';
-            columns: ['parent_id'];
-            isOneToOne: false;
-            referencedRelation: 'comments';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       countries: {
         Row: {
           country_name: string | null;
@@ -830,6 +779,20 @@ export type Database = {
             columns: ['document_id'];
             isOneToOne: false;
             referencedRelation: 'documents';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'document_history_edited_by_fkey1';
+            columns: ['edited_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'document_history_edited_by_fkey1';
+            columns: ['edited_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
             referencedColumns: ['id'];
           },
           {
@@ -1037,7 +1000,22 @@ export type Database = {
           updated_at?: string | null;
           user_id?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'feedback_tickets_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'feedback_tickets_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       link_categories: {
         Row: {
@@ -1149,7 +1127,22 @@ export type Database = {
           note?: string;
           updated_at?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'notes_created_by_fkey1';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'notes_created_by_fkey1';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       notifications: {
         Row: {
@@ -1182,7 +1175,22 @@ export type Database = {
           priority?: string | null;
           read?: boolean | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_notification_assignee_fkey1';
+            columns: ['notification_assignee'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'notifications_notification_assignee_fkey1';
+            columns: ['notification_assignee'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       otp_attempts: {
         Row: {
@@ -1200,7 +1208,22 @@ export type Database = {
           created_at?: string;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'otp_attempts_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'otp_attempts_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       portfolio_magazines: {
         Row: {
@@ -1265,6 +1288,21 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      portfolio_results: {
+        Row: {
+          created_at: string;
+          id: number;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+        };
+        Relationships: [];
       };
       portfolios: {
         Row: {
@@ -1364,6 +1402,20 @@ export type Database = {
           updated_at?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: 'properties_lead_agent_fkey1';
+            columns: ['lead_agent'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'properties_lead_agent_fkey1';
+            columns: ['lead_agent'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'property_state_id_fkey';
             columns: ['state_id'];
@@ -1623,6 +1675,13 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'route_access_route_id_fkey';
+            columns: ['route_id'];
+            isOneToOne: false;
+            referencedRelation: 'route_permissions_complete';
+            referencedColumns: ['id'];
+          },
+          {
             foreignKeyName: 'route_access_team_id_fkey';
             columns: ['team_id'];
             isOneToOne: false;
@@ -1652,10 +1711,11 @@ export type Database = {
           icon: string | null;
           id: string;
           label: string;
+          main_navigation: boolean;
           parent_path: string | null;
           path: string;
+          public: boolean | null;
           sort_order: number | null;
-          visible: boolean | null;
         };
         Insert: {
           created_at?: string;
@@ -1663,10 +1723,11 @@ export type Database = {
           icon?: string | null;
           id?: string;
           label: string;
+          main_navigation?: boolean;
           parent_path?: string | null;
           path: string;
+          public?: boolean | null;
           sort_order?: number | null;
-          visible?: boolean | null;
         };
         Update: {
           created_at?: string;
@@ -1674,10 +1735,11 @@ export type Database = {
           icon?: string | null;
           id?: string;
           label?: string;
+          main_navigation?: boolean;
           parent_path?: string | null;
           path?: string;
+          public?: boolean | null;
           sort_order?: number | null;
-          visible?: boolean | null;
         };
         Relationships: [
           {
@@ -1685,6 +1747,13 @@ export type Database = {
             columns: ['parent_path'];
             isOneToOne: false;
             referencedRelation: 'route_permissions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'route_permissions_parent_path_fkey';
+            columns: ['parent_path'];
+            isOneToOne: false;
+            referencedRelation: 'route_permissions_complete';
             referencedColumns: ['id'];
           },
         ];
@@ -2145,6 +2214,20 @@ export type Database = {
             referencedRelation: 'roles';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'user_roles_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profile_complete';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_roles_user_id_fkey1';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_profiles';
+            referencedColumns: ['id'];
+          },
         ];
       };
       user_teams: {
@@ -2189,6 +2272,43 @@ export type Database = {
       };
     };
     Views: {
+      route_permissions_complete: {
+        Row: {
+          created_at: string | null;
+          department_ids: number[] | null;
+          departments: string[] | null;
+          developing: boolean | null;
+          icon: string | null;
+          id: string | null;
+          label: string | null;
+          main_navigation: boolean | null;
+          parent_path: string | null;
+          path: string | null;
+          public: boolean | null;
+          role_ids: number[] | null;
+          roles: string[] | null;
+          sort_order: number | null;
+          team_ids: number[] | null;
+          teams: string[] | null;
+          user_ids: string[] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'route_permissions_parent_path_fkey';
+            columns: ['parent_path'];
+            isOneToOne: false;
+            referencedRelation: 'route_permissions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'route_permissions_parent_path_fkey';
+            columns: ['parent_path'];
+            isOneToOne: false;
+            referencedRelation: 'route_permissions_complete';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       user_profile_complete: {
         Row: {
           biography_description: string | null;
@@ -2322,7 +2442,7 @@ export type Database = {
       [_ in never]: never;
     };
   };
-};
+}
 
 type PublicSchema = Database[Extract<keyof Database, 'public'>];
 
