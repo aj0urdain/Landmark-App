@@ -3,10 +3,28 @@ import { cn } from '@/lib/utils';
 interface DotProps {
   size?: 'tiny' | 'small' | 'large';
   className?: string;
+  animationDelay?: string;
+  animationDuration?: string;
 }
 
-export function Dot({ size = 'small', className }: DotProps) {
-  const sizeClass =
-    size === 'tiny' ? 'h-0.5 w-0.5' : size === 'small' ? 'h-1 w-1' : 'h-2 w-2';
-  return <div className={cn(`${sizeClass} rounded-full`, className)} />;
-}
+export const Dot = ({
+  size = 'small',
+  className,
+  animationDelay,
+  animationDuration,
+}: DotProps) => {
+  const sizeClasses = {
+    tiny: 'h-1 w-1',
+    small: 'h-1.5 w-1.5',
+    large: 'h-2 w-2',
+  };
+
+  const style = {
+    animationDelay,
+    animationDuration,
+  };
+
+  return (
+    <div className={cn('rounded-full', sizeClasses[size], className)} style={style} />
+  );
+};

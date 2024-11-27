@@ -43,7 +43,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
 
       if (error) {
         if (error.code === 'PGRST116') {
-          console.log('No announcements found');
+          console.log('No announcements found for department', departmentID);
           return null;
         }
         console.error('Error fetching announcements:', error);
@@ -71,6 +71,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
 
       if (error) {
         if (error.code === 'PGRST116') {
+          console.log('No news found for department', departmentID);
           return null;
         }
         console.error('Error fetching news:', error);
@@ -136,7 +137,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
       <div className="absolute top-0 left-0 w-full h-full z-10 rounded-xl overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-background group-hover:opacity-90 opacity-100 transition-opacity duration-300 via-background/95 to-background/90 z-10" />
 
-        {latestAnnouncement?.cover_image ? (
+        {latestAnnouncement?.cover_image && activeTab === 'announcement' ? (
           <Image
             src={latestAnnouncement.cover_image}
             alt="Department News"
@@ -144,7 +145,7 @@ const GenericDepartmentNewsCard = ({ departmentID }: { departmentID: number }) =
             sizes="250px"
             className="object-cover rounded-xl"
           />
-        ) : latestNews?.cover_image ? (
+        ) : latestNews?.cover_image && activeTab === 'news' ? (
           <Image
             src={latestNews.cover_image}
             alt="Department News"

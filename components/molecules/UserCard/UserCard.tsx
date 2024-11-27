@@ -169,7 +169,11 @@ const UserCard = ({
                 </p>
               </Link>
               {user?.roles?.map((role: string) => (
-                <Link href={`/wiki/learn/roles/${role.split(' ').join('-')}`} key={role}>
+                <Link
+                  // href={`/wiki/learn/roles/${role.split(' ').join('-')}`}
+                  href="#"
+                  key={role}
+                >
                   <div
                     key={role}
                     className={`flex max-w-60 text-[0.85rem] w-fit items-start gap-1.5 font-normal text-muted-foreground
