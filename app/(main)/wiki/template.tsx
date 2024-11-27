@@ -7,10 +7,11 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const segments = pathname.split('/').filter(Boolean);
   const isOneLevelDeep = segments.length === 2;
+  const isHomePage = pathname === '/wiki/home';
 
   return (
     <div className="flex flex-col">
-      {isOneLevelDeep && <GenericHeader />}
+      {isOneLevelDeep && !isHomePage && <GenericHeader />}
       {children}
     </div>
   );

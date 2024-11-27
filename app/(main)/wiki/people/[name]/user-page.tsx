@@ -223,7 +223,8 @@ export function UserPage() {
 
               <div className="ml-2 flex animate-slide-up-fade-in items-center gap-4 text-2xl font-semibold text-muted-foreground opacity-0 [animation-delay:_1.5s] [animation-duration:_0.5s] [animation-fill-mode:_forwards]">
                 <Link
-                  href={`/wiki/learn/roles/${data?.roles?.map((role: string) => role).join('-')}`}
+                  // href={`/wiki/learn/roles/${data.roles?.map((role: string) => role).join('-') ?? ''}`}
+                  href="#"
                 >
                   <div className="flex items-center gap-2 animated-underline-1">
                     <IdCard />

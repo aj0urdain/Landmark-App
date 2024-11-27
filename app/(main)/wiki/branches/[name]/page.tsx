@@ -95,7 +95,10 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
         .contains('branches', [branch?.branch_name ?? ''])
         .order('work_anniversary', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error(error);
+        throw new Error(error.message);
+      }
       return data;
     },
     enabled: !!branch,
@@ -180,23 +183,23 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
             className="flex items-center gap-2 hover:text-foreground"
           >
             <Building2 className="h-4 w-4" />
-            Overview
+            <p className="animated-underline-1">Overview</p>
           </TabsTrigger>
           <TabsTrigger
             value="staff"
             className="flex items-center gap-2 hover:text-foreground"
           >
             <Users className="h-4 w-4" />
-            Staff
+            <p className="animated-underline-1">Staff</p>
           </TabsTrigger>
-
+          {/* if disabled, i want to make the text color darker, like text-muted-foreground/60 */}
           <TabsTrigger value="news" className="flex items-center gap-2" disabled>
             <Newspaper className="h-4 w-4" />
-            News
+            <p className="animated-underline-1">News</p>
           </TabsTrigger>
           <TabsTrigger value="events" className="flex items-center gap-2" disabled>
             <Calendar className="h-4 w-4" />
-            Events
+            <p className="animated-underline-1">Events</p>
           </TabsTrigger>
         </TabsList>
         <Separator className="my-8" />
@@ -226,12 +229,6 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
                         <div className="flex items-center gap-2 text-sm text-foreground/80">
                           <Phone className="h-3.5 w-3.5" />
                           {branch.contact_number}
-                        </div>
-                      )}
-                      {branch.email && (
-                        <div className="flex items-center gap-2 text-sm text-foreground/80">
-                          <Mail className="h-3.5 w-3.5" />
-                          {branch.email}
                         </div>
                       )}
                     </div>
@@ -301,27 +298,41 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
                 <div className="whitespace-pre-line leading-snug">
                   <div className="flex flex-col gap-4">
                     {/* Staff Count */}
-                    <div className="flex items-center gap-2 text-sm text-foreground/80">
-                      <p className="text-2xl font-bold">{staff?.length ?? 0}</p>
-                      <p className="text-muted-foreground">Staff Members</p>
+                    <div className="flex items-center gap-2 text-foreground/80">
+                      {staff?.length === 0 ? (
+                        <p className="text-muted-foreground/60 text-xs">
+                          No information available yet,
+                        </p>
+                      ) : (
+                        <>
+                          <p className="text-2xl font-bold">{staff?.length}</p>
+                          <p className="text-muted-foreground">Staff Members</p>
+                        </>
+                      )}
                     </div>
 
                     {/* Department List */}
                     <div className="flex flex-col gap-2">
                       <p className="text-xs text-muted-foreground/80">Departments</p>
                       <div className="grid grid-cols-2 gap-1.5">
-                        {Object.entries(staffByDepartment).map(([deptId, { name }]) => {
-                          if (name === 'Burgess Rawson') return null;
+                        {Object.entries(staffByDepartment).length === 0 ? (
+                          <p className="text-muted-foreground/60 text-xs">
+                            No information available yet.
+                          </p>
+                        ) : (
+                          Object.entries(staffByDepartment).map(([deptId, { name }]) => {
+                            if (name === 'Burgess Rawson') return null;
 
-                          return (
-                            <DepartmentBadge
-                              key={deptId}
-                              department={name}
-                              size="large"
-                              list
-                            />
-                          );
-                        })}
+                            return (
+                              <DepartmentBadge
+                                key={deptId}
+                                department={name}
+                                size="large"
+                                list
+                              />
+                            );
+                          })
+                        )}
                       </div>
                     </div>
                   </div>
@@ -331,35 +342,45 @@ const BranchPage = ({ params }: { params: { name: string } }) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="staff" className="mt-6">
-          <div className="space-y-24">
-            {Object.entries(staffByDepartment).map(([deptId, { name, staff }]) => {
-              return (
-                <div key={deptId} className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-semibold">
-                      <DepartmentBadge department={name} list size="large" />
-                    </h2>
-
-                    <Dot size="tiny" className="bg-muted-foreground" />
-
-                    <p className="text-sm text-muted-foreground font-medium flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      {staff?.length}
-                    </p>
+        <TabsContent value="staff" className="mt-6 animate-slide-down-fade-in">
+          {Object.entries(staffByDepartment).length === 0 ? (
+            <Card className="flex items-center justify-center p-8">
+              <CardHeader>
+                <CardTitle className="text-center text-muted-foreground">
+                  No information available yet
+                </CardTitle>
+                <CardDescription className="text-center">
+                  Staff information for this branch will appear here once available
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            <div className="space-y-24">
+              {Object.entries(staffByDepartment).map(([deptId, { name, staff }]) => {
+                return (
+                  <div key={deptId} className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-xl font-semibold">
+                        <DepartmentBadge department={name} list size="large" />
+                      </h2>
+                      <Dot size="tiny" className="bg-muted-foreground" />
+                      <p className="text-sm text-muted-foreground font-medium flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        {staff?.length}
+                      </p>
+                    </div>
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                      {staff?.map((member, index) => (
+                        <StaggeredAnimation key={member.id ?? ''} index={index + 1}>
+                          <UserCard userId={member.id ?? ''} />
+                        </StaggeredAnimation>
+                      ))}
+                    </div>
                   </div>
-
-                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-                    {staff?.map((member, index) => (
-                      <StaggeredAnimation key={member?.id ?? ''} index={index + 1}>
-                        <UserCard userId={member?.id ?? ''} />
-                      </StaggeredAnimation>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
