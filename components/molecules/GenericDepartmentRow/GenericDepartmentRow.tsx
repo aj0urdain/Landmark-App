@@ -23,6 +23,8 @@ export function GenericDepartmentRow({ department }: { department: string }) {
         return null;
       }
 
+      console.log('Department data:', data);
+
       return data;
     },
   });

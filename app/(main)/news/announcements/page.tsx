@@ -1,130 +1,75 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { createArticle } from '@/utils/use-cases/articles/createArticle';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
 import { createBrowserClient } from '@/utils/supabase/client';
-import { Card } from '@/components/ui/card';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { LoaderCircle, Speech } from 'lucide-react';
+import ArticleCard from '@/components/molecules/ArticleCard/ArticleCard';
 import { Separator } from '@/components/ui/separator';
-import { Article } from '@/types/articleTypes';
 
 const AnnouncementsNewsPage = () => {
-  const router = useRouter();
-  const { toast } = useToast();
   const supabase = createBrowserClient();
 
-  const createAnnouncementMutation = useMutation({
-    mutationFn: () => createArticle('announcement'),
-    onSuccess: (newArticle: Article) => {
-      router.push(`/news/announcements/${String(newArticle.id)}`);
-    },
-    onError: (error) => {
-      console.error('Error creating announcement:', error);
-      toast({
-        title: 'Error creating announcement!',
-        description: 'Please try again later',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const getAnnouncements = async () => {
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('article_type', 'announcement');
-    // .eq('public', true);
-
-    console.log('announcements', data);
-
-    return { data, error };
-  };
-
-  const {
-    data: announcements,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: articles, isLoading } = useQuery({
     queryKey: ['announcements'],
-    queryFn: getAnnouncements,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('article_type', 'announcement')
+        .eq('public', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
   });
 
-  if (isLoading) return null;
+  // Find the most recent featured announcement
+  const featuredAnnouncement = articles?.find((article) => article.featured === true);
 
-  if (error) return null;
+  // Filter out the featured announcement from the rest
+  const filteredAnnouncements = articles?.filter(
+    (article) => article.id !== featuredAnnouncement?.id,
+  );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <LoaderCircle className="animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Announcements</h1>
-        {/* <Button
-          onClick={() => {
-            createAnnouncementMutation.mutate();
-          }}
-          disabled={createAnnouncementMutation.isPending}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {createAnnouncementMutation.isPending
-            ? 'Creating Announcement...'
-            : 'Create Announcement'}
-        </Button> */}
-      </div>
+    <div className="flex flex-col gap-6">
+      <h1 className="text-4xl font-bold px-8 pt-8">Announcements</h1>
+      <div className="container mx-auto p-4 flex flex-col gap-14">
+        {featuredAnnouncement && (
+          <section className="h-[400px]">
+            <ArticleCard articleId={featuredAnnouncement.id} size="xlarge" />
+          </section>
+        )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {announcements?.data &&
-          announcements.data.length > 0 &&
-          announcements.data.map((announcement) => (
-            <Link
-              href={`/news/announcements/${announcement.id.toString()}`}
-              key={announcement.id}
-            >
-              <Card className="w-full relative min-h-80 flex flex-col items-start justify-end p-6 gap-2 hover:border-foreground transition-all group duration-300">
-                <div className="">
-                  <Image
-                    src={announcement.cover_image ?? ''}
-                    alt={announcement.title ?? ''}
-                    width={1000}
-                    height={1000}
-                    className=" absolute top-0 left-0 w-full h-full object-cover object-center rounded-xl"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/75 to-background rounded-xl" />
-                </div>
+        <Separator />
 
-                <h1 className="text-2xl group-hover:text-[1.6rem] transition-all duration-300 font-black z-10 line-clamp-2">
-                  {announcement.title}
-                </h1>
-
-                <p className="line-clamp-1 font-medium z-10 text-muted-foreground">
-                  {announcement.description}
-                </p>
-              </Card>
-            </Link>
-          ))}
-      </div>
-
-      <Separator className="my-12" />
-
-      {/* dont need to show more announcements for now */}
-
-      <div className="mt-6">
-        {/* <h1 className="text-lg font-bold text-muted-foreground">More Announcements</h1> */}
-        <div className="grid grid-cols-1 gap-4 mt-6">
-          {/* Dummy data for list of additional articles */}
-          {new Array(10).fill(0).map((_, index) => (
-            <Card key={index} className="w-full min-h-24 rounded-lg p-6">
-              <h1 className="text-lg font-bold">Article title {index + 1}</h1>
-              <p className="text-sm text-muted-foreground">
-                Article description {index + 1}
+        <section>
+          <h2 className="text-2xl ml-4 font-semibold mb-4 flex items-center gap-2">
+            <Speech className="h-4 w-4" />
+            All Announcements
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-[200px]">
+            {filteredAnnouncements && filteredAnnouncements.length > 0 ? (
+              filteredAnnouncements.map((announcement) => (
+                <ArticleCard key={announcement.id} articleId={announcement.id} />
+              ))
+            ) : (
+              <p className="text-muted-foreground col-span-2 text-center">
+                No announcements available
               </p>
-            </Card>
-          ))}
-        </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
