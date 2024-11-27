@@ -6,7 +6,7 @@ import { metroSans } from '@/utils/font';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from 'sonner';
 import type { Metadata } from 'next';
-
+import { Analytics } from '@vercel/analytics/react';
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : 'http://localhost:3000';
@@ -39,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             disableTransitionOnChange
           >
             {children}
+            <Analytics />
             <Toaster />
             <Sonner />
           </ThemeProvider>

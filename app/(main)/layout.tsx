@@ -3,7 +3,7 @@
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Sidebar } from '@/components/molecules/Sidebar/Sidebar';
 import { Button } from '@/components/ui/button';
@@ -13,24 +13,12 @@ import { UserProfileManager } from '@/components/atoms/UserProfileManager/UserPr
 import { Inbox } from '@/components/molecules/Inbox/Inbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { useRoutePermission } from '@/hooks/useRoutePermission';
-import { useRouter } from 'next/navigation';
 
 TimeAgo.addLocale(en);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
-  const [isInboxCollapsed, setIsInboxCollapsed] = useState(false);
-  // const { hasPermission, isLoading } = useRoutePermission();
-  // const router = useRouter();
-
-  // useEffect(() => {
-  //   if (!isLoading && !hasPermission) {
-  //     router.replace('/access-denied');
-  //   }
-  // }, [hasPermission, isLoading, router]);
-
-  // if (!isLoading && !hasPermission) return null;
+  const [isInboxCollapsed, setIsInboxCollapsed] = useState(true);
 
   const toggleLeftSidebar = () => {
     setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed);

@@ -37,10 +37,8 @@ export function UserMenu() {
 
   const { data: userProfile, isLoading, isError } = useQuery(userProfileOptions);
 
-  const handleSignOut = async () => {
-    const queryClient = getQueryClient();
-    queryClient.clear();
-    await signOutAction();
+  const handleSignOut = () => {
+    router.push('/loading');
   };
 
   const handleSettingsClick = () => {
