@@ -12,7 +12,8 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname === '/sign-in' ||
     request.nextUrl.pathname === '/access-denied' ||
     request.nextUrl.pathname === '/not-found' ||
-    request.nextUrl.pathname.startsWith('/auth')
+    request.nextUrl.pathname.startsWith('/auth') ||
+    request.nextUrl.pathname.startsWith('/loading')
   ) {
     console.log('⏩ Skipping middleware check for excluded path');
     return NextResponse.next({ request });

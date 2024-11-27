@@ -16,7 +16,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { createBrowserClient } from '@/utils/supabase/client';
 import { FormMessage, Message } from '@/components/atoms/FormMessage/FormMessage';
 
 import { Card } from '@/components/ui/card';
@@ -24,6 +23,9 @@ import { LogoWordmark } from '@/components/atoms/LogoWordmark/LogoWordmark';
 
 import { LandmarkLogoWordmark } from '@/components/atoms/LandmarkLogoWordmark/LandmarkLogoWordmark';
 import { Dot } from '@/components/atoms/Dot/Dot';
+import { cn } from '@/utils/cn';
+import { useAllowedDomains } from '@/queries/access/hooks';
+import { Separator } from '@/components/ui/separator';
 
 type ActionResult =
   | { error: string; attemptsLeft?: number; cooldownMinutes?: number }
@@ -82,7 +84,9 @@ const SignInForm = ({
     <form
       ref={formRef}
       className="flex min-w-64 flex-1 flex-col gap-8"
-      onSubmit={(e) => onSubmit(e, otpValue)}
+      onSubmit={(e) => {
+        void onSubmit(e, otpValue);
+      }}
     >
       <h1 className="text-2xl font-medium">Sign in</h1>
       <div className="flex w-full flex-col items-start gap-2">
@@ -96,7 +100,9 @@ const SignInForm = ({
             className="w-full"
             disabled={isOtpSent || isLoading}
             defaultValue={email}
-            onChange={(e) => setCurrentEmail(e.target.value)}
+            onChange={(e) => {
+              setCurrentEmail(e.target.value);
+            }}
           />
 
           <input type="hidden" name="email" value={currentEmail} />
@@ -120,7 +126,9 @@ const SignInForm = ({
               <InputOTP
                 maxLength={6}
                 value={otpValue}
-                onChange={(value) => setOtpValue(value)}
+                onChange={(value) => {
+                  setOtpValue(value);
+                }}
                 name="token"
                 disabled={attemptsLeft === 0}
                 className="w-full"
@@ -130,9 +138,10 @@ const SignInForm = ({
                     <InputOTPSlot
                       key={index}
                       index={index}
-                      className={`${
-                        otpError && otpValue.length === 0 && 'border-destructive'
-                      } w-full`}
+                      className={cn(
+                        'w-full',
+                        otpError && otpValue.length === 0 && 'border-destructive',
+                      )}
                     />
                   ))}
                 </InputOTPGroup>
@@ -178,7 +187,7 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [otpError, setOtpError] = useState(false);
   const [email, setEmail] = useState('');
-  const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
+  const { data: allowedDomains } = useAllowedDomains();
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(false);
   const router = useRouter();
 
@@ -242,31 +251,14 @@ export default function SignIn() {
     setOtpError(false);
   };
 
-  useEffect(() => {
-    const fetchAllowedDomains = async () => {
-      const supabase = createBrowserClient();
-      const { data, error } = await supabase
-        .from('app_config')
-        .select('value')
-        .eq('key', 'ALLOWED_DOMAINS')
-        .single();
-
-      if (data && !error) {
-        const allowedDomainsArray = data.value;
-        console.log('Allowed domains:', allowedDomainsArray);
-        setAllowedDomains(allowedDomainsArray as string[]);
-      } else {
-        console.error('Error fetching allowed domains:', error);
-      }
-    };
-
-    fetchAllowedDomains();
-  }, []);
-
   return (
-    <div className="flex min-h-screen w-full max-w-screen-sm flex-col items-center mx-auto justify-center gap-8 p-4">
-      <div className="flex flex-col items-center justify-center gap-4">
+    <div className="flex min-h-screen w-full max-w-sm flex-col items-center mx-auto justify-center gap-8 p-4">
+      <div className="flex flex-col items-center justify-center gap-4 w-full px-4">
         <LogoWordmark />
+        <Separator className="w-full" />
+        <div className="flex items-center justify-center gap-2 w-full">
+          <h2 className="text-5xl font-bold font-lexia">Betty</h2>
+        </div>
       </div>
 
       <Card className="w-full max-w-sm p-6">
@@ -279,7 +271,7 @@ export default function SignIn() {
             otpError={otpError}
             onReset={handleReset}
             email={email}
-            allowedDomains={allowedDomains}
+            allowedDomains={allowedDomains ?? []}
             isLoginSuccessful={isLoginSuccessful}
           />
           <FormMessage message={message} />

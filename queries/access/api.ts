@@ -28,3 +28,21 @@ export const accessApi = {
     return access;
   },
 };
+
+export const authApi = {
+  getAllowedDomains: async () => {
+    const supabase = createBrowserClient();
+    const { data, error } = await supabase
+      .from('app_config')
+      .select('value')
+      .eq('key', 'ALLOWED_DOMAINS')
+      .single();
+
+    if (error) {
+      console.error('Error fetching allowed domains:', error);
+      throw new Error(error.message);
+    }
+
+    return data.value as string[];
+  },
+};
