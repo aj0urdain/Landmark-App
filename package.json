@@ -97,6 +97,7 @@
     "@tiptap/starter-kit": "^2.8.0",
     "@types/canvas-confetti": "^1.6.4",
     "@types/lodash": "^4.17.13",
+    "@vercel/analytics": "^1.4.1",
     "autoprefixer": "10.4.17",
     "axios": "^1.7.7",
     "canvas-confetti": "^1.9.3",
