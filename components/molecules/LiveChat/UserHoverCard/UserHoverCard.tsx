@@ -92,7 +92,8 @@ export function UserHoverCard({ userId, children, visible = true }: UserHoverCar
                 </Link>
                 {user.roles?.map((role: string) => (
                   <Link
-                    href={`/wiki/learn/roles/${role.toLowerCase().replace(/\s+/g, '-')}`}
+                    // href={`/wiki/learn/roles/${role.toLowerCase().replace(/\s+/g, '-')}`}
+                    href="#"
                     key={role}
                     className="flex items-start justify-start gap-0.5 text-xs w-fit max-w-full text-muted-foreground animated-underline-1 after:bottom-[-1px]"
                   >

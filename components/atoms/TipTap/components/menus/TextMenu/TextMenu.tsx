@@ -76,11 +76,11 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
           <MemoContentTypePicker options={blockOptions} />
           <MemoFontFamilyPicker
             onChange={commands.onSetFont}
-            value={states.currentFont || ''}
+            value={states.currentFont as string}
           />
           <MemoFontSizePicker
             onChange={commands.onSetFontSize}
-            value={states.currentSize || ''}
+            value={states.currentSize as string}
           />
           <Toolbar.Divider />
           <MemoButton

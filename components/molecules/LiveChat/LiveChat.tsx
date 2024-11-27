@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { Loader2, MessageSquare, Send } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Database } from '@/types/supabaseTypes';
 import { createBrowserClient } from '@/utils/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { debounce } from 'lodash';
 
 import {
   Tooltip,
@@ -52,7 +53,6 @@ const EmptyStateMessage = () => (
 export default function LiveChat({ height, chatName }: LiveChatProps) {
   const [input, setInput] = useState('');
   const [charCount, setCharCount] = useState(0);
-  const [isSending, setIsSending] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const supabase = createBrowserClient();
@@ -121,11 +121,9 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
   // Send message mutation
   const { mutate: sendMessage } = useMutation({
     mutationFn: async (messageContent: string) => {
-      setIsSending(true);
-
       const { error } = await supabase.from('chat_messages').insert({
         content: messageContent,
-        chat_room_id: chatRoomData?.id as number,
+        chat_room_id: chatRoomData?.id,
       });
 
       if (error) {
@@ -135,12 +133,19 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
     onSuccess: () => {
       setInput('');
       setCharCount(0);
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-      setIsSending(false);
     },
   });
+
+  // Add this debounced handler
+  const debouncedSendMessage = useMemo(
+    () =>
+      debounce((message: string) => {
+        if (message.trim() && charCount <= MESSAGE_CHAR_LIMIT) {
+          sendMessage(message.trim());
+        }
+      }, 300),
+    [sendMessage, charCount],
+  );
 
   // Setup realtime subscription
   useEffect(() => {
@@ -179,9 +184,7 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
   }, [messages]);
 
   const handleSend = () => {
-    if (input.trim() && !isSending && charCount <= MESSAGE_CHAR_LIMIT) {
-      sendMessage(input.trim());
-    }
+    debouncedSendMessage(input);
   };
 
   const renderMessageGroups = () => {
@@ -357,30 +360,29 @@ export default function LiveChat({ height, chatName }: LiveChatProps) {
                 <Input
                   ref={inputRef}
                   type="text"
-                  placeholder={isSending ? 'Sending...' : 'Type a message...'}
+                  placeholder={'Type a message...'}
                   value={input}
                   onChange={(e) => {
                     setInput(e.target.value);
                     setCharCount(e.target.value.length);
                   }}
-                  disabled={isSending || isFetchingMessages}
+                  disabled={isFetchingMessages}
                   className={charCount > MESSAGE_CHAR_LIMIT ? 'border-red-500' : ''}
                 />
                 <Button
                   type="submit"
                   variant="ghost"
                   size="icon"
-                  disabled={isSending || charCount > MESSAGE_CHAR_LIMIT}
+                  disabled={charCount > MESSAGE_CHAR_LIMIT}
                 >
                   <Send
-                    key={isSending ? 'sending' : 'idle'}
                     className={`${
-                      isSending
+                      isFetchingMessages
                         ? 'animate-pulse text-muted-foreground [animation-duration:2s]'
                         : 'animate-slide-up-fade-in'
                     } h-4 w-4 transition-all`}
                   />
-                  <span className="sr-only">{isSending ? 'Sending' : 'Send'}</span>
+                  <span className="sr-only">Send</span>
                 </Button>
               </div>
               <Progress
