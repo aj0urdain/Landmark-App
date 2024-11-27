@@ -74,10 +74,10 @@ const AuctionByPortfolioAndLocationPage = () => {
         <div className="relative flex min-h-96 flex-col overflow-hidden rounded-3xl">
           <Image
             src={
-              auction.auction_venues?.image ||
+              auction.auction_venues?.image ??
               `/images/auctionImages/crown-casino-melbourne.jpg`
             }
-            alt={`${auction.auction_locations?.name} Auction`}
+            alt={`${auction.auction_locations?.name ?? 'Venue TBA'} Auction`}
             width={1000}
             height={1000}
             className="absolute left-0 top-0 h-full w-full object-cover object-center"
@@ -112,7 +112,7 @@ const AuctionByPortfolioAndLocationPage = () => {
                 </h1>
                 <div className="flex items-center gap-2 text-xl text-muted-foreground font-medium">
                   <MapPin className="h-6 w-6" />
-                  {auction.auction_venues?.name || 'Venue TBA'}
+                  {auction.auction_venues?.name ?? 'Venue TBA'}
                 </div>
               </div>
             </div>
@@ -131,19 +131,19 @@ const AuctionByPortfolioAndLocationPage = () => {
             </TabsTrigger>
             <TabsTrigger value="attendees" disabled>
               <Users className="mr-2 h-4 w-4" />
-              <p className="select-none animated-underline-1">Attendees</p>
+              <p className="select-none">Attendees</p>
             </TabsTrigger>
             <TabsTrigger value="comments" disabled>
               <MessageCircle className="mr-2 h-4 w-4" />
-              <p className="select-none animated-underline-1">Comments</p>
+              <p className="select-none">Comments</p>
             </TabsTrigger>
             <TabsTrigger value="results" disabled>
               <Trophy className="mr-2 h-4 w-4" />
-              <p className="select-none animated-underline-1">Results</p>
+              <p className="select-none">Results</p>
             </TabsTrigger>
             <TabsTrigger value="listings" disabled>
               <Building className="mr-2 h-4 w-4" />
-              <p className="select-none animated-underline-1">Listings</p>
+              <p className="select-none">Listings</p>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="h-full">

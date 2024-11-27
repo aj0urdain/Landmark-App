@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Calendar, Gavel, History } from 'lucide-react';
+import { Calendar, Gavel, History, Building2 } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -40,7 +40,10 @@ const AuctionsPage = () => {
     queryFn: async () => {
       const supabase = createBrowserClient();
       const { data, error } = await supabase.rpc('get_active_portfolio_with_auctions');
-      if (error) throw error;
+      if (error) {
+        console.error(error);
+        throw new Error(error.message);
+      }
 
       const typedData = data as unknown as PortfolioWithAuctions;
       const auctionEvents = typedData.auctions.map((auction: Auction) => ({
@@ -65,11 +68,14 @@ const AuctionsPage = () => {
       const supabase = createBrowserClient();
       const { data, error } = await supabase
         .from('auctions')
-        .select('*, auction_locations(name), auction_venues(name, image)')
+        .select('*, auction_locations(name), auction_venues(name, image), portfolios(*)')
         .lt('start_date', new Date().toISOString())
         .order('start_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error(error);
+        throw new Error(error.message);
+      }
       return data;
     },
   });
@@ -80,14 +86,28 @@ const AuctionsPage = () => {
       const supabase = createBrowserClient();
       const { data, error } = await supabase
         .from('auctions')
-        .select('*, auction_locations(name), auction_venues(name, image)')
+        .select('*, auction_locations(name), auction_venues(name, image), portfolios(*)')
         .gte('start_date', new Date().toISOString())
         .order('start_date', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error(error);
+        throw new Error(error.message);
+      }
       return data;
     },
   });
+
+  const groupAuctionsByPortfolio = (auctions: any[]) => {
+    return auctions?.reduce((acc, auction) => {
+      const portfolioId = auction.portfolio_id;
+      if (!acc[portfolioId]) {
+        acc[portfolioId] = [];
+      }
+      acc[portfolioId].push(auction);
+      return acc;
+    }, {});
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -106,22 +126,7 @@ const AuctionsPage = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Advertising Period
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {format(new Date(activePortfolio.advertising_period_start), 'PPP')} -{' '}
-                  {format(new Date(activePortfolio.advertising_period_end), 'PPP')}
-                </p>
-              </CardContent>
-            </Card>
-
-            {activePortfolio.auctionEvents.slice(0, 2).map((event) => (
+            {activePortfolio.auctionEvents.slice(0, 3).map((event) => (
               <EventCard key={event.details.auction_id} event={event} variant="full" />
             ))}
           </div>
@@ -144,78 +149,135 @@ const AuctionsPage = () => {
         </TabsList>
 
         <TabsContent value="upcoming" className="mt-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {futureAuctions?.map((auction) => (
-              <Link
-                key={auction.id}
-                href={`/events/auctions/${auction.portfolio_id}/${auction.auction_locations.name}`}
-              >
-                <Card className="group overflow-hidden transition-all hover:shadow-lg">
-                  <div className="relative h-48">
-                    <Image
-                      src={auction.auction_venues?.image ?? ''}
-                      alt={auction.auction_venues?.name ?? ''}
-                      fill
-                      sizes="250px"
-                      className="object-cover transition-transform group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-background/20" />
-                    <div className="absolute bottom-4 left-4">
-                      <Badge>{auction.auction_locations.name}</Badge>
-                      <h3 className="mt-2 text-lg font-bold text-white">
-                        {auction.auction_venues.name}
-                      </h3>
-                    </div>
+          {Object.entries(groupAuctionsByPortfolio(futureAuctions || [])).map(
+            ([portfolioId, auctions]) => (
+              <Card key={portfolioId} className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-muted-foreground" />
+                    Portfolio {portfolioId}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {auctions.map((auction: any) => (
+                      <Link
+                        key={auction.id}
+                        href={`/events/auctions/${String(auction.portfolio_id)}/${
+                          auction.auction_locations?.name ?? ''
+                        }`}
+                      >
+                        <Card className="group overflow-hidden transition-all hover:shadow-md border-muted bg-muted/50">
+                          <div className="relative h-24">
+                            <Image
+                              src={auction.auction_venues?.image ?? ''}
+                              alt={auction.auction_venues?.name ?? ''}
+                              fill
+                              sizes="250px"
+                              className="object-cover opacity-50 grayscale transition-all duration-300 group-hover:opacity-75 group-hover:grayscale-0"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background/60" />
+
+                            {/* Top right - Time information */}
+                            <div className="absolute top-2 right-2">
+                              <div className="relative">
+                                <p className="text-xs text-muted-foreground absolute transition-all duration-300 opacity-100 group-hover:opacity-0">
+                                  {format(new Date(auction.start_date ?? ''), 'PPP')}
+                                </p>
+                                <div className="transition-all duration-300 opacity-0 group-hover:opacity-100">
+                                  <Countdown
+                                    date={new Date(auction.start_date ?? '')}
+                                    renderer={({ days, hours, minutes }) => (
+                                      <p className="text-xs font-medium text-muted-foreground">
+                                        {days}d {hours}h {minutes}m
+                                      </p>
+                                    )}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Bottom left - Location information */}
+                            <div className="absolute bottom-2 left-2">
+                              <div className="relative">
+                                <p className="text-sm font-medium absolute transition-all duration-300 opacity-100 group-hover:opacity-0">
+                                  {auction.auction_locations?.name ?? ''}
+                                </p>
+                                <p className="text-sm font-medium transition-all duration-300 opacity-0 group-hover:opacity-100">
+                                  {auction.auction_venues?.name ?? ''}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </Link>
+                    ))}
                   </div>
-                  <CardContent className="p-4">
-                    <div className="flex justify-between">
-                      <p className="text-sm text-muted-foreground">
-                        {format(new Date(auction.start_date), 'PPP')}
-                      </p>
-                      <Countdown
-                        date={new Date(auction.start_date)}
-                        renderer={({ days, hours, minutes }) => (
-                          <p className="text-sm font-medium">
-                            {days}d {hours}h {minutes}m
-                          </p>
-                        )}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+                </CardContent>
+              </Card>
+            ),
+          )}
         </TabsContent>
 
         <TabsContent value="past" className="mt-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {pastAuctions?.map((auction) => (
-              <Card key={auction.id} className="overflow-hidden opacity-75">
-                <div className="relative h-48">
-                  <Image
-                    src={auction.auction_venues?.image ?? ''}
-                    alt={auction.auction_venues?.name ?? ''}
-                    fill
-                    sizes="250px"
-                    className="object-cover transition-transform group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-background/30" />
-                  <div className="absolute bottom-4 left-4">
-                    <Badge variant="secondary">{auction.auction_locations.name}</Badge>
-                    <h3 className="mt-2 text-lg font-bold text-white">
-                      {auction.auction_venues.name}
-                    </h3>
+          {Object.entries(groupAuctionsByPortfolio(pastAuctions || [])).map(
+            ([portfolioId, auctions]) => (
+              <Card key={portfolioId} className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-muted-foreground" />
+                    Portfolio {portfolioId}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {auctions.map((auction: any) => (
+                      <Card
+                        key={auction.id}
+                        className="group overflow-hidden transition-all border-muted bg-muted/50 opacity-75"
+                      >
+                        <div className="relative h-24">
+                          <Image
+                            src={auction.auction_venues?.image ?? ''}
+                            alt={auction.auction_venues?.name ?? ''}
+                            fill
+                            sizes="250px"
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-background/30" />
+                          <div className="absolute inset-0 flex flex-col justify-center items-center">
+                            <p className="text-lg font-medium text-center group-hover:opacity-0 transition-opacity duration-300">
+                              {auction.auction_locations?.name ?? ''}
+                            </p>
+                            <p className="text-sm font-medium text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              {auction.auction_venues?.name ?? ''}
+                            </p>
+                          </div>
+                        </div>
+                        <CardContent className="p-2">
+                          <div className="flex justify-between items-center">
+                            <p className="text-xs text-muted-foreground group-hover:opacity-0 transition-opacity duration-300">
+                              {format(new Date(auction.start_date ?? ''), 'PPP')}
+                            </p>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <Countdown
+                                date={new Date(auction.start_date ?? '')}
+                                renderer={({ days, hours, minutes }) => (
+                                  <p className="text-xs font-medium text-muted-foreground">
+                                    {days}d {hours}h {minutes}m
+                                  </p>
+                                )}
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                </div>
-                <CardContent className="p-4">
-                  <p className="text-sm text-muted-foreground">
-                    {format(new Date(auction.start_date), 'PPP')}
-                  </p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            ),
+          )}
         </TabsContent>
       </Tabs>
     </div>

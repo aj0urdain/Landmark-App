@@ -63,7 +63,7 @@ const AnnouncementsNewsPage = () => {
     <div className="">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Announcements</h1>
-        <Button
+        {/* <Button
           onClick={() => {
             createAnnouncementMutation.mutate();
           }}
@@ -73,7 +73,7 @@ const AnnouncementsNewsPage = () => {
           {createAnnouncementMutation.isPending
             ? 'Creating Announcement...'
             : 'Create Announcement'}
-        </Button>
+        </Button> */}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
