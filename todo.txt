@@ -1,18 +1,83 @@
 // need to define access to all routes
-// need to block off library
+// need to block off library 
 // need to add further filters (branch, team, department) to announcements
-// edit login page to be mobile friendly and replace logo with
-// Burgess Rawson, powered by Landmark
+// edit login page to be mobile friendly and replace logo with *******
+// Burgess Rawson, powered by Landmark *******
 // need to test logins
-// need to get chelsea to test login and creating an announcement
+
 // need to create an admin panel for managing users
-// need to fix portfolio page with listings
-// need to fix auctions page
+// need to fix portfolio page with listings *******
+// need to fix auctions page *******
 // need to remove results from hardcoded values
 // need to add metadata to all pages
-// need to add coming soon to inbox section
-// need to fix department pages to use generic structure
-// need to add path access to all burgess rawson members
+// need to add coming soon to inbox section *******
+// need to fix department pages to use generic structure *******
+// need to add path access to all burgess rawson members ***
 // need to edit navigation control for visibility
 
-// 
+>>>calendar, this fix math
+>>>>fix admin routes
+>>>> copy and paste block spacing
+>>>need to get chelsea to test login and creating an announcement
+>>>>make non usable tabs darker
+>>>multiple roles, user profile, list both
+
+
+active portfolio
+
+
+
+
+
+
+
+
+
+
+
+
+
+bin edward beehag / madeliene churcher / paul ibrahim
+andrew buzari > leasing
+
+auction, fix auction page
+
+auctions, portfolio group
+
+
+
+description needs to be bigger
+
+same as title
+
+
+//news
+filter (most engaged, most recent: default)
+emoji replacement
+
+//updates
+start developer diary // technology
+
+//signin
+animated background
+
+
+
+// clean up all data, messages, articles, feedback, chat
+
+
+
+
+wiki home route needs access?
+
+rhys parker *****
+
+chat FOCUS
+
+//make sure roles doesn't link to learn, just link it to the user page for now
+
+0 staff members > no information yet
+
+
+
+

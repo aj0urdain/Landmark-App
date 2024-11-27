@@ -26,6 +26,9 @@ import { Dot } from '@/components/atoms/Dot/Dot';
 import { cn } from '@/utils/cn';
 import { useAllowedDomains } from '@/queries/access/hooks';
 import { Separator } from '@/components/ui/separator';
+import { Logo } from '@/components/atoms/Logo/Logo';
+import { KeyRound } from 'lucide-react';
+import { AnimatedBackground } from '@/components/atoms/AnimatedBackground/AnimatedBackground';
 
 type ActionResult =
   | { error: string; attemptsLeft?: number; cooldownMinutes?: number }
@@ -83,12 +86,18 @@ const SignInForm = ({
   return (
     <form
       ref={formRef}
-      className="flex min-w-64 flex-1 flex-col gap-8"
+      className="flex min-w-64 flex-1 flex-col gap-8 group/form"
       onSubmit={(e) => {
         void onSubmit(e, otpValue);
       }}
     >
-      <h1 className="text-2xl font-medium">Sign in</h1>
+      <div className="flex items-center gap-2 w-full justify-between text-lg font-bold font-lexia">
+        <div className="flex items-center gap-2 text-muted-foreground group-hover/form:text-foreground transition-colors duration-300">
+          <KeyRound className="w-4 h-4 group-hover/form:-rotate-45 transition-transform duration-300" />
+          Sign In
+        </div>
+        <Logo className="w-3" />
+      </div>
       <div className="flex w-full flex-col items-start gap-2">
         <div className="w-full">
           <Label htmlFor="email">Email</Label>
@@ -179,6 +188,24 @@ const SignInForm = ({
   );
 };
 
+export const getRandomAnimation = () => {
+  const randomDelay = Math.random() * 2; // Random delay between 0-2s
+  const randomDuration = 2 + Math.random() * 2; // Random duration between 2-4s
+  return {
+    animationDelay: `${randomDelay.toFixed(2)}s`,
+    animationDuration: `${randomDuration.toFixed(2)}s`,
+  };
+};
+
+const getRandomFloat = () => {
+  const randomDelay = Math.random() * 2; // Random delay between 0-2s
+  const randomDuration = 4 + Math.random() * 4; // Random duration between 4-8s
+  return {
+    animationDelay: `${randomDelay.toFixed(2)}s`,
+    animationDuration: `${randomDuration.toFixed(2)}s`,
+  };
+};
+
 export default function SignIn() {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [message, setMessage] = useState<Message>({});
@@ -252,57 +279,124 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen w-full max-w-sm flex-col items-center mx-auto justify-center gap-8 p-4">
-      <div className="flex flex-col items-center justify-center gap-4 w-full px-4">
-        <LogoWordmark />
-        <Separator className="w-full" />
-        <div className="flex items-center justify-center gap-2 w-full">
-          <h2 className="text-5xl font-bold font-lexia">Betty</h2>
-        </div>
-      </div>
-
-      <Card className="w-full max-w-sm p-6">
-        <div className="flex w-full flex-col gap-2">
-          <SignInForm
-            isOtpSent={isOtpSent}
-            onSubmit={handleSubmit}
-            attemptsLeft={attemptsLeft}
-            isLoading={isLoading}
-            otpError={otpError}
-            onReset={handleReset}
-            email={email}
-            allowedDomains={allowedDomains ?? []}
-            isLoginSuccessful={isLoginSuccessful}
-          />
-          <FormMessage message={message} />
-          {isOtpSent && attemptsLeft !== null && attemptsLeft > 0 && (
-            <p className="text-xs text-warning dark:text-warning-foreground">
-              Attempts left: {attemptsLeft}
-            </p>
-          )}
-        </div>
-      </Card>
-
-      <div className="flex items-center uppercase gap-2 text-xs text-muted-foreground">
-        <p>Powered by</p>
-        <Dot size="small" className="bg-green-500 animate-pulse mr-1" />
-        <LandmarkLogoWordmark className="w-32" />
-      </div>
-
-      <Dialog open={isDisabled}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Too Many Attempts</DialogTitle>
-            <DialogDescription>
-              You have made too many false attempts. You can try again in{' '}
-              {cooldownMinutes} minutes.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-6 flex justify-center">
-            <Button onClick={handleRefresh}>I understand</Button>
+    <AnimatedBackground
+      colors={[
+        'hsl(var(--background))',
+        'hsl(var(--muted))',
+        'hsl(var(--card))',
+        'hsl(var(--accent))',
+        'hsl(var(--background))',
+      ]}
+      active={true}
+      className="min-h-screen w-full"
+    >
+      <div className="flex min-h-screen w-full max-w-sm flex-col items-center mx-auto justify-center gap-8 p-4 relative z-10">
+        <div className="flex flex-col items-center justify-center gap-4 w-full px-4">
+          <LogoWordmark />
+          <Separator className="w-full" />
+          <div className="flex items-center justify-center gap-6 w-full">
+            <div className="flex items-center gap-2">
+              {[...new Array<number>(3)].map((_, i) => {
+                const { animationDelay: pulseDelay, animationDuration: pulseDuration } =
+                  getRandomAnimation();
+                const { animationDelay: floatDelay, animationDuration: floatDuration } =
+                  getRandomFloat();
+                return (
+                  <div
+                    className="animate-float"
+                    style={{
+                      animationDelay: floatDelay,
+                      animationDuration: floatDuration,
+                    }}
+                  >
+                    <Dot
+                      key={i}
+                      size={i === 0 ? 'tiny' : i === 1 ? 'small' : 'large'}
+                      className={`bg-${i === 1 ? 'muted-foreground' : 'foreground'} animate-pulse mr-1`}
+                      animationDelay={pulseDelay}
+                      animationDuration={pulseDuration}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <h2 className="text-5xl font-bold font-lexia">Betty</h2>
+            <div className="flex items-center gap-2">
+              {[...new Array<number>(3)].map((_, i) => {
+                const { animationDelay: pulseDelay, animationDuration: pulseDuration } =
+                  getRandomAnimation();
+                const { animationDelay: floatDelay, animationDuration: floatDuration } =
+                  getRandomFloat();
+                return (
+                  <div
+                    className="animate-float"
+                    style={{
+                      animationDelay: floatDelay,
+                      animationDuration: floatDuration,
+                    }}
+                  >
+                    <Dot
+                      key={i}
+                      size={i === 2 ? 'tiny' : i === 1 ? 'small' : 'large'}
+                      className={`bg-${i === 1 ? 'muted-foreground' : 'foreground'} animate-pulse mr-1`}
+                      animationDelay={pulseDelay}
+                      animationDuration={pulseDuration}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+
+        <Card className="w-full max-w-sm p-6 bg-card/95 backdrop-blur-sm">
+          <div className="flex w-full flex-col gap-2">
+            <SignInForm
+              isOtpSent={isOtpSent}
+              onSubmit={handleSubmit}
+              attemptsLeft={attemptsLeft}
+              isLoading={isLoading}
+              otpError={otpError}
+              onReset={handleReset}
+              email={email}
+              allowedDomains={allowedDomains ?? []}
+              isLoginSuccessful={isLoginSuccessful}
+            />
+            <FormMessage message={message} />
+            {isOtpSent && attemptsLeft !== null && attemptsLeft > 0 && (
+              <p className="text-xs text-warning dark:text-warning-foreground">
+                Attempts left: {attemptsLeft}
+              </p>
+            )}
+          </div>
+        </Card>
+
+        <div className="flex items-center uppercase gap-2 transition-all duration-300 text-xs text-muted-foreground group/powered-by select-none">
+          <p className="group-hover/powered-by:text-foreground opacity-50 group-hover/powered-by:opacity-100 transition-all duration-300 group-hover/powered-by:tracking-widest font-bold">
+            Powered by
+          </p>
+          <Dot
+            size="tiny"
+            className="bg-green-500 animate-pulse mr-1 group-hover/powered-by:scale-150 transition-transform duration-300"
+          />
+          <LandmarkLogoWordmark className="w-32 opacity-50 group-hover/powered-by:opacity-100 group-hover/powered-by:scale-[1.01] transition-all duration-300" />
+        </div>
+
+        <Dialog open={isDisabled}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Too Many Attempts</DialogTitle>
+              <DialogDescription>
+                You have made too many false attempts. You can try again in{' '}
+                {cooldownMinutes} minutes.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-6 flex justify-center">
+              <Button onClick={handleRefresh}>I understand</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </AnimatedBackground>
   );
 }
