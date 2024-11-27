@@ -72,6 +72,22 @@ const config = {
       },
     },
     extend: {
+      animationDelay: {
+        '100': '100ms',
+        '200': '200ms',
+        '300': '300ms',
+        '400': '400ms',
+        '500': '500ms',
+        '1000': '1000ms',
+        '2000': '2000ms',
+      },
+      animationDuration: {
+        '1500': '1500ms',
+        '2000': '2000ms',
+        '2500': '2500ms',
+        '3000': '3000ms',
+        '4000': '4000ms',
+      },
       colors: {
         portfolio: 'portfolioColors',
         border: 'hsl(var(--border))',
@@ -133,9 +149,11 @@ const config = {
         'gradient-animation': {
           '0%, 100%': {
             backgroundPosition: '0% 50%',
+            transform: 'rotate(0deg)',
           },
           '50%': {
             backgroundPosition: '100% 50%',
+            transform: 'rotate(3deg)',
           },
         },
         'float-up': {
@@ -256,7 +274,7 @@ const config = {
         },
       },
       animation: {
-        'gradient-animation': 'gradient-animation 10s ease infinite',
+        'gradient-animation': 'gradient-animation 15s ease infinite',
         'gavel-hit': 'gavel-hit 0.75s ease-in-out infinite',
         'float-up-fade-out': 'float-up-fade-out 0.5s ease-out forwards',
         'float-up': 'float-up 0.5s ease-out forwards',
