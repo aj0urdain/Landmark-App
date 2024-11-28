@@ -74,9 +74,14 @@ export const NavLink = React.memo(function NavLink({
 
   const linkContent = (
     <>
-      <Icon className="h-5 w-5 shrink-0" />
+      <Icon className={cn('shrink-0', isSubsection ? 'h-3.5 w-3.5' : 'h-5 w-5')} />
       {!isCollapsed && (
-        <span className="ml-3 flex flex-1 items-center justify-between">
+        <span
+          className={cn(
+            'flex flex-1 items-center justify-between',
+            isSubsection ? 'ml-1.5' : 'ml-2',
+          )}
+        >
           {children}
           {subsections && (
             <button

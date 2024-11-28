@@ -303,6 +303,7 @@ export default function SignIn() {
                   getRandomFloat();
                 return (
                   <div
+                    key={i}
                     className="animate-float"
                     style={{
                       animationDelay: floatDelay,
@@ -329,6 +330,7 @@ export default function SignIn() {
                   getRandomFloat();
                 return (
                   <div
+                    key={i}
                     className="animate-float"
                     style={{
                       animationDelay: floatDelay,

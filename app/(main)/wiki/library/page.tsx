@@ -23,7 +23,7 @@ const categorizedItems = {
       description: 'Access all of our portfolios',
       href: '/wiki/library/portfolios',
       count: '172 portfolios',
-      disabled: false,
+      disabled: true,
     },
     {
       title: 'Portfolio Magazines',
@@ -31,7 +31,7 @@ const categorizedItems = {
       description: 'Access our collection of portfolio magazines and publications',
       href: '/wiki/library/portfolio-magazines',
       count: '172 magazines',
-      disabled: false,
+      disabled: true,
     },
     {
       title: 'Portfolio Results',
@@ -39,7 +39,7 @@ const categorizedItems = {
       description: 'Access our collection of portfolio results',
       href: '/wiki/library/portfolio-results',
       count: '172 results',
-      disabled: false,
+      disabled: true,
     },
   ],
   assets: [
@@ -49,7 +49,7 @@ const categorizedItems = {
       description: 'Document templates for various business needs',
       href: '/wiki/library/templates',
       count: '24 templates',
-      disabled: false,
+      disabled: true,
     },
     {
       title: 'Images',
@@ -57,7 +57,7 @@ const categorizedItems = {
       description: 'Property images, logos, and marketing assets',
       href: '/wiki/library/images',
       count: '1.2k images',
-      disabled: false,
+      disabled: true,
     },
     {
       title: 'Handbooks',
@@ -109,7 +109,7 @@ export default function LibraryPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {items.map((item) => (
-              <Link href={item.disabled ? '/updates' : item.href} key={item.title}>
+              <Link href={item.disabled ? '#' : item.href} key={item.title}>
                 <Card
                   className={cn(
                     'transition-all p-6 flex flex-col justify-between h-52 cursor-pointer group',

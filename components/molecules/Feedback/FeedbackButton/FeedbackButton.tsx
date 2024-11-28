@@ -17,6 +17,7 @@ import {
   History,
   Lightbulb,
   MessageCircleWarning,
+  MessageSquareQuote,
   Puzzle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -146,14 +147,14 @@ export const FeedbackButton = React.memo(function FeedbackButton({
 
   const linkContent = (
     <>
-      <BugIcon className="h-5 w-5 shrink-0" />
-      {!isCollapsed && <span className="ml-3">Feedback</span>}
+      <MessageSquareQuote className="h-5 w-5 shrink-0" />
+      {!isCollapsed && <span className="ml-2">Feedback</span>}
     </>
   );
 
   const linkClass = cn(
-    'flex items-center py-2 text-sm font-medium border border-warning-foreground/40 rounded-md transition-all duration-200 ease-in-out',
-    'text-warning-foreground hover:bg-warning-foreground/20 hover:text-foreground',
+    'flex items-center py-2 my-1 text-sm font-medium border border-transparent hover:border-warning-foreground/20 rounded-md transition-all duration-200 ease-in-out',
+    'text-warning-foreground hover:bg-warning-foreground/20',
     isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'px-4 mx-4',
   );
 
@@ -165,7 +166,7 @@ export const FeedbackButton = React.memo(function FeedbackButton({
       <DialogContent className="flex flex-col items-start justify-start p-8 sm:h-[600px] sm:max-w-[800px]">
         <DialogHeader className="">
           <DialogTitle className="flex items-center gap-2">
-            <BugIcon className="h-4 w-4" />
+            <MessageSquareQuote className="h-4 w-4" />
             Feedback
           </DialogTitle>
           <DialogDescription>
