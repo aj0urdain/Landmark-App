@@ -177,17 +177,17 @@ const UserCard = ({
                   <div
                     key={role}
                     className={`flex max-w-60 text-[0.85rem] w-fit items-start gap-1.5 font-normal text-muted-foreground
-                      ${role.length > 20 ? 'items-start' : 'items-center'}
+                      ${role?.length > 20 ? 'items-start' : 'items-center'}
                       `}
                   >
                     <IdCard
                       className={`w-full ${
-                        role.length > 20 ? 'min-w-4 max-w-4 pb-1' : 'min-w-4 max-w-4'
+                        role?.length > 20 ? 'min-w-4 max-w-4 pb-1' : 'min-w-4 max-w-4'
                       }`}
                     />
                     <p
                       className={cn(
-                        role.length > 20 ? 'text-sm' : '',
+                        role?.length > 20 ? 'text-sm' : '',
                         'animated-underline-1 after:bottom-[1px] w-fit',
                       )}
                     >
